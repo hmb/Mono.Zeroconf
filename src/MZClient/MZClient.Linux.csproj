@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mono.Zeroconf.Providers.AvahiDBus\Mono.Zeroconf.Providers.AvahiDBus.csproj" />
+    <ProjectReference Include="..\MZClient.Lib\MZClient.Lib.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -29,10 +29,11 @@
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
-
 using Mono.Zeroconf;
 
-public class MZClient 
+namespace MZClient.Lib;
+
+public class MZClient
 {
     private static bool resolve_shares = false; 
     private static uint @interface = 0;
@@ -41,7 +42,7 @@ public class MZClient
     private static string app_name = "mzclient";
     private static bool verbose = false;
 
-    public static int Main(string [] args)
+    public static int MainLib(string [] args)
     {
         string type = "_workstation._tcp";
         bool show_help = false;

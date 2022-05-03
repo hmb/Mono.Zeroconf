@@ -52,9 +52,12 @@ namespace NDesk.DBus
 			if (asmBdef != null)
 				return;
 
-			asmBdef = AppDomain.CurrentDomain.DefineDynamicAssembly (new AssemblyName ("Defs"), AssemblyBuilderAccess.RunAndSave);
+			//asmBdef = AppDomain.CurrentDomain.DefineDynamicAssembly (new AssemblyName ("Defs"), AssemblyBuilderAccess.RunAndSave);
+			asmBdef = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("Defs"), AssemblyBuilderAccess.Run);
+			
 			//asmBdef = System.Threading.Thread.GetDomain ().DefineDynamicAssembly (new AssemblyName ("DefAssembly"), AssemblyBuilderAccess.RunAndSave);
-			modBdef = asmBdef.DefineDynamicModule ("Defs.dll", "Defs.dll");
+			//modBdef = asmBdef.DefineDynamicModule ("Defs.dll", "Defs.dll");
+			modBdef = asmBdef.DefineDynamicModule ("Defs.dll");
 		}
 
 		static uint ifaceId = 0;
@@ -92,7 +95,7 @@ namespace NDesk.DBus
 
 		public static void Save ()
 		{
-			asmBdef.Save ("Defs.dll");
+			//asmBdef.Save ("Defs.dll");
 		}
 
 		const MethodAttributes ifaceMethAttr = MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual;

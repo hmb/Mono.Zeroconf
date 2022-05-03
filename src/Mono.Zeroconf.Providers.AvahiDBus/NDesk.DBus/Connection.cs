@@ -519,7 +519,8 @@ namespace NDesk.DBus
 
 				BusObject busObject = new BusObject (this, bus_name, path);
 				DProxy prox = new DProxy (busObject, type);
-				return prox.GetTransparentProxy ();
+				//return prox.GetTransparentProxy ();
+				return prox;
 			}
 		}
 

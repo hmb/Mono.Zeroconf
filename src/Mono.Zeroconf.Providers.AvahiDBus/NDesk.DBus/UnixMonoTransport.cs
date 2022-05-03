@@ -7,8 +7,8 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 
-using Mono.Unix;
-using Mono.Unix.Native;
+// using Mono.Unix;
+// using Mono.Unix.Native;
 
 namespace NDesk.DBus.Transports
 {
@@ -38,7 +38,8 @@ namespace NDesk.DBus.Transports
 
 		protected Socket OpenAbstractUnix (string path)
 		{
-			AbstractUnixEndPoint ep = new AbstractUnixEndPoint (path);
+			//AbstractUnixEndPoint ep = new AbstractUnixEndPoint (path);
+			var ep = new UnixDomainSocketEndPoint('\0' + path);
 
 			Socket client = new Socket (AddressFamily.Unix, SocketType.Stream, 0);
 			client.Connect (ep);
@@ -48,7 +49,8 @@ namespace NDesk.DBus.Transports
 
 		public Socket OpenUnix (string path)
 		{
-			UnixEndPoint remoteEndPoint = new UnixEndPoint (path);
+			//UnixEndPoint remoteEndPoint = new UnixEndPoint (path);
+			var remoteEndPoint = new UnixDomainSocketEndPoint(path);
 
 			Socket client = new Socket (AddressFamily.Unix, SocketType.Stream, 0);
 			client.Connect (remoteEndPoint);

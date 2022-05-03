@@ -4,17 +4,17 @@
 
 using System;
 using System.Reflection;
-using System.Runtime.Remoting.Proxies;
-using System.Runtime.Remoting.Messaging;
+// using System.Runtime.Remoting.Proxies;
+// using System.Runtime.Remoting.Messaging;
 
 namespace NDesk.DBus
 {
 	//marked internal because this is really an implementation detail and needs to be replaced
-	internal class DProxy : RealProxy
+	internal class DProxy : DispatchProxy 
 	{
 		protected BusObject busObject;
 
-		public DProxy (BusObject busObject, Type type) : base(type)
+		public DProxy (BusObject busObject, Type type) : base()
 		{
 			this.busObject = busObject;
 		}
@@ -38,28 +38,31 @@ namespace NDesk.DBus
 			return null;
 		}
 
-		public override IMessage Invoke (IMessage message)
+		protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+		//public override IMessage Invoke (IMessage message)
 		{
-			IMethodCallMessage callMessage = (IMethodCallMessage) message;
+			//IMethodCallMessage callMessage = (IMethodCallMessage) message;
 
-			object defaultRetVal = GetDefaultReturn (callMessage.MethodBase, callMessage.InArgs);
-			if (defaultRetVal != null) {
-				MethodReturnMessageWrapper defaultReturnMessage = new MethodReturnMessageWrapper ((IMethodReturnMessage) message);
-				defaultReturnMessage.ReturnValue = defaultRetVal;
-
-				return defaultReturnMessage;
-			}
+			// object defaultRetVal = GetDefaultReturn (callMessage.MethodBase, callMessage.InArgs);
+			// if (defaultRetVal != null) {
+			// 	MethodReturnMessageWrapper defaultReturnMessage = new MethodReturnMessageWrapper ((IMethodReturnMessage) message);
+			// 	defaultReturnMessage.ReturnValue = defaultRetVal;
+			//
+			// 	return defaultReturnMessage;
+			// }
 
 			object[] outArgs;
 			object retVal;
 			Exception exception;
-			busObject.Invoke (callMessage.MethodBase, callMessage.MethodName, callMessage.InArgs, out outArgs, out retVal, out exception);
+			// busObject.Invoke (callMessage.MethodBase, callMessage.MethodName, callMessage.InArgs, out outArgs, out retVal, out exception);
+			var result = targetMethod.Invoke (busObject, args);//, out outArgs, out retVal, out exception);
 
-			MethodReturnMessageWrapper returnMessage = new MethodReturnMessageWrapper ((IMethodReturnMessage) message);
-			returnMessage.Exception = exception;
-			returnMessage.ReturnValue = retVal;
+			// MethodReturnMessageWrapper returnMessage = new MethodReturnMessageWrapper ((IMethodReturnMessage) message);
+			// returnMessage.Exception = exception;
+			// returnMessage.ReturnValue = retVal;
 
-			return returnMessage;
+			// return returnMessage;
+			return result;
 		}
 
 		/*

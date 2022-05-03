@@ -4,7 +4,7 @@
 
 using System;
 using System.IO;
-using Mono.Unix;
+//using Mono.Unix;
 
 namespace NDesk.DBus.Transports
 {
@@ -27,7 +27,8 @@ namespace NDesk.DBus.Transports
 
 		public override string AuthString ()
 		{
-			long uid = UnixUserInfo.GetRealUserId ();
+			//long uid = UnixUserInfo.GetRealUserId ();
+			long uid = 0;
 
 			return uid.ToString ();
 		}

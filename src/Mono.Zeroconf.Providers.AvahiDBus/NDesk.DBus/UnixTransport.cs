@@ -4,6 +4,8 @@
 
 using System;
 using System.IO;
+using Mono.Zeroconf.Providers.AvahiDBus.NDesk.DBus;
+
 //using Mono.Unix;
 
 namespace NDesk.DBus.Transports
@@ -27,8 +29,7 @@ namespace NDesk.DBus.Transports
 
 		public override string AuthString ()
 		{
-			//long uid = UnixUserInfo.GetRealUserId ();
-			long uid = 0;
+			var uid = UnixUserInfo.GetRealUserId ();
 
 			return uid.ToString ();
 		}

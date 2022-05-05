@@ -106,7 +106,7 @@ namespace NDesk.DBus
 #endif
 	}
 
-	enum EndianFlag : byte
+	public enum EndianFlag : byte
 	{
 		Little = (byte)'l',
 		Big = (byte)'B',

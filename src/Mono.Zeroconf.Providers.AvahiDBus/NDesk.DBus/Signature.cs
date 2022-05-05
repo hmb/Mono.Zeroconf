@@ -12,7 +12,7 @@ using System.Reflection;
 namespace NDesk.DBus
 {
 	//maybe this should be nullable?
-	struct Signature
+	public struct Signature
 	{
 		//TODO: this class needs some work
 		//Data should probably include the null terminator
@@ -536,7 +536,7 @@ namespace NDesk.DBus
 		Out,
 	}
 
-	enum DType : byte
+	public enum DType : byte
 	{
 		Invalid = (byte)'\0',
 

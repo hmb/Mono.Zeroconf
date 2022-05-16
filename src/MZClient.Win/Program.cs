@@ -1,9 +1,11 @@
-﻿namespace MZClient.Win;
+﻿using System.Threading.Tasks;
+
+namespace MZClient.Win;
 
 internal static class Program
 {
-    public static int Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
-        return Lib.MZClient.MainLib(args);
+        return await Lib.MZClient.MainLib(args);
     }    
 }

@@ -29,20 +29,25 @@
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Mono.Zeroconf;
+
+// ReSharper disable InconsistentNaming
 
 namespace MZClient.Lib;
 
-public class MZClient
+public static class MZClient
 {
-    private static bool resolve_shares = false; 
-    private static uint @interface = 0;
+    private const string app_name = "mzclient";
+    private static readonly SemaphoreSlim endProgram = new(0, 1);
     private static AddressProtocol address_protocol = AddressProtocol.Any;
+    private static uint @interface;
     private static string domain = "local";
-    private static string app_name = "mzclient";
-    private static bool verbose = false;
+    private static bool resolve_shares; 
+    private static bool verbose;
 
-    public static int MainLib(string [] args)
+    public static async Task<int> MainLib(string [] args)
     {
         string type = "_workstation._tcp";
         bool show_help = false;
@@ -68,7 +73,7 @@ public class MZClient
                     break;
                 case "-i":
                 case "--interface":
-                    if (!UInt32.TryParse (args[++i], out @interface)) {
+                    if (!uint.TryParse (args[++i], out @interface)) {
                         Console.Error.WriteLine ("Invalid interface index, '{0}'", args[i]);
                         show_help = true;
                     }
@@ -132,7 +137,7 @@ public class MZClient
         
         if(services.Count > 0) {
             foreach(string service_description in services) {
-                RegisterService(service_description);
+                await RegisterService(service_description);
             }
         } else {
             if (verbose) {
@@ -145,22 +150,28 @@ public class MZClient
                 Console.WriteLine ();
             }
         
-            Console.WriteLine("Hit ^C when you're bored waiting for responses.");
+            Console.WriteLine("Hit Ctrl-C when you're bored waiting for responses.");
             Console.WriteLine();
             
             // Listen for events of some service type
             ServiceBrowser browser = new ServiceBrowser();
             browser.ServiceAdded += OnServiceAdded;
             browser.ServiceRemoved += OnServiceRemoved;
-            browser.Browse (@interface, address_protocol, type, domain);
+            await browser.Browse (@interface, address_protocol, type, domain);
         }
        
-        while(true) {
-            System.Threading.Thread.Sleep(1000);
-        }
+        Console.CancelKeyPress += ConsoleOnCancelKeyPress;
+        await endProgram.WaitAsync();
+        
+        return 0;
     }
     
-    private static void RegisterService(string serviceDescription)
+    private static void ConsoleOnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
+    {
+        endProgram.Release();
+    }
+    
+    private static async Task RegisterService(string serviceDescription)
     {
         Match match = Regex.Match(serviceDescription, @"(_[a-z]+._tcp|udp)\s*(\d+)\s*(.*)");
         if(match.Groups.Count < 4) {
@@ -171,8 +182,8 @@ public class MZClient
         short port = Convert.ToInt16(match.Groups[2].Value);
         string name = match.Groups[3].Value.Trim();
         
-        int txt_pos = name.IndexOf("TXT");
-        string txt_data = null;
+        int txt_pos = name.IndexOf("TXT", StringComparison.InvariantCulture);
+        string? txt_data = null;
         
         if(txt_pos > 0) {
             txt_data = name.Substring(txt_pos).Trim();
@@ -189,16 +200,16 @@ public class MZClient
         service.ReplyDomain = "local.";
         service.Port = port;
 
-        TxtRecord record = null;
+        TxtRecord? record = null;
         
         if(txt_data != null) {
-            Match tmatch = Regex.Match(txt_data, @"TXT\s*\[(.*)\]");
+            Match txtMatch = Regex.Match(txt_data, @"TXT\s*\[(.*)\]");
 
-            if(tmatch.Groups.Count != 2) {
+            if(txtMatch.Groups.Count != 2) {
                 throw new ApplicationException("Invalid TXT record definition syntax");
             }
             
-            txt_data = tmatch.Groups[1].Value;
+            txt_data = txtMatch.Groups[1].Value;
         
             foreach(string part in Regex.Split(txt_data, @"'\s*,")) {
                 string expr = part.Trim();
@@ -206,18 +217,15 @@ public class MZClient
                     expr += "'";
                 }
                 
-                Match pmatch = Regex.Match(expr, @"(\w+\s*\w*)\s*=\s*['](.*)[']\s*");
-                string key = pmatch.Groups[1].Value.Trim();
-                string val = pmatch.Groups[2].Value.Trim();
+                Match keyValueMatch = Regex.Match(expr, @"(\w+\s*\w*)\s*=\s*['](.*)[']\s*");
+                string key = keyValueMatch.Groups[1].Value.Trim();
+                string val = keyValueMatch.Groups[2].Value.Trim();
                 
-                if(key == null || key == String.Empty || val == null || val == String.Empty) {
+                if(string.IsNullOrEmpty(key) || string.IsNullOrEmpty(val)) {
                     throw new ApplicationException("Invalid key = 'value' syntax for TXT record item");
                 }
                 
-                if(record == null) {
-                    record = new TxtRecord();
-                }
-                
+                record ??= new TxtRecord();
                 record.Add(key, val);
             }
         }
@@ -232,20 +240,24 @@ public class MZClient
             service.ReplyDomain);
             
         service.Response += OnRegisterServiceResponse;
-        service.Register();
+        await service.Register();
     }
     
-    private static void OnServiceAdded(object o, ServiceBrowseEventArgs args)
+    private static async void OnServiceAdded(object o, ServiceBrowseEventArgs args)
     {
         Console.WriteLine("*** Found name = '{0}', type = '{1}', domain = '{2}'", 
             args.Service.Name,
             args.Service.RegType,
             args.Service.ReplyDomain);
-        
-        if(resolve_shares) {
-            args.Service.Resolved += OnServiceResolved;
-            args.Service.Resolve();
+
+        if (!resolve_shares)
+        {
+            return;
         }
+        
+        Console.WriteLine("resolving shares"); 
+        args.Service.Resolved += OnServiceResolved;
+        await args.Service.Resolve();
     }
     
     private static void OnServiceRemoved(object o, ServiceBrowseEventArgs args)
@@ -258,14 +270,18 @@ public class MZClient
     
     private static void OnServiceResolved(object o, ServiceResolvedEventArgs args)
     {
-        IResolvableService service = o as IResolvableService;
+        if (o is not IResolvableService service)
+        {
+            return;
+        }
+        
         Console.Write ("*** Resolved name = '{0}', host ip = '{1}', hostname = {2}, port = '{3}', " + 
             "interface = '{4}', address type = '{5}'", 
             service.FullName, service.HostEntry.AddressList[0], service.HostEntry.HostName, service.Port, 
             service.NetworkInterface, service.AddressProtocol);
         
         ITxtRecord record = service.TxtRecord;
-        int record_count = record != null ? record.Count : 0;
+        int record_count = record.Count;
         if(record_count > 0) {
             Console.Write(", TXT Record = [");
             for(int i = 0, n = record.Count; i < n; i++) {

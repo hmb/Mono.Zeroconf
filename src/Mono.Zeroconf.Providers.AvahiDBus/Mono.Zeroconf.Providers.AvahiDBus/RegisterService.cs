@@ -28,14 +28,16 @@
 
 using System;
 using System.Threading;
-using NDesk.DBus;
+using System.Threading.Tasks;
+using AvahiDBus.AvahiObjects;
+using Tmds.DBus;
 
 namespace Mono.Zeroconf.Providers.AvahiDBus
 {
     public class RegisterService : Service, IRegisterService
     {
         private ushort port;
-        private IAvahiEntryGroup entry_group;
+        private IEntryGroup entry_group;
         
         public event RegisterServiceEventHandler Response;
      
@@ -48,7 +50,7 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
         {
         }
         
-        public void Register ()
+        public async Task Register ()
         {
             RegisterDBus ();
 
@@ -56,43 +58,43 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
                 ? new byte[0][] 
                 : Mono.Zeroconf.Providers.AvahiDBus.TxtRecord.Render (TxtRecord);
             
-            entry_group.AddService (AvahiInterface, AvahiProtocol, PublishFlags.None, 
-                Name ?? String.Empty, RegType ?? String.Empty, ReplyDomain ?? String.Empty, 
-                String.Empty, port, txt_record);
+             await entry_group.AddServiceAsync(AvahiInterface, (int)AvahiProtocol, (uint)PublishFlags.None, 
+                 Name ?? String.Empty, RegType ?? String.Empty, ReplyDomain ?? String.Empty, 
+                 String.Empty, port, txt_record);
 
-            entry_group.Commit ();
+            await entry_group.CommitAsync();
         }
         
-        private void RegisterDBus ()
+        private async Task RegisterDBus ()
         {
             try {
                 Monitor.Enter (this);
-                DBusManager.Bus.TrapSignals ();
+                //DBusManager.Connection.TrapSignals ();
                 
                 if (entry_group != null) {
-                    entry_group.Reset ();
+                    await entry_group.ResetAsync();
                     return;
                 }
-                
-                if (DBusManager.Server.GetState () != AvahiServerState.Running) {
+
+                var state = await DBusManager.Server.GetStateAsync();
+                if (state != AvahiServerState.Running) {
                     throw new ApplicationException ("Avahi Server is not in the Running state");
                 }
 
-                ObjectPath path = DBusManager.Server.EntryGroupNew ();
-                entry_group = DBusManager.GetObject<IAvahiEntryGroup> (path);
+                entry_group = await DBusManager.Server.EntryGroupNewAsync();
                 
                 Monitor.Exit (this);
                 
-                entry_group.StateChanged += OnEntryGroupStateChanged;
+                await entry_group.WatchStateChangedAsync(OnEntryGroupStateChanged);
             } finally {
                 Monitor.Exit (this);
-                DBusManager.Bus.UntrapSignals ();
+                //DBusManager.Connection.UntrapSignals ();
             }
         }
-        
-        private void OnEntryGroupStateChanged (EntryGroupState state, string error)
+
+        private void OnEntryGroupStateChanged((int state, string error) obj)
         {
-            switch (state) {
+            switch ((EntryGroupState)obj.state) {
                 case EntryGroupState.Collision:
                     if (!OnResponse (ErrorCode.Collision)) {
                         throw new ApplicationException ();
@@ -134,8 +136,8 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
         {
             lock (this) {
                 if (entry_group != null) {
-                    entry_group.Reset ();
-                    entry_group.Free ();
+                    entry_group.ResetAsync().GetAwaiter().GetResult();
+                    entry_group.FreeAsync().GetAwaiter().GetResult();
                     entry_group = null;
                 }
             }

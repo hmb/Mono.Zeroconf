@@ -28,9 +28,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Mono.Zeroconf;
 
-using NDesk.DBus;
+using Tmds.DBus;
 
 namespace Mono.Zeroconf.Providers.AvahiDBus
 {
@@ -39,16 +40,18 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
         public event ServiceBrowseEventHandler ServiceAdded;
         public event ServiceBrowseEventHandler ServiceRemoved;
     
-        private IAvahiServiceBrowser service_browser;
+        private global::AvahiDBus.AvahiObjects.IServiceBrowser service_browser;
         private Dictionary<string, BrowseService> services = new Dictionary<string, BrowseService> ();
-        
+        private IDisposable itemNewWatcher;
+        private IDisposable itemRemoveWatcher;
+
         public void Dispose ()
         {
             lock (this) {
                 if (service_browser != null) {
-                    service_browser.ItemNew -= OnItemNew;
-                    service_browser.ItemRemove -= OnItemRemove;
-                    service_browser.Free ();
+                    itemNewWatcher.Dispose();
+                    itemRemoveWatcher.Dispose();
+                    service_browser.FreeAsync().GetAwaiter().GetResult();
                 }
                 
                 if (services.Count > 0) {
@@ -60,26 +63,24 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
             }
         }
     
-        public void Browse (uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
+        public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
         {
-            DBusManager.Bus.TrapSignals ();
+            // DBusManager.Connection.TrapSignals ();
             
             lock (this) {
                 Dispose ();
                 
-                ObjectPath object_path = DBusManager.Server.ServiceBrowserNew (
+                service_browser = DBusManager.Server.ServiceBrowserNewAsync (
                     AvahiUtils.FromMzcInterface (interfaceIndex), 
-                    AvahiUtils.FromMzcProtocol (addressProtocol), 
-                    regtype ?? String.Empty, domain ?? String.Empty, 
-                    LookupFlags.None);
-                    
-                service_browser = DBusManager.GetObject<IAvahiServiceBrowser> (object_path);
+                    (int)AvahiUtils.FromMzcProtocol (addressProtocol), 
+                    regtype ?? string.Empty, domain ?? string.Empty, 
+                    (uint)LookupFlags.None).GetAwaiter().GetResult();
             }
+
+            itemNewWatcher = await service_browser.WatchItemNewAsync(OnItemNew);
+            itemRemoveWatcher = await service_browser.WatchItemRemoveAsync(OnItemRemove);
             
-            service_browser.ItemNew += OnItemNew;
-            service_browser.ItemRemove += OnItemRemove;
-            
-            DBusManager.Bus.UntrapSignals ();
+            // DBusManager.Bus.UntrapSignals ();
         }
         
         protected virtual void OnServiceAdded (BrowseService service)
@@ -112,32 +113,30 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
             return GetEnumerator ();
         }
         
-        private void OnItemNew (int @interface, Protocol protocol, string name, string type, 
-            string domain, LookupResultFlags flags)
+        private void OnItemNew((int @interface, int protocol, string name, string type, string domain, uint flags) obj)
         {
             lock (this) {
-                BrowseService service = new BrowseService (name, type, domain, @interface, protocol);
+                var service = new BrowseService (obj.name, obj.type, obj.domain, obj.@interface, (Protocol)obj.protocol);
                 
-                if (services.ContainsKey (name)) {
-                    services[name].Dispose ();
-                    services[name] = service;
+                if (services.ContainsKey (obj.name)) {
+                    services[obj.name].Dispose ();
+                    services[obj.name] = service;
                 } else {
-                    services.Add (name, service);
+                    services.Add (obj.name, service);
                 }
                 
                 OnServiceAdded (service);
             }
         }
         
-        private void OnItemRemove (int @interface, Protocol protocol, string name, string type, 
-            string domain, LookupResultFlags flags)
+        private void OnItemRemove((int @interface, int protocol, string name, string type, string domain, uint flags) obj)
         {
             lock (this) {
-                BrowseService service = new BrowseService (name, type, domain, @interface, protocol);
+                var service = new BrowseService(obj.name, obj.type, obj.domain, obj.@interface, (Protocol)obj.protocol);
                 
-                if (services.ContainsKey (name)) {
-                    services[name].Dispose ();
-                    services.Remove (name);
+                if (services.ContainsKey (obj.name)) {
+                    services[obj.name].Dispose ();
+                    services.Remove (obj.name);
                 }
                 
                 OnServiceRemoved (service);

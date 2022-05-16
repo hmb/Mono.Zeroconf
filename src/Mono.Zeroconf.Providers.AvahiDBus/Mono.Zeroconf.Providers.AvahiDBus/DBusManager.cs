@@ -27,11 +27,10 @@
 //
 
 using System;
-using System.IO;
-using System.Reflection;
 using System.Threading;
-
-using NDesk.DBus;
+using System.Threading.Tasks;
+using AvahiDBus.AvahiObjects;
+using Tmds.DBus;
 
 namespace Mono.Zeroconf.Providers.AvahiDBus
 {
@@ -39,41 +38,39 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
     {
         private const uint MINIMUM_AVAHI_API_VERSION = 515;
         
-        private static object thread_wait = new object ();
+        private static object thread_wait = new();
         private static bool initialized;
-        private static Bus bus;
-        public static Bus Bus {
-            get { return bus; }
-        }
+        private static Connection connection;
+        private static IServer server;
+        public static Connection Connection => connection;
 
-        private static IAvahiServer server;
-        public static IAvahiServer Server {
-            get { return server; }
-        }
-                                
+        public static IServer Server => server;
+
         private static void ConnectToSystemBus ()
         {
             string address = Environment.GetEnvironmentVariable ("DBUS_SYSTEM_BUS_ADDRESS");
             if (String.IsNullOrEmpty (address)) {
                 address = "unix:path=/var/run/dbus/system_bus_socket";
             }
-            
-            bus = Bus.Open (address);
+
+            //bus = new Connection(address);
+            connection = Connection.System;
         }
         
         private static void IterateThread (object o)
         {
             lock (thread_wait) {
                 ConnectToSystemBus ();
+                // TODO use signal
                 Monitor.Pulse (thread_wait);
             }
             
             while (true) {
-                bus.Iterate ();
+                //bus.Iterate ();
             }
         }
 
-        public static void Initialize ()
+        public static async Task Initialize ()
         {
             if (initialized) {
                 return;
@@ -83,31 +80,23 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
             
             lock (thread_wait) {
                 ThreadPool.QueueUserWorkItem (IterateThread);
+                // TODO use signal
                 Monitor.Wait (thread_wait);
             }
             
-            if (!bus.NameHasOwner("org.freedesktop.Avahi")) {
+            server = connection.CreateProxy<IServer>("org.freedesktop.Avahi", ObjectPath.Root);
+            if (server == null)
+            {
                 throw new ApplicationException ("Could not find org.freedesktop.Avahi");
             }
             
-            server = GetObject<IAvahiServer> ("/");
-            uint api_version = server.GetAPIVersion ();
+            var apiVersion = await server.GetAPIVersionAsync();
             
-            if (api_version < MINIMUM_AVAHI_API_VERSION) {
+            if (apiVersion < MINIMUM_AVAHI_API_VERSION) {
                 throw new ApplicationException (String.Format ("Avahi API version " +
                     "{0} is required, but {1} is what the server returned.", 
-                    MINIMUM_AVAHI_API_VERSION, api_version));
+                    MINIMUM_AVAHI_API_VERSION, apiVersion));
             }
-        }
-        
-        public static T GetObject<T> (string objectPath)
-        {
-            return GetObject<T> (new ObjectPath (objectPath));
-        }
-
-        public static T GetObject<T> (ObjectPath objectPath)
-        {
-            return bus.GetObject<T> ("org.freedesktop.Avahi", objectPath);
         }
     }
 }

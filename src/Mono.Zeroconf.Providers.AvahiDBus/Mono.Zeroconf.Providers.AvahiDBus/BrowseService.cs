@@ -28,8 +28,9 @@
 
 using System;
 using System.Net;
-using NDesk.DBus;
-using Mono.Zeroconf;
+using System.Threading.Tasks;
+using AvahiDBus.AvahiObjects;
+using Tmds.DBus;
 
 namespace Mono.Zeroconf.Providers.AvahiDBus
 {
@@ -40,8 +41,10 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
         private string host_target;
         private short port;
         private bool disposed;
-        private IAvahiServiceResolver resolver;
-    
+        private IServiceResolver resolver;
+        private IDisposable failureWatcher;
+        private IDisposable foundWatcher;
+
         public event ServiceResolvedEventHandler Resolved;
         
         public BrowseService (string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
@@ -61,41 +64,43 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
         {
             lock (this) {
                 if (resolver != null) {
-                    resolver.Failure -= OnResolveFailure;
-                    resolver.Found -= OnResolveFound;
-                    resolver.Free ();
+                    failureWatcher.Dispose();
+                    foundWatcher.Dispose();;
+                    resolver.FreeAsync().GetAwaiter().GetResult();
                     resolver = null;
                 }
             }
         }
         
-        public void Resolve ()
+        public async Task Resolve ()
         {
             if (disposed) {
                 throw new InvalidOperationException ("The service has been disposed and cannot be resolved. " + 
                     " Perhaps this service was removed?");
             }
             
-            DBusManager.Bus.TrapSignals ();
+            //DBusManager.Connection.TrapSignals ();
             
+            Console.WriteLine("Resolve called: lock");
             lock (this) {
                 if (resolver != null) {
                     throw new InvalidOperationException ("The service is already running a resolve operation");
                 }
-                
-                ObjectPath path = DBusManager.Server.ServiceResolverNew (AvahiInterface, AvahiProtocol, 
-                    Name ?? String.Empty, RegType ?? String.Empty, ReplyDomain ?? String.Empty, 
-                    AvahiProtocol, LookupFlags.None);
-                    
-                resolver = DBusManager.GetObject<IAvahiServiceResolver> (path);
             }
+
+            Console.WriteLine($"Resolve called: assigning resolver {AvahiInterface} {(int)AvahiProtocol} {Name} {RegType} {ReplyDomain}");
+            resolver = await DBusManager.Server.ServiceResolverNewAsync(AvahiInterface, (int)AvahiProtocol, 
+                Name ?? String.Empty, RegType ?? String.Empty, ReplyDomain ?? String.Empty, 
+                (int)AvahiProtocol, (uint)LookupFlags.None);
             
-            resolver.Failure += OnResolveFailure;
-            resolver.Found += OnResolveFound;
+            Console.WriteLine("Resolve called: WatchFoundAsync/WatchFailureAsync");
+            failureWatcher = await resolver.WatchFailureAsync(OnResolveFailure);
+            foundWatcher = await resolver.WatchFoundAsync(OnResolveFound);
             
-            DBusManager.Bus.UntrapSignals ();
+            Console.WriteLine("Resolve called: awaited");
+            // DBusManager.Connection.UntrapSignals ();
         }
-        
+
         protected virtual void OnResolved ()
         {
             ServiceResolvedEventHandler handler = Resolved;
@@ -108,28 +113,30 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
         {
             DisposeResolver ();
         }
-        
-        private void OnResolveFound (int @interface, Protocol protocol, string name, 
-            string type, string domain, string host, Protocol aprotocol, string address, 
-            ushort port, byte [][] txt, LookupResultFlags flags)
+
+        private void OnResolveFound(
+            (int @interface, int protocol, string name, string type, string domain, string host, int aprotocol, string
+                address, ushort port, byte[][] txt, uint flags) obj)
         {
-            Name = name;
-            RegType = type;
-            AvahiInterface = @interface;
-            AvahiProtocol = protocol;
-            ReplyDomain = domain;
-            TxtRecord = new TxtRecord (txt);
+            Console.WriteLine("OnResolveFound");
             
-            this.full_name = String.Format ("{0}.{1}.{2}", name.Replace (" ", "\\032"), type, domain);
+            Name = obj.name;
+            RegType = obj.type;
+            AvahiInterface = obj.@interface;
+            AvahiProtocol = (Protocol)obj.protocol;
+            ReplyDomain = obj.domain;
+            TxtRecord = new TxtRecord (obj.txt);
+            
+            this.full_name = String.Format ("{0}.{1}.{2}", obj.name.Replace (" ", "\\032"), obj.type, obj.domain);
             this.port = (short)port;
-            this.host_target = host;
+            this.host_target = obj.host;
             
             host_entry = new IPHostEntry ();
             host_entry.AddressList = new IPAddress[1];
-            if (IPAddress.TryParse (address, out host_entry.AddressList[0]) && protocol == Protocol.IPv6) {
-                host_entry.AddressList[0].ScopeId = @interface;
+            if (IPAddress.TryParse (obj.address, out host_entry.AddressList[0]) && (Protocol)obj.protocol == Protocol.IPv6) {
+                host_entry.AddressList[0].ScopeId = obj.@interface;
             }
-            host_entry.HostName = host;
+            host_entry.HostName = obj.host;
             
             OnResolved ();
         }

@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Threading.Tasks;
 
 namespace Mono.Zeroconf
 {
@@ -34,7 +35,7 @@ namespace Mono.Zeroconf
     {
         event RegisterServiceEventHandler Response;
         
-        void Register();
+        Task Register();
         
         new string Name { get; set; }
         new string RegType { get; set; }

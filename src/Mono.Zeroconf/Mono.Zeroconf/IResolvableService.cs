@@ -28,6 +28,7 @@
 
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Mono.Zeroconf
 {
@@ -35,7 +36,7 @@ namespace Mono.Zeroconf
     {
         event ServiceResolvedEventHandler Resolved;
         
-        void Resolve();
+        Task Resolve();
         
         string FullName { get; }
         IPHostEntry HostEntry { get; }

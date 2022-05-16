@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Mono.Zeroconf
 {
@@ -36,6 +37,6 @@ namespace Mono.Zeroconf
         event ServiceBrowseEventHandler ServiceAdded;
         event ServiceBrowseEventHandler ServiceRemoved;
         
-        void Browse (uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain);
+        Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain);
     }
 }

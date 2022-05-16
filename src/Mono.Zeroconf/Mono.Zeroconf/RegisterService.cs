@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Threading.Tasks;
 using Mono.Zeroconf.Providers;
 
 namespace Mono.Zeroconf
@@ -41,9 +42,9 @@ namespace Mono.Zeroconf
                 ProviderFactory.SelectedProvider.RegisterService);
         }
         
-        public void Register()
+        public async Task Register()
         {
-            register_service.Register();
+            await register_service.Register();
         }
         
         public void Dispose()

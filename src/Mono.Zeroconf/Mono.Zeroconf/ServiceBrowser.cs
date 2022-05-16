@@ -28,6 +28,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Mono.Zeroconf.Providers;
 
 namespace Mono.Zeroconf
@@ -46,24 +47,24 @@ namespace Mono.Zeroconf
             browser.Dispose ();
         }
         
-        public void Browse (uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
+        public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
         {
-            browser.Browse (interfaceIndex, addressProtocol, regtype, domain ?? "local");
+            await browser.Browse (interfaceIndex, addressProtocol, regtype, domain ?? "local");
         }
         
-        public void Browse (uint interfaceIndex, string regtype, string domain)
+        public async Task Browse (uint interfaceIndex, string regtype, string domain)
         {
-            Browse (interfaceIndex, AddressProtocol.Any, regtype, domain);
+            await Browse (interfaceIndex, AddressProtocol.Any, regtype, domain);
         }
         
-        public void Browse (AddressProtocol addressProtocol, string regtype, string domain)
+        public async Task Browse (AddressProtocol addressProtocol, string regtype, string domain)
         {
-            Browse (0, addressProtocol, regtype, domain);
+            await Browse (0, addressProtocol, regtype, domain);
         }
         
-        public void Browse (string regtype, string domain)
+        public async Task Browse (string regtype, string domain)
         {
-            Browse (0, AddressProtocol.Any, regtype, domain);
+            await Browse (0, AddressProtocol.Any, regtype, domain);
         }
         
         public IEnumerator<IResolvableService> GetEnumerator ()

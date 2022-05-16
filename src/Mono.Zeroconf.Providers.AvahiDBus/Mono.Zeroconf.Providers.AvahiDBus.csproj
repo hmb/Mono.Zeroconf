@@ -7,15 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj" />
     <ProjectReference Include="..\Mono.Zeroconf\Mono.Zeroconf.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Unix" />
-  </ItemGroup>
-
-<!--  <ItemGroup>-->
-<!--    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />-->
-<!--  </ItemGroup>-->
-  
 </Project>

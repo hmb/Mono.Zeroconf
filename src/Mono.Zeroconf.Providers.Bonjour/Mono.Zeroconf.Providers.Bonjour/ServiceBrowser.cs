@@ -27,9 +27,9 @@
 //
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mono.Zeroconf.Providers.Bonjour
 {
@@ -69,10 +69,11 @@ namespace Mono.Zeroconf.Providers.Bonjour
             browse_reply_handler = new Native.DNSServiceBrowseReply(OnBrowseReply);
         }
         
-        public void Browse (uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
+        public Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
         {
             Configure(interfaceIndex, addressProtocol, regtype, domain);
             StartAsync();
+            return Task.CompletedTask;
         }
 
         public void Configure(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)

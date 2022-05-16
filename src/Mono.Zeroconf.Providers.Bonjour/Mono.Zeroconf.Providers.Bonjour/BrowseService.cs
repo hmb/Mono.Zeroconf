@@ -28,9 +28,9 @@
 
 using System;
 using System.Net;
-using System.Text;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Mono.Zeroconf.Providers.Bonjour
 {
@@ -60,9 +60,10 @@ namespace Mono.Zeroconf.Providers.Bonjour
             query_record_reply_handler = new Native.DNSServiceQueryRecordReply(OnQueryRecordReply);
         }
 
-        public void Resolve()
+        public Task Resolve()
         {
             Resolve(false);
+            return Task.CompletedTask;
         }
         
         public void Resolve(bool requery)

@@ -30,6 +30,7 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Mono.Zeroconf.Providers.Bonjour
 {
@@ -58,9 +59,10 @@ namespace Mono.Zeroconf.Providers.Bonjour
             register_reply_handler = new Native.DNSServiceRegisterReply(OnRegisterReply);
         }
         
-        public void Register()
+        public Task Register()
         {
             Register(true);
+            return Task.CompletedTask;
         }
     
         public void Register(bool @async)

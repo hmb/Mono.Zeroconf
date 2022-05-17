@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Zeroconf", "src\Mono.Z
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Zeroconf.Providers.Bonjour", "src\Mono.Zeroconf.Providers.Bonjour\Mono.Zeroconf.Providers.Bonjour.csproj", "{623325E2-5821-4701-A40C-3759097008DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Zeroconf.Providers.AvahiDBus", "src\Mono.Zeroconf.Providers.AvahiDBus\Mono.Zeroconf.Providers.AvahiDBus.csproj", "{EF6ED6D1-D201-42ED-B680-5A77641BEB77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mono.Zeroconf.Providers.Avahi", "src\Mono.Zeroconf.Providers.Avahi\Mono.Zeroconf.Providers.Avahi.csproj", "{EF6ED6D1-D201-42ED-B680-5A77641BEB77}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MZClient.Lib", "src\MZClient.Lib\MZClient.Lib.csproj", "{B6D42D18-5EE5-482F-8D74-2D6FE4DBC4EC}"
 EndProject

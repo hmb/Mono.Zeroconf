@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mono.Zeroconf.Providers.AvahiDBus\Mono.Zeroconf.Providers.AvahiDBus.csproj" />
+    <ProjectReference Include="..\Mono.Zeroconf.Providers.Avahi\Mono.Zeroconf.Providers.Avahi.csproj" />
     <ProjectReference Include="..\MZClient.Lib\MZClient.Lib.csproj" />
   </ItemGroup>
 

@@ -1,5 +1,11 @@
 # README
 
+The C# classes in this directory are generated using the Tdms.DBus code
+generator tool. The following command lines have been used to generate the
+files. Manual adjustments have been made to return dedicated types instead of
+plain dbus objects. Dbus integers that are used as enums have been replaced with
+corresponding c# enums.
+
 ## Generate C# classes
 
 ```bash

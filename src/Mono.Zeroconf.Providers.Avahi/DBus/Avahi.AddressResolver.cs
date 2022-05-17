@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tmds.DBus;
 
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
-namespace AvahiDBus.AvahiObjects
+namespace Mono.Zeroconf.Providers.Avahi.DBus
 {
     [DBusInterface("org.freedesktop.Avahi.AddressResolver")]
     interface IAddressResolver : IDBusObject

@@ -29,10 +29,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AvahiDBus.AvahiObjects;
-using Tmds.DBus;
+using Mono.Zeroconf.Providers.Avahi.DBus;
 
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {
     public class RegisterService : Service, IRegisterService
     {
@@ -56,7 +55,7 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
 
             byte [][] txt_record = TxtRecord == null 
                 ? new byte[0][] 
-                : Mono.Zeroconf.Providers.AvahiDBus.TxtRecord.Render (TxtRecord);
+                : Avahi.TxtRecord.Render (TxtRecord);
             
              await entry_group.AddServiceAsync(AvahiInterface, (int)AvahiProtocol, (uint)PublishFlags.None, 
                  Name ?? String.Empty, RegType ?? String.Empty, ReplyDomain ?? String.Empty, 

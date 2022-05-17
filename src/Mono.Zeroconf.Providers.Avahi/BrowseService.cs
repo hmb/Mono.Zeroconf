@@ -29,10 +29,9 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using AvahiDBus.AvahiObjects;
-using Tmds.DBus;
+using Mono.Zeroconf.Providers.Avahi.DBus;
 
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {
     public class BrowseService : Service, IResolvableService, IDisposable
     {

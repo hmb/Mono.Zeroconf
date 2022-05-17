@@ -1,11 +1,10 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Mono.Zeroconf.Providers.AvahiDBus;
 using Tmds.DBus;
 
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
-namespace AvahiDBus.AvahiObjects
+namespace Mono.Zeroconf.Providers.Avahi.DBus
 {
     [DBusInterface("org.freedesktop.Avahi.Server")]
     interface IServer : IDBusObject

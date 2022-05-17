@@ -26,9 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
-namespace AvahiDBus.AvahiObjects
+namespace Mono.Zeroconf.Providers.Avahi.DBus
 {
     public enum AvahiServerState 
     {

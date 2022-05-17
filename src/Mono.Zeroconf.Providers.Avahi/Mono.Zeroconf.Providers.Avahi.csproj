@@ -4,7 +4,6 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <RootNamespace>Mono.Zeroconf.Providers.AvahiDBus</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

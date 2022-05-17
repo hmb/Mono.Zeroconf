@@ -29,18 +29,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Mono.Zeroconf;
 
-using Tmds.DBus;
-
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {
     public class ServiceBrowser : IServiceBrowser
     {
         public event ServiceBrowseEventHandler ServiceAdded;
         public event ServiceBrowseEventHandler ServiceRemoved;
     
-        private global::AvahiDBus.AvahiObjects.IServiceBrowser service_browser;
+        private global::Mono.Zeroconf.Providers.Avahi.DBus.IServiceBrowser service_browser;
         private Dictionary<string, BrowseService> services = new Dictionary<string, BrowseService> ();
         private IDisposable itemNewWatcher;
         private IDisposable itemRemoveWatcher;

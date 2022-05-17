@@ -26,9 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {
     public enum ErrorCode 
     {

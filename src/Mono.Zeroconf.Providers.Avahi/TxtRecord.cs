@@ -27,13 +27,11 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
 
-using Mono.Zeroconf;
-
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {
     public class TxtRecord : ITxtRecord
     {

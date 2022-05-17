@@ -29,10 +29,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AvahiDBus.AvahiObjects;
+using Mono.Zeroconf.Providers.Avahi.DBus;
 using Tmds.DBus;
 
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {
     internal static class DBusManager
     {

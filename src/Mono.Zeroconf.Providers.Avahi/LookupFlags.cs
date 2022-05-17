@@ -28,7 +28,7 @@
 
 using System;
 
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {   
     [Flags]
     public enum LookupFlags : uint 

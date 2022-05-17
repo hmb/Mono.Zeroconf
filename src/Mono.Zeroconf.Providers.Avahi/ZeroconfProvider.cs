@@ -27,11 +27,11 @@
 //
 
 using System;
-using System.Collections;
+using Mono.Zeroconf.Providers.Avahi;
 
-[assembly:Mono.Zeroconf.Providers.ZeroconfProvider (typeof (Mono.Zeroconf.Providers.AvahiDBus.ZeroconfProvider))]
+[assembly:Mono.Zeroconf.Providers.ZeroconfProvider (typeof (ZeroconfProvider))]
 
-namespace Mono.Zeroconf.Providers.AvahiDBus
+namespace Mono.Zeroconf.Providers.Avahi
 {
     public class ZeroconfProvider : IZeroconfProvider
     {
@@ -41,15 +41,15 @@ namespace Mono.Zeroconf.Providers.AvahiDBus
         }
         
         public Type ServiceBrowser { 
-            get { return typeof (Mono.Zeroconf.Providers.AvahiDBus.ServiceBrowser); }
+            get { return typeof (ServiceBrowser); }
         }
         
         public Type RegisterService { 
-            get { return typeof (Mono.Zeroconf.Providers.AvahiDBus.RegisterService); }
+            get { return typeof (RegisterService); }
         }
         
         public Type TxtRecord {
-            get { return typeof (Mono.Zeroconf.Providers.AvahiDBus.TxtRecord); }
+            get { return typeof (TxtRecord); }
         }
     }
 }

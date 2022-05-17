@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -37,7 +38,7 @@ namespace Mono.Zeroconf.Providers.Avahi
         public event ServiceBrowseEventHandler ServiceAdded;
         public event ServiceBrowseEventHandler ServiceRemoved;
     
-        private global::Mono.Zeroconf.Providers.Avahi.DBus.IServiceBrowser service_browser;
+        private DBus.IServiceBrowser service_browser;
         private Dictionary<string, BrowseService> services = new Dictionary<string, BrowseService> ();
         private IDisposable itemNewWatcher;
         private IDisposable itemRemoveWatcher;
@@ -105,7 +106,7 @@ namespace Mono.Zeroconf.Providers.Avahi
             }
         }
         
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+        IEnumerator IEnumerable.GetEnumerator ()
         {
             return GetEnumerator ();
         }

@@ -28,7 +28,7 @@
 
 namespace Mono.Zeroconf.Providers.Avahi
 {
-    public class Service : Mono.Zeroconf.IService
+    public class Service : IService
     {
         private string name;
         private string regtype;

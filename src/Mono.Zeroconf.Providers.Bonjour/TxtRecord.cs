@@ -27,9 +27,9 @@
 //
 
 using System;
-using System.Text;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Mono.Zeroconf.Providers.Bonjour
 {

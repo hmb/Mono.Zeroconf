@@ -27,9 +27,10 @@
 //
 
 using System;
+using Mono.Zeroconf.Providers;
 using Mono.Zeroconf.Providers.Avahi;
 
-[assembly:Mono.Zeroconf.Providers.ZeroconfProvider (typeof (ZeroconfProvider))]
+[assembly:ZeroconfProvider (typeof (ZeroconfProvider))]
 
 namespace Mono.Zeroconf.Providers.Avahi
 {

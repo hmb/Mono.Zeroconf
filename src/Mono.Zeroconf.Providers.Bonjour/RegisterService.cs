@@ -28,8 +28,8 @@
 
 using System;
 using System.Net;
-using System.Threading;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mono.Zeroconf.Providers.Bonjour

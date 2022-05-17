@@ -26,10 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
 using System.Net;
-
-using Mono.Zeroconf;
 
 namespace Mono.Zeroconf.Providers.Bonjour
 {

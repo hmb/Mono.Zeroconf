@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -120,7 +121,7 @@ namespace Mono.Zeroconf.Providers.Avahi
             return records.GetEnumerator ();
         }
         
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+        IEnumerator IEnumerable.GetEnumerator ()
         {
             return GetEnumerator ();
         }

@@ -143,7 +143,7 @@ namespace Mono.Zeroconf.Providers.Bonjour
             int count = Count;
             
             foreach(TxtRecordItem item in this) {
-                ret += "\"" + item.ToString() + "\"";
+                ret += "\"" + item + "\"";
                 if(i < count - 1) {
                     ret += ", ";
                 }

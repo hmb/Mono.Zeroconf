@@ -38,16 +38,13 @@ namespace Mono.Zeroconf.Providers.Bonjour
     {
         public static void Initialize()
         {
-            ServiceRef sd_ref;
-            ServiceError error = Native.DNSServiceCreateConnection(out sd_ref);
+            var error = Native.DNSServiceCreateConnection(out var sd_ref);
             
             if(error != ServiceError.NoError) {
                 throw new ServiceErrorException(error);
             }
             
             sd_ref.Deallocate();
-            
-            return;
         }
     }
 
@@ -58,16 +55,8 @@ namespace Mono.Zeroconf.Providers.Bonjour
             Zeroconf.Initialize();
         }
         
-        public Type ServiceBrowser {
-            get { return typeof(ServiceBrowser); }
-        }
-        
-        public Type RegisterService {
-            get { return typeof(RegisterService); }
-        }
-        
-        public Type TxtRecord {
-            get { return typeof(TxtRecord); }
-        }
+        public Type ServiceBrowser => typeof(ServiceBrowser);
+        public Type RegisterService => typeof(RegisterService);
+        public Type TxtRecord => typeof(TxtRecord);
     }
 }

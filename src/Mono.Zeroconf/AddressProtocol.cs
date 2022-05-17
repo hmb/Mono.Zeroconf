@@ -2,9 +2,11 @@
 // AddressProtocol.cs
 //
 // Author:
-//   Aaron Bockover <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2008 Novell, Inc.
+// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -25,6 +27,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+
+// ReSharper disable InconsistentNaming
 
 namespace Mono.Zeroconf;
 

@@ -2,9 +2,11 @@
 // ITxtRecord.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
 // Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,23 +28,23 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+namespace Mono.Zeroconf;
+
 using System;
 using System.Collections;
-
-namespace Mono.Zeroconf;
 
 public interface ITxtRecord : IEnumerable, IDisposable
 {
     void Add(string key, string value);
-    void Add(string key, byte [] value);
+    void Add(string key, byte[] value);
     void Add(TxtRecordItem item);
-        
+
     void Remove(string key);
-        
+
     TxtRecordItem GetItemAt(int index);
-        
+
     TxtRecordItem this[string key] { get; }
     int Count { get; }
-        
+
     ITxtRecord BaseRecord { get; }
 }

@@ -2,9 +2,11 @@
 // TxtRecord.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
 // Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -34,57 +36,49 @@ namespace Mono.Zeroconf;
 
 public class TxtRecord : ITxtRecord
 {
-    private ITxtRecord record;
-        
+    public ITxtRecord BaseRecord { get; }
+
+    public int Count => this.BaseRecord.Count;
+    
     public TxtRecord()
     {
-        record = (ITxtRecord)Activator.CreateInstance(ProviderFactory.SelectedProvider.TxtRecord);
+        this.BaseRecord = (ITxtRecord)Activator.CreateInstance(ProviderFactory.SelectedProvider.TxtRecord);
     }
         
     public void Add(string key, string value)
     {
-        record.Add(key, value);
+        this.BaseRecord.Add(key, value);
     }
         
     public void Add(string key, byte [] value)
     {
-        record.Add(key, value);
+        this.BaseRecord.Add(key, value);
     }
         
     public void Add(TxtRecordItem item)
     {
-        record.Add(item);
+        this.BaseRecord.Add(item);
     }
         
     public void Remove(string key)
     {
-        record.Remove(key);
+        this.BaseRecord.Remove(key);
     }
         
     public TxtRecordItem GetItemAt(int index)
     {
-        return record.GetItemAt(index);
+        return this.BaseRecord.GetItemAt(index);
     }
         
     public IEnumerator GetEnumerator()
     {
-        return record.GetEnumerator();
+        return this.BaseRecord.GetEnumerator();
     }
-        
+
+    public TxtRecordItem this[string index] => this.BaseRecord[index];
+
     public void Dispose()
     {
-        record.Dispose();
-    }
-        
-    public TxtRecordItem this[string index] { 
-        get { return record[index]; }
-    }
-        
-    public int Count { 
-        get { return record.Count; }
-    }
-        
-    public ITxtRecord BaseRecord {
-        get { return record; }
+        this.BaseRecord.Dispose();
     }
 }

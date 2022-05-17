@@ -2,9 +2,11 @@
 // TxtRecordItem.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
 // Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,58 +28,32 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Text;
-
 namespace Mono.Zeroconf;
+
+using System.Text;
 
 public class TxtRecordItem
 {
-    private string key;
-    private byte [] value_raw;
-    private string value_string;
-        
-    private static readonly Encoding encoding = new UTF8Encoding();
-        
+    public string Key { get; }
+    public byte[] ValueRaw { get; }
+    public string ValueString { get; }
+    
     public TxtRecordItem(string key, byte [] valueRaw)
     {
-        this.key = key;
-        ValueRaw = valueRaw;
+        this.Key = key;
+        this.ValueRaw = valueRaw;
+        this.ValueString = Encoding.UTF8.GetString(this.ValueRaw);
     }
         
     public TxtRecordItem(string key, string valueString)
     {
-        this.key = key;
-        ValueString = valueString;
+        this.Key = key;
+        this.ValueString = valueString;
+        this.ValueRaw = Encoding.UTF8.GetBytes(valueString);
     }
         
     public override string ToString()
     {
-        return String.Format("{0} = {1}", Key, ValueString);
-    }
-        
-    public string Key {
-        get { return key; }
-    }
-        
-    public byte [] ValueRaw {
-        get { return value_raw; }
-        set { value_raw = value; }
-    }
-        
-    public string ValueString {
-        get { 
-            if(value_string != null) {
-                return value_string;
-            }
-                
-            value_string = encoding.GetString(value_raw);
-            return value_string;
-        }
-            
-        set {
-            value_string = value;
-            value_raw = encoding.GetBytes(value);
-        }
+        return $"{this.Key} = {this.ValueString}";
     }
 }

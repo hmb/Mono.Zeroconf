@@ -2,9 +2,11 @@
 // IServiceBrowser.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
 // Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,16 +28,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+namespace Mono.Zeroconf;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-namespace Mono.Zeroconf;
 
 public interface IServiceBrowser : IEnumerable<IResolvableService>, IDisposable
 {
     event ServiceBrowseEventHandler ServiceAdded;
     event ServiceBrowseEventHandler ServiceRemoved;
-        
+
     Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain);
 }

@@ -2,9 +2,11 @@
 // RegisterServiceEventArgs.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,39 +28,27 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
 namespace Mono.Zeroconf;
+
+using System;
 
 public class RegisterServiceEventArgs : EventArgs
 {
-    private IRegisterService service;
-    private bool is_registered;
-    private ServiceErrorCode error;
-        
     public RegisterServiceEventArgs()
     {
+        this.Service = null;
+        this.IsRegistered = false;
+        this.ServiceError = ServiceErrorCode.None;
     }
-        
+
     public RegisterServiceEventArgs(IRegisterService service, bool isRegistered, ServiceErrorCode error)
     {
-        this.service = service;
-        this.is_registered = isRegistered;
-        this.error = error;
+        this.Service = service;
+        this.IsRegistered = isRegistered;
+        this.ServiceError = error;
     }
-        
-    public IRegisterService Service {
-        get { return service; }
-        set { service = value; }
-    }
-        
-    public bool IsRegistered {
-        get { return is_registered; }
-        set { is_registered = value; }
-    }
-        
-    public ServiceErrorCode ServiceError {
-        get { return error; }
-        set { error = value; }
-    }
+
+    public IRegisterService? Service { get; set; }
+    public bool IsRegistered { get; set; }
+    public ServiceErrorCode ServiceError { get; set; }
 }

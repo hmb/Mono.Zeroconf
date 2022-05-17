@@ -75,25 +75,6 @@ internal static class ProviderFactory
         
         directories.Add(Path.GetDirectoryName(assemblyPath) ?? Directory.GetCurrentDirectory());
 
-        if (Assembly.GetExecutingAssembly().GlobalAssemblyCache)
-        {
-            var pathParts = directories[0].Split(Path.DirectorySeparatorChar);
-            var newPath = Path.DirectorySeparatorChar.ToString();
-            var root = Path.GetPathRoot(assemblyPath);
-            
-            if (root.StartsWith(pathParts[0]))
-            {
-                pathParts[0] = root;
-            }
-
-            for (var i = 0; i < pathParts.Length - 4; i++)
-            {
-                newPath = Path.Combine(newPath, pathParts[i]);
-            }
-
-            directories.Add(Path.Combine(newPath, "mono-zeroconf"));
-        }
-
         var providerList = new List<IZeroconfProvider>();
         
         foreach (var directory in directories)

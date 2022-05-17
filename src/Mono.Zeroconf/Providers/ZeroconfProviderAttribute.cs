@@ -2,9 +2,11 @@
 // ZeroconfProviderAttribute.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
 // Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -33,14 +35,10 @@ namespace Mono.Zeroconf.Providers;
 [AttributeUsage(AttributeTargets.Assembly)]
 public class ZeroconfProviderAttribute : Attribute
 {
-    private Type provider_type;
-        
     public ZeroconfProviderAttribute(Type providerType)
     {
-        this.provider_type = providerType;
+        this.ProviderType = providerType;
     }
         
-    public Type ProviderType {
-        get { return provider_type; }
-    }
+    public Type ProviderType { get; }
 }

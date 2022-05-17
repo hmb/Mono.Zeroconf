@@ -2,9 +2,11 @@
 // ProviderFactory.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
 // Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -35,87 +37,109 @@ namespace Mono.Zeroconf.Providers;
 
 internal static class ProviderFactory
 {
-    private static IZeroconfProvider [] providers;
-    private static IZeroconfProvider selected_provider;
-    
-    private static IZeroconfProvider DefaultProvider {
-        get {
-            if(providers == null) {
-                GetProviders();
-            }
-                
+    private static IZeroconfProvider[]? providers;
+    private static IZeroconfProvider? selectedProvider;
+
+    private static IZeroconfProvider DefaultProvider
+    {
+        get
+        {
+            providers ??= LoadProvidersFromFilesystem();
             return providers[0];
         }
     }
-        
-    public static IZeroconfProvider SelectedProvider {
-        get { return selected_provider == null ? DefaultProvider : selected_provider; }
-        set { selected_provider = value; }
-    }
-    
-    private static IZeroconfProvider [] GetProviders()
+
+    public static IZeroconfProvider SelectedProvider
     {
-        if(providers != null) {
-            return providers;
-        }
+        get => selectedProvider ?? DefaultProvider;
+        set => selectedProvider = value;
+    }
+
+    private static IZeroconfProvider[] LoadProvidersFromFilesystem()
+    {
+        var directories = new List<string>();
+        var envPath = Environment.GetEnvironmentVariable("MONO_ZEROCONF_PROVIDERS");
         
-        List<IZeroconfProvider> providers_list = new List<IZeroconfProvider>();
-        List<string> directories = new List<string>();
-        Assembly asm = Assembly.GetExecutingAssembly();
-            
-        string env_path = Environment.GetEnvironmentVariable("MONO_ZEROCONF_PROVIDERS");
-        if(!String.IsNullOrEmpty(env_path)) {
-            foreach(string path in env_path.Split(':')) {
-                if(Directory.Exists(path)) {
+        if (!string.IsNullOrEmpty(envPath))
+        {
+            foreach (var path in envPath.Split(':'))
+            {
+                if (Directory.Exists(path))
+                {
                     directories.Add(path);
                 }
             }
         }
+
+        var assemblyPath = Assembly.GetExecutingAssembly().Location;
+        
+        directories.Add(Path.GetDirectoryName(assemblyPath) ?? Directory.GetCurrentDirectory());
+
+        if (Assembly.GetExecutingAssembly().GlobalAssemblyCache)
+        {
+            var pathParts = directories[0].Split(Path.DirectorySeparatorChar);
+            var newPath = Path.DirectorySeparatorChar.ToString();
+            var root = Path.GetPathRoot(assemblyPath);
             
-        string this_asm_path = asm.Location;
-        directories.Add(Path.GetDirectoryName(this_asm_path));
-            
-        if(Assembly.GetExecutingAssembly().GlobalAssemblyCache) {
-            string [] path_parts = directories[0].Split(Path.DirectorySeparatorChar);
-            string new_path = Path.DirectorySeparatorChar.ToString();
-            string root = Path.GetPathRoot (this_asm_path);
-            if (root.StartsWith (path_parts[0])) {
-                path_parts[0] = root;
+            if (root.StartsWith(pathParts[0]))
+            {
+                pathParts[0] = root;
             }
 
-            for(int i = 0; i < path_parts.Length - 4; i++) {
-                new_path = Path.Combine(new_path, path_parts[i]);
+            for (var i = 0; i < pathParts.Length - 4; i++)
+            {
+                newPath = Path.Combine(newPath, pathParts[i]);
             }
-                
-            directories.Add(Path.Combine(new_path, "mono-zeroconf"));
+
+            directories.Add(Path.Combine(newPath, "mono-zeroconf"));
         }
-            
-        foreach(string directory in directories) {
-            foreach(string file in Directory.GetFiles(directory, "Mono.Zeroconf.Providers.*.dll")) {
-                if(Path.GetFileName(file) != Path.GetFileName(this_asm_path)) {
-                    Assembly provider_asm = Assembly.LoadFile(file);
-                    foreach(Attribute attr in provider_asm.GetCustomAttributes(false)) {
-                        if(attr is ZeroconfProviderAttribute) {
-                            Type type = (attr as ZeroconfProviderAttribute).ProviderType;
-                            IZeroconfProvider provider = (IZeroconfProvider)Activator.CreateInstance(type);
-                            try {
-                                provider.Initialize();
-                                providers_list.Add(provider);
-                            } catch (Exception e) {
-                                Console.WriteLine (e);
-                            }
-                        }
+
+        var providerList = new List<IZeroconfProvider>();
+        
+        foreach (var directory in directories)
+        {
+            foreach (var file in Directory.GetFiles(directory, "Mono.Zeroconf.Providers.*.dll"))
+            {
+                if (Path.GetFileName(file) == Path.GetFileName(assemblyPath))
+                {
+                    continue;
+                }
+                
+                var providerAssembly = Assembly.LoadFile(file);
+                    
+                foreach (Attribute attr in providerAssembly.GetCustomAttributes(false))
+                {
+                    if (attr is not ZeroconfProviderAttribute attribute)
+                    {
+                        continue;
+                    }
+                        
+                    var provider = (IZeroconfProvider?)Activator.CreateInstance(attribute.ProviderType);
+
+                    if (provider == null)
+                    {
+                        continue;
+                    }
+                            
+                    try
+                    {
+                        provider.Initialize();
+                        providerList.Add(provider);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
                     }
                 }
             }
         }
-            
-        if(providers_list.Count == 0) {
-            throw new Exception("No Zeroconf providers could be found or initialized. Necessary daemon may not be running.");
+
+        if (providerList.Count == 0)
+        {
+            throw new Exception(
+                "No Zeroconf providers could be found or initialized. Necessary daemon may not be running.");
         }
-            
-        providers = providers_list.ToArray();
-            
-        return providers;
+
+        return providerList.ToArray();
     }
 }

@@ -38,13 +38,13 @@ namespace Mono.Zeroconf.Providers.Avahi
         private int @interface;
         private Protocol aprotocol;
         private ITxtRecord txt_record;
-        
-        public Service ()
+
+        public Service()
         {
             this.@interface = -1; // Unspecified
         }
-        
-        public Service (string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
+
+        public Service(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
         {
             this.name = name;
             this.regtype = regtype;
@@ -52,41 +52,49 @@ namespace Mono.Zeroconf.Providers.Avahi
             this.@interface = @interface;
             this.aprotocol = aprotocol;
         }
-        
-        protected int AvahiInterface {
+
+        protected int AvahiInterface
+        {
             get { return @interface; }
             set { @interface = value; }
         }
-        
-        protected Protocol AvahiProtocol {
+
+        protected Protocol AvahiProtocol
+        {
             get { return aprotocol; }
             set { aprotocol = value; }
         }
-        
-        public string Name {
+
+        public string Name
+        {
             get { return name; }
             set { name = value; }
         }
-        
-        public string RegType {
+
+        public string RegType
+        {
             get { return regtype; }
             set { regtype = value; }
         }
-        
-        public string ReplyDomain {
+
+        public string ReplyDomain
+        {
             get { return reply_domain; }
             set { reply_domain = value; }
         }
-        
-        public uint NetworkInterface {
-            get { return AvahiUtils.ToMzcInterface (@interface); }
+
+        public uint NetworkInterface
+        {
+            get { return AvahiUtils.ToMzcInterface(@interface); }
         }
-        
-        public AddressProtocol AddressProtocol {
-            get { return AvahiUtils.ToMzcProtocol (aprotocol); }
+
+        public AddressProtocol AddressProtocol
+        {
+            get { return AvahiUtils.ToMzcProtocol(aprotocol); }
         }
-        
-        public ITxtRecord TxtRecord {
+
+        public ITxtRecord TxtRecord
+        {
             get { return txt_record; }
             set { txt_record = value; }
         }

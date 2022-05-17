@@ -31,9 +31,9 @@
 using System;
 
 namespace Mono.Zeroconf.Providers.Avahi
-{   
+{
     [Flags]
-    public enum LookupFlags : uint 
+    public enum LookupFlags : uint
     {
         None = 0,
         UseWideArea = 1,

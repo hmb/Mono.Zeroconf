@@ -30,12 +30,12 @@
 
 namespace Mono.Zeroconf.Providers.Avahi
 {
-    public enum ErrorCode 
+    public enum ErrorCode
     {
         Ok = 0,
         Failure = -1,
         BadState = -2,
-        InvalidHostName = - 3,
+        InvalidHostName = -3,
         InvalidDomainName = -4,
         NoNetwork = -5,
         InvalidTTL = -6,

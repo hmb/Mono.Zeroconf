@@ -30,7 +30,7 @@
 
 namespace Mono.Zeroconf.Providers.Avahi
 {
-    public enum Protocol : int 
+    public enum Protocol : int
     {
         Unspecified = -1,
         IPv4 = 0,

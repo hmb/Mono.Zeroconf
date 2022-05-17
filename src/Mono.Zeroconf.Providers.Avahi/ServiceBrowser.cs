@@ -39,108 +39,126 @@ namespace Mono.Zeroconf.Providers.Avahi
     {
         public event ServiceBrowseEventHandler ServiceAdded;
         public event ServiceBrowseEventHandler ServiceRemoved;
-    
+
         private DBus.IServiceBrowser service_browser;
-        private Dictionary<string, BrowseService> services = new Dictionary<string, BrowseService> ();
+        private Dictionary<string, BrowseService> services = new Dictionary<string, BrowseService>();
         private IDisposable itemNewWatcher;
         private IDisposable itemRemoveWatcher;
 
-        public void Dispose ()
+        public void Dispose()
         {
-            lock (this) {
-                if (service_browser != null) {
+            lock (this)
+            {
+                if (service_browser != null)
+                {
                     itemNewWatcher.Dispose();
                     itemRemoveWatcher.Dispose();
                     service_browser.FreeAsync().GetAwaiter().GetResult();
                 }
-                
-                if (services.Count > 0) {
-                    foreach (BrowseService service in services.Values) {
-                        service.Dispose ();
+
+                if (services.Count > 0)
+                {
+                    foreach (BrowseService service in services.Values)
+                    {
+                        service.Dispose();
                     }
-                    services.Clear ();
+
+                    services.Clear();
                 }
             }
         }
-    
+
         public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
         {
             // DBusManager.Connection.TrapSignals ();
-            
-            lock (this) {
-                Dispose ();
-                
-                service_browser = DBusManager.Server.ServiceBrowserNewAsync (
-                    AvahiUtils.FromMzcInterface (interfaceIndex), 
-                    (int)AvahiUtils.FromMzcProtocol (addressProtocol), 
-                    regtype ?? string.Empty, domain ?? string.Empty, 
+
+            lock (this)
+            {
+                Dispose();
+
+                service_browser = DBusManager.Server.ServiceBrowserNewAsync(
+                    AvahiUtils.FromMzcInterface(interfaceIndex),
+                    (int)AvahiUtils.FromMzcProtocol(addressProtocol),
+                    regtype ?? string.Empty,
+                    domain ?? string.Empty,
                     (uint)LookupFlags.None).GetAwaiter().GetResult();
             }
 
             itemNewWatcher = await service_browser.WatchItemNewAsync(OnItemNew);
             itemRemoveWatcher = await service_browser.WatchItemRemoveAsync(OnItemRemove);
-            
+
             // DBusManager.Bus.UntrapSignals ();
         }
-        
-        protected virtual void OnServiceAdded (BrowseService service)
+
+        protected virtual void OnServiceAdded(BrowseService service)
         {
             ServiceBrowseEventHandler handler = ServiceAdded;
-            if (handler != null) {
-                handler (this, new ServiceBrowseEventArgs (service));
+            if (handler != null)
+            {
+                handler(this, new ServiceBrowseEventArgs(service));
             }
         }
-        
-        protected virtual void OnServiceRemoved (BrowseService service)
+
+        protected virtual void OnServiceRemoved(BrowseService service)
         {
             ServiceBrowseEventHandler handler = ServiceRemoved;
-            if (handler != null) {
-                handler (this, new ServiceBrowseEventArgs (service));
+            if (handler != null)
+            {
+                handler(this, new ServiceBrowseEventArgs(service));
             }
         }
-        
-        public IEnumerator<IResolvableService> GetEnumerator ()
+
+        public IEnumerator<IResolvableService> GetEnumerator()
         {
-            lock (this) {
-                foreach (IResolvableService service in services.Values) {
+            lock (this)
+            {
+                foreach (IResolvableService service in services.Values)
+                {
                     yield return service;
                 }
             }
         }
-        
-        IEnumerator IEnumerable.GetEnumerator ()
+
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator ();
+            return GetEnumerator();
         }
-        
+
         private void OnItemNew((int @interface, int protocol, string name, string type, string domain, uint flags) obj)
         {
-            lock (this) {
-                var service = new BrowseService (obj.name, obj.type, obj.domain, obj.@interface, (Protocol)obj.protocol);
-                
-                if (services.ContainsKey (obj.name)) {
-                    services[obj.name].Dispose ();
+            lock (this)
+            {
+                var service = new BrowseService(obj.name, obj.type, obj.domain, obj.@interface, (Protocol)obj.protocol);
+
+                if (services.ContainsKey(obj.name))
+                {
+                    services[obj.name].Dispose();
                     services[obj.name] = service;
-                } else {
-                    services.Add (obj.name, service);
                 }
-                
-                OnServiceAdded (service);
+                else
+                {
+                    services.Add(obj.name, service);
+                }
+
+                OnServiceAdded(service);
             }
         }
-        
-        private void OnItemRemove((int @interface, int protocol, string name, string type, string domain, uint flags) obj)
+
+        private void OnItemRemove(
+            (int @interface, int protocol, string name, string type, string domain, uint flags) obj)
         {
-            lock (this) {
+            lock (this)
+            {
                 var service = new BrowseService(obj.name, obj.type, obj.domain, obj.@interface, (Protocol)obj.protocol);
-                
-                if (services.ContainsKey (obj.name)) {
-                    services[obj.name].Dispose ();
-                    services.Remove (obj.name);
+
+                if (services.ContainsKey(obj.name))
+                {
+                    services[obj.name].Dispose();
+                    services.Remove(obj.name);
                 }
-                
-                OnServiceRemoved (service);
-                service.Dispose ();
+
+                OnServiceRemoved(service);
+                service.Dispose();
             }
         }
     }

@@ -39,117 +39,140 @@ namespace Mono.Zeroconf.Providers.Avahi
     {
         private ushort port;
         private IEntryGroup entry_group;
-        
-        public event RegisterServiceEventHandler Response;
-     
-        public RegisterService ()
-        {
-        }
-     
-        public RegisterService (string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
-            : base (name, regtype, replyDomain, @interface, aprotocol)
-        {
-        }
-        
-        public async Task Register ()
-        {
-            RegisterDBus ();
 
-            byte [][] txt_record = TxtRecord == null 
-                ? new byte[0][] 
-                : Avahi.TxtRecord.Render (TxtRecord);
-            
-             await entry_group.AddServiceAsync(AvahiInterface, (int)AvahiProtocol, (uint)PublishFlags.None, 
-                 Name ?? String.Empty, RegType ?? String.Empty, ReplyDomain ?? String.Empty, 
-                 String.Empty, port, txt_record);
+        public event RegisterServiceEventHandler Response;
+
+        public RegisterService()
+        {
+        }
+
+        public RegisterService(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
+            : base(name, regtype, replyDomain, @interface, aprotocol)
+        {
+        }
+
+        public async Task Register()
+        {
+            RegisterDBus();
+
+            byte[][] txt_record = TxtRecord == null
+                ? new byte[0][]
+                : Avahi.TxtRecord.Render(TxtRecord);
+
+            await entry_group.AddServiceAsync(
+                AvahiInterface,
+                (int)AvahiProtocol,
+                (uint)PublishFlags.None,
+                Name ?? String.Empty,
+                RegType ?? String.Empty,
+                ReplyDomain ?? String.Empty,
+                String.Empty,
+                port,
+                txt_record);
 
             await entry_group.CommitAsync();
         }
-        
-        private async Task RegisterDBus ()
+
+        private async Task RegisterDBus()
         {
-            try {
-                Monitor.Enter (this);
+            try
+            {
+                Monitor.Enter(this);
                 //DBusManager.Connection.TrapSignals ();
-                
-                if (entry_group != null) {
+
+                if (entry_group != null)
+                {
                     await entry_group.ResetAsync();
                     return;
                 }
 
                 var state = await DBusManager.Server.GetStateAsync();
-                if (state != AvahiServerState.Running) {
-                    throw new ApplicationException ("Avahi Server is not in the Running state");
+                if (state != AvahiServerState.Running)
+                {
+                    throw new ApplicationException("Avahi Server is not in the Running state");
                 }
 
                 entry_group = await DBusManager.Server.EntryGroupNewAsync();
-                
-                Monitor.Exit (this);
-                
+
+                Monitor.Exit(this);
+
                 await entry_group.WatchStateChangedAsync(OnEntryGroupStateChanged);
-            } finally {
-                Monitor.Exit (this);
+            }
+            finally
+            {
+                Monitor.Exit(this);
                 //DBusManager.Connection.UntrapSignals ();
             }
         }
 
         private void OnEntryGroupStateChanged((int state, string error) obj)
         {
-            switch ((EntryGroupState)obj.state) {
+            switch ((EntryGroupState)obj.state)
+            {
                 case EntryGroupState.Collision:
-                    if (!OnResponse (ErrorCode.Collision)) {
-                        throw new ApplicationException ();
+                    if (!OnResponse(ErrorCode.Collision))
+                    {
+                        throw new ApplicationException();
                     }
+
                     break;
                 case EntryGroupState.Failure:
-                    if (!OnResponse (ErrorCode.Failure)) {
-                        throw new ApplicationException ();
+                    if (!OnResponse(ErrorCode.Failure))
+                    {
+                        throw new ApplicationException();
                     }
+
                     break;
                 case EntryGroupState.Established:
-                    OnResponse (ErrorCode.Ok);
+                    OnResponse(ErrorCode.Ok);
                     break;
             }
         }
-        
-        protected virtual bool OnResponse (ErrorCode errorCode)
+
+        protected virtual bool OnResponse(ErrorCode errorCode)
         {
-            RegisterServiceEventArgs args = new RegisterServiceEventArgs ();
-            
+            RegisterServiceEventArgs args = new RegisterServiceEventArgs();
+
             args.Service = this;
             args.IsRegistered = false;
-            args.ServiceError = AvahiUtils.ErrorCodeToServiceError (errorCode);
-            
-            if (errorCode == ErrorCode.Ok) {
+            args.ServiceError = AvahiUtils.ErrorCodeToServiceError(errorCode);
+
+            if (errorCode == ErrorCode.Ok)
+            {
                 args.IsRegistered = true;
             }
-            
+
             RegisterServiceEventHandler handler = Response;
-            if (handler != null) {
-                handler (this, args);
+            if (handler != null)
+            {
+                handler(this, args);
                 return true;
             }
-            
+
             return false;
         }
-        
-        public void Dispose ()
+
+        public void Dispose()
         {
-            lock (this) {
-                if (entry_group != null) {
+            lock (this)
+            {
+                if (entry_group != null)
+                {
                     entry_group.ResetAsync().GetAwaiter().GetResult();
                     entry_group.FreeAsync().GetAwaiter().GetResult();
                     entry_group = null;
                 }
             }
         }
-        
-        public short Port {
+
+        public short Port
+        {
             get { return (short)UPort; }
             set { UPort = (ushort)value; }
         }
 
-        public ushort UPort {
+        public ushort UPort
+        {
             get { return port; }
             set { port = value; }
         }

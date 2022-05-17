@@ -33,7 +33,7 @@ using System;
 namespace Mono.Zeroconf.Providers.Avahi
 {
     [Flags]
-    public enum LookupResultFlags : uint 
+    public enum LookupResultFlags : uint
     {
         None = 0,
         Cached = 1,

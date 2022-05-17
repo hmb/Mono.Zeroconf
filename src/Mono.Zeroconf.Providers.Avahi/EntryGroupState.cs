@@ -30,7 +30,7 @@
 
 namespace Mono.Zeroconf.Providers.Avahi
 {
-    public enum EntryGroupState 
+    public enum EntryGroupState
     {
         Uncommited,
         Registering,

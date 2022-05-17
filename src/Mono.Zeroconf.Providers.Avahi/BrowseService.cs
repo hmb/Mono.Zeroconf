@@ -47,72 +47,87 @@ namespace Mono.Zeroconf.Providers.Avahi
         private IDisposable foundWatcher;
 
         public event ServiceResolvedEventHandler Resolved;
-        
-        public BrowseService (string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
-            : base (name, regtype, replyDomain, @interface, aprotocol)
+
+        public BrowseService(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
+            : base(name, regtype, replyDomain, @interface, aprotocol)
         {
         }
-        
-        public void Dispose ()
+
+        public void Dispose()
         {
-            lock (this) {
+            lock (this)
+            {
                 disposed = true;
-                DisposeResolver ();
+                DisposeResolver();
             }
         }
-        
-        private void DisposeResolver ()
+
+        private void DisposeResolver()
         {
-            lock (this) {
-                if (resolver != null) {
+            lock (this)
+            {
+                if (resolver != null)
+                {
                     failureWatcher.Dispose();
-                    foundWatcher.Dispose();;
+                    foundWatcher.Dispose();
+                    ;
                     resolver.FreeAsync().GetAwaiter().GetResult();
                     resolver = null;
                 }
             }
         }
-        
-        public async Task Resolve ()
+
+        public async Task Resolve()
         {
-            if (disposed) {
-                throw new InvalidOperationException ("The service has been disposed and cannot be resolved. " + 
+            if (disposed)
+            {
+                throw new InvalidOperationException(
+                    "The service has been disposed and cannot be resolved. " +
                     " Perhaps this service was removed?");
             }
-            
+
             //DBusManager.Connection.TrapSignals ();
-            
+
             Console.WriteLine("Resolve called: lock");
-            lock (this) {
-                if (resolver != null) {
-                    throw new InvalidOperationException ("The service is already running a resolve operation");
+            lock (this)
+            {
+                if (resolver != null)
+                {
+                    throw new InvalidOperationException("The service is already running a resolve operation");
                 }
             }
 
-            Console.WriteLine($"Resolve called: assigning resolver {AvahiInterface} {(int)AvahiProtocol} {Name} {RegType} {ReplyDomain}");
-            resolver = await DBusManager.Server.ServiceResolverNewAsync(AvahiInterface, (int)AvahiProtocol, 
-                Name ?? String.Empty, RegType ?? String.Empty, ReplyDomain ?? String.Empty, 
-                (int)AvahiProtocol, (uint)LookupFlags.None);
-            
+            Console.WriteLine(
+                $"Resolve called: assigning resolver {AvahiInterface} {(int)AvahiProtocol} {Name} {RegType} {ReplyDomain}");
+            resolver = await DBusManager.Server.ServiceResolverNewAsync(
+                AvahiInterface,
+                (int)AvahiProtocol,
+                Name ?? String.Empty,
+                RegType ?? String.Empty,
+                ReplyDomain ?? String.Empty,
+                (int)AvahiProtocol,
+                (uint)LookupFlags.None);
+
             Console.WriteLine("Resolve called: WatchFoundAsync/WatchFailureAsync");
             failureWatcher = await resolver.WatchFailureAsync(OnResolveFailure);
             foundWatcher = await resolver.WatchFoundAsync(OnResolveFound);
-            
+
             Console.WriteLine("Resolve called: awaited");
             // DBusManager.Connection.UntrapSignals ();
         }
 
-        protected virtual void OnResolved ()
+        protected virtual void OnResolved()
         {
             ServiceResolvedEventHandler handler = Resolved;
-            if (handler != null) {
-                handler (this, new ServiceResolvedEventArgs (this));
+            if (handler != null)
+            {
+                handler(this, new ServiceResolvedEventArgs(this));
             }
         }
-        
-        private void OnResolveFailure (string error)
+
+        private void OnResolveFailure(string error)
         {
-            DisposeResolver ();
+            DisposeResolver();
         }
 
         private void OnResolveFound(
@@ -120,41 +135,48 @@ namespace Mono.Zeroconf.Providers.Avahi
                 address, ushort port, byte[][] txt, uint flags) obj)
         {
             Console.WriteLine("OnResolveFound");
-            
+
             Name = obj.name;
             RegType = obj.type;
             AvahiInterface = obj.@interface;
             AvahiProtocol = (Protocol)obj.protocol;
             ReplyDomain = obj.domain;
-            TxtRecord = new TxtRecord (obj.txt);
-            
-            this.full_name = String.Format ("{0}.{1}.{2}", obj.name.Replace (" ", "\\032"), obj.type, obj.domain);
+            TxtRecord = new TxtRecord(obj.txt);
+
+            this.full_name = String.Format("{0}.{1}.{2}", obj.name.Replace(" ", "\\032"), obj.type, obj.domain);
             this.port = (short)port;
             this.host_target = obj.host;
-            
-            host_entry = new IPHostEntry ();
+
+            host_entry = new IPHostEntry();
             host_entry.AddressList = new IPAddress[1];
-            if (IPAddress.TryParse (obj.address, out host_entry.AddressList[0]) && (Protocol)obj.protocol == Protocol.IPv6) {
+            if (IPAddress.TryParse(obj.address, out host_entry.AddressList[0]) &&
+                (Protocol)obj.protocol == Protocol.IPv6)
+            {
                 host_entry.AddressList[0].ScopeId = obj.@interface;
             }
+
             host_entry.HostName = obj.host;
-            
-            OnResolved ();
+
+            OnResolved();
         }
-        
-        public string FullName { 
+
+        public string FullName
+        {
             get { return full_name; }
         }
-        
-        public IPHostEntry HostEntry { 
-            get { return host_entry; } 
+
+        public IPHostEntry HostEntry
+        {
+            get { return host_entry; }
         }
-        
-        public string HostTarget { 
-            get { return host_target; } 
+
+        public string HostTarget
+        {
+            get { return host_target; }
         }
-        
-        public short Port { 
+
+        public short Port
+        {
             get { return port; }
         }
     }

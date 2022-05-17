@@ -39,7 +39,7 @@ namespace Mono.Zeroconf.Providers.Avahi
     internal static class DBusManager
     {
         private const uint MINIMUM_AVAHI_API_VERSION = 515;
-        
+
         private static object thread_wait = new();
         private static bool initialized;
         private static Connection connection;
@@ -48,56 +48,65 @@ namespace Mono.Zeroconf.Providers.Avahi
 
         public static IServer Server => server;
 
-        private static void ConnectToSystemBus ()
+        private static void ConnectToSystemBus()
         {
-            string address = Environment.GetEnvironmentVariable ("DBUS_SYSTEM_BUS_ADDRESS");
-            if (String.IsNullOrEmpty (address)) {
+            string address = Environment.GetEnvironmentVariable("DBUS_SYSTEM_BUS_ADDRESS");
+            if (String.IsNullOrEmpty(address))
+            {
                 address = "unix:path=/var/run/dbus/system_bus_socket";
             }
 
             //bus = new Connection(address);
             connection = Connection.System;
         }
-        
-        private static void IterateThread (object o)
+
+        private static void IterateThread(object o)
         {
-            lock (thread_wait) {
-                ConnectToSystemBus ();
+            lock (thread_wait)
+            {
+                ConnectToSystemBus();
                 // TODO use signal
-                Monitor.Pulse (thread_wait);
+                Monitor.Pulse(thread_wait);
             }
-            
-            while (true) {
+
+            while (true)
+            {
                 //bus.Iterate ();
             }
         }
 
-        public static async Task Initialize ()
+        public static async Task Initialize()
         {
-            if (initialized) {
+            if (initialized)
+            {
                 return;
             }
-            
+
             initialized = true;
-            
-            lock (thread_wait) {
-                ThreadPool.QueueUserWorkItem (IterateThread);
+
+            lock (thread_wait)
+            {
+                ThreadPool.QueueUserWorkItem(IterateThread);
                 // TODO use signal
-                Monitor.Wait (thread_wait);
+                Monitor.Wait(thread_wait);
             }
-            
+
             server = connection.CreateProxy<IServer>("org.freedesktop.Avahi", ObjectPath.Root);
             if (server == null)
             {
-                throw new ApplicationException ("Could not find org.freedesktop.Avahi");
+                throw new ApplicationException("Could not find org.freedesktop.Avahi");
             }
-            
+
             var apiVersion = await server.GetAPIVersionAsync();
-            
-            if (apiVersion < MINIMUM_AVAHI_API_VERSION) {
-                throw new ApplicationException (String.Format ("Avahi API version " +
-                    "{0} is required, but {1} is what the server returned.", 
-                    MINIMUM_AVAHI_API_VERSION, apiVersion));
+
+            if (apiVersion < MINIMUM_AVAHI_API_VERSION)
+            {
+                throw new ApplicationException(
+                    String.Format(
+                        "Avahi API version " +
+                        "{0} is required, but {1} is what the server returned.",
+                        MINIMUM_AVAHI_API_VERSION,
+                        apiVersion));
             }
         }
     }

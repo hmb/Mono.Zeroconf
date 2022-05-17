@@ -32,27 +32,29 @@ using System;
 using Mono.Zeroconf.Providers;
 using Mono.Zeroconf.Providers.Avahi;
 
-[assembly:ZeroconfProvider (typeof (ZeroconfProvider))]
+[assembly: ZeroconfProvider(typeof(ZeroconfProvider))]
 
-namespace Mono.Zeroconf.Providers.Avahi
+namespace Mono.Zeroconf.Providers.Avahi;
+
+public class ZeroconfProvider : IZeroconfProvider
 {
-    public class ZeroconfProvider : IZeroconfProvider
+    public void Initialize()
     {
-        public void Initialize ()
-        {
-            DBusManager.Initialize ();
-        }
-        
-        public Type ServiceBrowser { 
-            get { return typeof (ServiceBrowser); }
-        }
-        
-        public Type RegisterService { 
-            get { return typeof (RegisterService); }
-        }
-        
-        public Type TxtRecord {
-            get { return typeof (TxtRecord); }
-        }
+        DBusManager.Initialize();
+    }
+
+    public Type ServiceBrowser
+    {
+        get { return typeof(ServiceBrowser); }
+    }
+
+    public Type RegisterService
+    {
+        get { return typeof(RegisterService); }
+    }
+
+    public Type TxtRecord
+    {
+        get { return typeof(TxtRecord); }
     }
 }

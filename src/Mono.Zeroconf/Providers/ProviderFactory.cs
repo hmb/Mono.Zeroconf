@@ -28,12 +28,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+namespace Mono.Zeroconf.Providers;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-
-namespace Mono.Zeroconf.Providers;
 
 internal static class ProviderFactory
 {
@@ -57,18 +58,12 @@ internal static class ProviderFactory
 
     private static IZeroconfProvider[] LoadProvidersFromFilesystem()
     {
-        var directories = new List<string>();
         var envPath = Environment.GetEnvironmentVariable("MONO_ZEROCONF_PROVIDERS");
+        var directories = new List<string>();
         
         if (!string.IsNullOrEmpty(envPath))
         {
-            foreach (var path in envPath.Split(':'))
-            {
-                if (Directory.Exists(path))
-                {
-                    directories.Add(path);
-                }
-            }
+            directories.AddRange(envPath.Split(':').Where(Directory.Exists));
         }
 
         var assemblyPath = Assembly.GetExecutingAssembly().Location;

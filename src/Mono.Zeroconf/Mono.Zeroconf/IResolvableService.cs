@@ -26,23 +26,21 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public interface IResolvableService : IService
 {
-    public interface IResolvableService : IService
-    {
-        event ServiceResolvedEventHandler Resolved;
+    event ServiceResolvedEventHandler Resolved;
         
-        Task Resolve();
+    Task Resolve();
         
-        string FullName { get; }
-        IPHostEntry HostEntry { get; }
-        string HostTarget { get; }
-        uint NetworkInterface { get; }
-        AddressProtocol AddressProtocol { get; }
-        short Port { get; }
-    }
+    string FullName { get; }
+    IPHostEntry HostEntry { get; }
+    string HostTarget { get; }
+    uint NetworkInterface { get; }
+    AddressProtocol AddressProtocol { get; }
+    short Port { get; }
 }

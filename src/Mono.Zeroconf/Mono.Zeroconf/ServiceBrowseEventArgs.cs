@@ -28,19 +28,18 @@
 
 using System;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public class ServiceBrowseEventArgs : EventArgs
 {
-    public class ServiceBrowseEventArgs : EventArgs
+    private IResolvableService service;
+        
+    public ServiceBrowseEventArgs(IResolvableService service)
     {
-        private IResolvableService service;
+        this.service = service;
+    }
         
-        public ServiceBrowseEventArgs(IResolvableService service)
-        {
-            this.service = service;
-        }
-        
-        public IResolvableService Service {
-            get { return service; }
-        }
+    public IResolvableService Service {
+        get { return service; }
     }
 }

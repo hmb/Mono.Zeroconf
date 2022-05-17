@@ -30,13 +30,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public interface IServiceBrowser : IEnumerable<IResolvableService>, IDisposable
 {
-    public interface IServiceBrowser : IEnumerable<IResolvableService>, IDisposable
-    {
-        event ServiceBrowseEventHandler ServiceAdded;
-        event ServiceBrowseEventHandler ServiceRemoved;
+    event ServiceBrowseEventHandler ServiceAdded;
+    event ServiceBrowseEventHandler ServiceRemoved;
         
-        Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain);
-    }
+    Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain);
 }

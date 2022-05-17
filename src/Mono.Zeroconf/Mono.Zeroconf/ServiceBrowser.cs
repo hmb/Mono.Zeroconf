@@ -27,64 +27,64 @@
 //
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mono.Zeroconf.Providers;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public class ServiceBrowser : IServiceBrowser
 {
-    public class ServiceBrowser : IServiceBrowser
+    private IServiceBrowser browser;
+        
+    public ServiceBrowser ()
     {
-        private IServiceBrowser browser;
+        browser = (IServiceBrowser)Activator.CreateInstance (ProviderFactory.SelectedProvider.ServiceBrowser);
+    }
         
-        public ServiceBrowser ()
-        {
-            browser = (IServiceBrowser)Activator.CreateInstance (ProviderFactory.SelectedProvider.ServiceBrowser);
-        }
+    public void Dispose ()
+    {
+        browser.Dispose ();
+    }
         
-        public void Dispose ()
-        {
-            browser.Dispose ();
-        }
+    public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
+    {
+        await browser.Browse (interfaceIndex, addressProtocol, regtype, domain ?? "local");
+    }
         
-        public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
-        {
-            await browser.Browse (interfaceIndex, addressProtocol, regtype, domain ?? "local");
-        }
+    public async Task Browse (uint interfaceIndex, string regtype, string domain)
+    {
+        await Browse (interfaceIndex, AddressProtocol.Any, regtype, domain);
+    }
         
-        public async Task Browse (uint interfaceIndex, string regtype, string domain)
-        {
-            await Browse (interfaceIndex, AddressProtocol.Any, regtype, domain);
-        }
+    public async Task Browse (AddressProtocol addressProtocol, string regtype, string domain)
+    {
+        await Browse (0, addressProtocol, regtype, domain);
+    }
         
-        public async Task Browse (AddressProtocol addressProtocol, string regtype, string domain)
-        {
-            await Browse (0, addressProtocol, regtype, domain);
-        }
+    public async Task Browse (string regtype, string domain)
+    {
+        await Browse (0, AddressProtocol.Any, regtype, domain);
+    }
         
-        public async Task Browse (string regtype, string domain)
-        {
-            await Browse (0, AddressProtocol.Any, regtype, domain);
-        }
+    public IEnumerator<IResolvableService> GetEnumerator ()
+    {
+        return browser.GetEnumerator ();
+    }
         
-        public IEnumerator<IResolvableService> GetEnumerator ()
-        {
-            return browser.GetEnumerator ();
-        }
+    IEnumerator IEnumerable.GetEnumerator ()
+    {
+        return browser.GetEnumerator ();
+    }
         
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
-        {
-            return browser.GetEnumerator ();
-        }
+    public event ServiceBrowseEventHandler ServiceAdded {
+        add { browser.ServiceAdded += value; }
+        remove { browser.ServiceRemoved -= value; }
+    }
         
-        public event ServiceBrowseEventHandler ServiceAdded {
-            add { browser.ServiceAdded += value; }
-            remove { browser.ServiceRemoved -= value; }
-        }
-        
-        public event ServiceBrowseEventHandler ServiceRemoved {
-            add { browser.ServiceRemoved += value; }
-            remove { browser.ServiceRemoved -= value; }
-        }
+    public event ServiceBrowseEventHandler ServiceRemoved {
+        add { browser.ServiceRemoved += value; }
+        remove { browser.ServiceRemoved -= value; }
     }
 }

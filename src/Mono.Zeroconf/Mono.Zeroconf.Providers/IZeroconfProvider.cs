@@ -28,13 +28,12 @@
 
 using System;
 
-namespace Mono.Zeroconf.Providers
+namespace Mono.Zeroconf.Providers;
+
+public interface IZeroconfProvider
 {
-    public interface IZeroconfProvider
-    {
-        void Initialize();
-        Type ServiceBrowser { get; }
-        Type RegisterService { get; }
-        Type TxtRecord { get; }
-    }
+    void Initialize();
+    Type ServiceBrowser { get; }
+    Type RegisterService { get; }
+    Type TxtRecord { get; }
 }

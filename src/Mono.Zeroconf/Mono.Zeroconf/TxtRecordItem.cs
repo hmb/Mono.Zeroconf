@@ -29,56 +29,55 @@
 using System;
 using System.Text;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public class TxtRecordItem
 {
-    public class TxtRecordItem
+    private string key;
+    private byte [] value_raw;
+    private string value_string;
+        
+    private static readonly Encoding encoding = new UTF8Encoding();
+        
+    public TxtRecordItem(string key, byte [] valueRaw)
     {
-        private string key;
-        private byte [] value_raw;
-        private string value_string;
+        this.key = key;
+        ValueRaw = valueRaw;
+    }
         
-        private static readonly Encoding encoding = new UTF8Encoding();
+    public TxtRecordItem(string key, string valueString)
+    {
+        this.key = key;
+        ValueString = valueString;
+    }
         
-        public TxtRecordItem(string key, byte [] valueRaw)
-        {
-            this.key = key;
-            ValueRaw = valueRaw;
-        }
+    public override string ToString()
+    {
+        return String.Format("{0} = {1}", Key, ValueString);
+    }
         
-        public TxtRecordItem(string key, string valueString)
-        {
-            this.key = key;
-            ValueString = valueString;
-        }
+    public string Key {
+        get { return key; }
+    }
         
-        public override string ToString()
-        {
-            return String.Format("{0} = {1}", Key, ValueString);
-        }
+    public byte [] ValueRaw {
+        get { return value_raw; }
+        set { value_raw = value; }
+    }
         
-        public string Key {
-            get { return key; }
-        }
-        
-        public byte [] ValueRaw {
-            get { return value_raw; }
-            set { value_raw = value; }
-        }
-        
-        public string ValueString {
-            get { 
-                if(value_string != null) {
-                    return value_string;
-                }
-                
-                value_string = encoding.GetString(value_raw);
+    public string ValueString {
+        get { 
+            if(value_string != null) {
                 return value_string;
             }
+                
+            value_string = encoding.GetString(value_raw);
+            return value_string;
+        }
             
-            set {
-                value_string = value;
-                value_raw = encoding.GetBytes(value);
-            }
+        set {
+            value_string = value;
+            value_raw = encoding.GetBytes(value);
         }
     }
 }

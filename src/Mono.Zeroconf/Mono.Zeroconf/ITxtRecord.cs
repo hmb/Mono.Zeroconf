@@ -29,21 +29,20 @@
 using System;
 using System.Collections;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public interface ITxtRecord : IEnumerable, IDisposable
 {
-    public interface ITxtRecord : IEnumerable, IDisposable
-    {
-        void Add(string key, string value);
-        void Add(string key, byte [] value);
-        void Add(TxtRecordItem item);
+    void Add(string key, string value);
+    void Add(string key, byte [] value);
+    void Add(TxtRecordItem item);
         
-        void Remove(string key);
+    void Remove(string key);
         
-        TxtRecordItem GetItemAt(int index);
+    TxtRecordItem GetItemAt(int index);
         
-        TxtRecordItem this[string key] { get; }
-        int Count { get; }
+    TxtRecordItem this[string key] { get; }
+    int Count { get; }
         
-        ITxtRecord BaseRecord { get; }
-    }
+    ITxtRecord BaseRecord { get; }
 }

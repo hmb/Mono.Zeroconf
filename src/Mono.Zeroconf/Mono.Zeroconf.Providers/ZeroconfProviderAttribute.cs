@@ -28,20 +28,19 @@
 
 using System;
 
-namespace Mono.Zeroconf.Providers
+namespace Mono.Zeroconf.Providers;
+
+[AttributeUsage(AttributeTargets.Assembly)]
+public class ZeroconfProviderAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Assembly)]
-    public class ZeroconfProviderAttribute : Attribute
+    private Type provider_type;
+        
+    public ZeroconfProviderAttribute(Type providerType)
     {
-        private Type provider_type;
+        this.provider_type = providerType;
+    }
         
-        public ZeroconfProviderAttribute(Type providerType)
-        {
-            this.provider_type = providerType;
-        }
-        
-        public Type ProviderType {
-            get { return provider_type; }
-        }
+    public Type ProviderType {
+        get { return provider_type; }
     }
 }

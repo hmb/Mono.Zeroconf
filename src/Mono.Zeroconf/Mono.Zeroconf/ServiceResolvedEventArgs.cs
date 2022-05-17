@@ -28,19 +28,18 @@
 
 using System;
 
-namespace Mono.Zeroconf
-{    
-    public class ServiceResolvedEventArgs : EventArgs
+namespace Mono.Zeroconf;
+
+public class ServiceResolvedEventArgs : EventArgs
+{
+    private IResolvableService service;
+        
+    public ServiceResolvedEventArgs(IResolvableService service)
     {
-        private IResolvableService service;
+        this.service = service;
+    }
         
-        public ServiceResolvedEventArgs(IResolvableService service)
-        {
-            this.service = service;
-        }
-        
-        public IResolvableService Service {
-            get { return service; }
-        }
+    public IResolvableService Service {
+        get { return service; }
     }
 }

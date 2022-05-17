@@ -29,19 +29,18 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public interface IRegisterService : IService, IDisposable
 {
-    public interface IRegisterService : IService, IDisposable
-    {
-        event RegisterServiceEventHandler Response;
+    event RegisterServiceEventHandler Response;
         
-        Task Register();
+    Task Register();
         
-        new string Name { get; set; }
-        new string RegType { get; set; }
-        new string ReplyDomain { get; set; }
+    new string Name { get; set; }
+    new string RegType { get; set; }
+    new string ReplyDomain { get; set; }
         
-        short Port { get; set; }
-        ushort UPort { get; set; }
-    }
+    short Port { get; set; }
+    ushort UPort { get; set; }
 }

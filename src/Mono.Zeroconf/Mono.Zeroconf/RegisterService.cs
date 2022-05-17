@@ -30,61 +30,60 @@ using System;
 using System.Threading.Tasks;
 using Mono.Zeroconf.Providers;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public class RegisterService : IRegisterService
 {
-    public class RegisterService : IRegisterService
+    private readonly IRegisterService register_service;
+        
+    public RegisterService()
     {
-        private IRegisterService register_service;
+        register_service = (IRegisterService)Activator.CreateInstance(
+            ProviderFactory.SelectedProvider.RegisterService);
+    }
         
-        public RegisterService()
-        {
-            register_service = (IRegisterService)Activator.CreateInstance(
-                ProviderFactory.SelectedProvider.RegisterService);
-        }
+    public async Task Register()
+    {
+        await register_service.Register();
+    }
         
-        public async Task Register()
-        {
-            await register_service.Register();
-        }
+    public void Dispose()
+    {
+        register_service.Dispose();
+    }
         
-        public void Dispose()
-        {
-            register_service.Dispose();
-        }
+    public event RegisterServiceEventHandler Response {
+        add => register_service.Response += value;
+        remove => register_service.Response -= value;
+    }
         
-        public event RegisterServiceEventHandler Response {
-            add { register_service.Response += value; }
-            remove { register_service.Response -= value; }
-        }
+    public string Name {
+        get => register_service.Name;
+        set => register_service.Name = value;
+    }
         
-        public string Name {
-            get { return register_service.Name; }
-            set { register_service.Name = value; }
-        }
+    public string RegType {
+        get => register_service.RegType;
+        set => register_service.RegType = value;
+    }
         
-        public string RegType {
-            get { return register_service.RegType; }
-            set { register_service.RegType = value; }
-        }
+    public string ReplyDomain {
+        get => register_service.ReplyDomain;
+        set => register_service.ReplyDomain = value;
+    }
         
-        public string ReplyDomain {
-            get { return register_service.ReplyDomain; }
-            set { register_service.ReplyDomain = value; }
-        }
+    public ITxtRecord TxtRecord { 
+        get => register_service.TxtRecord;
+        set => register_service.TxtRecord = value;
+    }
         
-        public ITxtRecord TxtRecord { 
-            get { return register_service.TxtRecord; }
-            set { register_service.TxtRecord = value; }
-        }
+    public short Port {
+        get => register_service.Port;
+        set => register_service.Port = value;
+    }
         
-        public short Port {
-            get { return register_service.Port; }
-            set { register_service.Port = value; }
-        }
-        
-        public ushort UPort {
-            get { return register_service.UPort; }
-            set { register_service.UPort = value; }
-        }
+    public ushort UPort {
+        get => register_service.UPort;
+        set => register_service.UPort = value;
     }
 }

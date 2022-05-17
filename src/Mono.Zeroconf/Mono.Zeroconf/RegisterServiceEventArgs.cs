@@ -28,38 +28,37 @@
 
 using System;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public class RegisterServiceEventArgs : EventArgs
 {
-    public class RegisterServiceEventArgs : EventArgs
+    private IRegisterService service;
+    private bool is_registered;
+    private ServiceErrorCode error;
+        
+    public RegisterServiceEventArgs()
     {
-        private IRegisterService service;
-        private bool is_registered;
-        private ServiceErrorCode error;
+    }
         
-        public RegisterServiceEventArgs()
-        {
-        }
+    public RegisterServiceEventArgs(IRegisterService service, bool isRegistered, ServiceErrorCode error)
+    {
+        this.service = service;
+        this.is_registered = isRegistered;
+        this.error = error;
+    }
         
-        public RegisterServiceEventArgs(IRegisterService service, bool isRegistered, ServiceErrorCode error)
-        {
-            this.service = service;
-            this.is_registered = isRegistered;
-            this.error = error;
-        }
+    public IRegisterService Service {
+        get { return service; }
+        set { service = value; }
+    }
         
-        public IRegisterService Service {
-            get { return service; }
-            set { service = value; }
-        }
+    public bool IsRegistered {
+        get { return is_registered; }
+        set { is_registered = value; }
+    }
         
-        public bool IsRegistered {
-            get { return is_registered; }
-            set { is_registered = value; }
-        }
-        
-        public ServiceErrorCode ServiceError {
-            get { return error; }
-            set { error = value; }
-        }
+    public ServiceErrorCode ServiceError {
+        get { return error; }
+        set { error = value; }
     }
 }

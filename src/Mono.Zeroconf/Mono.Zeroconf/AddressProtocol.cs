@@ -26,14 +26,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
+namespace Mono.Zeroconf;
 
-namespace Mono.Zeroconf
+public enum AddressProtocol
 {
-    public enum AddressProtocol
-    {
-        Any,
-        IPv4,
-        IPv6
-    }
+    Any,
+    IPv4,
+    IPv6
 }

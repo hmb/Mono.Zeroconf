@@ -26,7 +26,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf
-{
-    public delegate void ServiceBrowseEventHandler(object o, ServiceBrowseEventArgs args);
-}
+namespace Mono.Zeroconf;
+
+public delegate void ServiceBrowseEventHandler(object o, ServiceBrowseEventArgs args);

@@ -30,62 +30,61 @@ using System;
 using System.Collections;
 using Mono.Zeroconf.Providers;
 
-namespace Mono.Zeroconf
+namespace Mono.Zeroconf;
+
+public class TxtRecord : ITxtRecord
 {
-    public class TxtRecord : ITxtRecord
+    private ITxtRecord record;
+        
+    public TxtRecord()
     {
-        private ITxtRecord record;
+        record = (ITxtRecord)Activator.CreateInstance(ProviderFactory.SelectedProvider.TxtRecord);
+    }
         
-        public TxtRecord()
-        {
-            record = (ITxtRecord)Activator.CreateInstance(ProviderFactory.SelectedProvider.TxtRecord);
-        }
+    public void Add(string key, string value)
+    {
+        record.Add(key, value);
+    }
         
-        public void Add(string key, string value)
-        {
-            record.Add(key, value);
-        }
+    public void Add(string key, byte [] value)
+    {
+        record.Add(key, value);
+    }
         
-        public void Add(string key, byte [] value)
-        {
-            record.Add(key, value);
-        }
+    public void Add(TxtRecordItem item)
+    {
+        record.Add(item);
+    }
         
-        public void Add(TxtRecordItem item)
-        {
-            record.Add(item);
-        }
+    public void Remove(string key)
+    {
+        record.Remove(key);
+    }
         
-        public void Remove(string key)
-        {
-            record.Remove(key);
-        }
+    public TxtRecordItem GetItemAt(int index)
+    {
+        return record.GetItemAt(index);
+    }
         
-        public TxtRecordItem GetItemAt(int index)
-        {
-            return record.GetItemAt(index);
-        }
+    public IEnumerator GetEnumerator()
+    {
+        return record.GetEnumerator();
+    }
         
-        public IEnumerator GetEnumerator()
-        {
-            return record.GetEnumerator();
-        }
+    public void Dispose()
+    {
+        record.Dispose();
+    }
         
-        public void Dispose()
-        {
-            record.Dispose();
-        }
+    public TxtRecordItem this[string index] { 
+        get { return record[index]; }
+    }
         
-        public TxtRecordItem this[string index] { 
-            get { return record[index]; }
-        }
+    public int Count { 
+        get { return record.Count; }
+    }
         
-        public int Count { 
-            get { return record.Count; }
-        }
-        
-        public ITxtRecord BaseRecord {
-            get { return record; }
-        }
+    public ITxtRecord BaseRecord {
+        get { return record; }
     }
 }

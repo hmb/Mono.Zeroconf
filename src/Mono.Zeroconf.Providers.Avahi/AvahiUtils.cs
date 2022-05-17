@@ -32,58 +32,55 @@ namespace Mono.Zeroconf.Providers.Avahi
 {
     public static class AvahiUtils
     {
-        public static Protocol FromMzcProtocol (AddressProtocol addressProtocol)
+        private const int MonoZeroconfAnyInterface = 0;
+        private const int AvahiAnyInterface = -1;
+
+        public static Protocol FromMzcProtocol(AddressProtocol addressProtocol)
         {
-            switch (addressProtocol) {
-                case AddressProtocol.IPv4: 
-                    return Protocol.IPv4;
-                case AddressProtocol.IPv6: 
-                    return Protocol.IPv6;
-                case AddressProtocol.Any:
-                default:
-                    return Protocol.Unspecified;
-            }
+            return addressProtocol switch
+            {
+                AddressProtocol.IPv4 => Protocol.IPv4,
+                AddressProtocol.IPv6 => Protocol.IPv6,
+                _ => Protocol.Unspecified
+            };
         }
-        
-        public static AddressProtocol ToMzcProtocol (Protocol addressProtocol)
+
+        public static AddressProtocol ToMzcProtocol(Protocol addressProtocol)
         {
-            switch (addressProtocol) {
-                case Protocol.IPv4: 
-                    return AddressProtocol.IPv4;
-                case Protocol.IPv6: 
-                    return AddressProtocol.IPv6;
-                case Protocol.Unspecified:
-                default:
-                    return AddressProtocol.Any;
-            }
+            return addressProtocol switch
+            {
+                Protocol.IPv4 => AddressProtocol.IPv4,
+                Protocol.IPv6 => AddressProtocol.IPv6,
+                _ => AddressProtocol.Any
+            };
         }
-        
-        public static int FromMzcInterface (uint @interface)
+
+        public static int FromMzcInterface(uint @interface)
         {
-            // Avahi appears to use a value of -1 for "unspecified" ("any"), and
-            // zero-based interface indexes... we hope
-            
-            switch (@interface) {
-                case 0: return -1;
-                default: return (int)@interface - 1;
-            }
+            return @interface switch
+            {
+                MonoZeroconfAnyInterface => AvahiAnyInterface,
+                _ => (int)@interface - 1
+            };
         }
-        
-        public static uint ToMzcInterface (int @interface)
+
+        public static uint ToMzcInterface(int @interface)
         {
-            switch (@interface) {
-                case -1: return 0;
-                default: return (uint)@interface + 1;
-            }
+            return @interface switch
+            {
+                AvahiAnyInterface => MonoZeroconfAnyInterface,
+                _ => (uint)@interface + 1
+            };
         }
-        
-        public static ServiceErrorCode ErrorCodeToServiceError (ErrorCode error)
+
+        public static ServiceErrorCode ErrorCodeToServiceError(ErrorCode error)
         {
-            switch (error) {
-                case ErrorCode.Ok: return ServiceErrorCode.None;
-                case ErrorCode.Collision: return ServiceErrorCode.NameConflict;
-                default: return ServiceErrorCode.Unknown;
-            }
+            return error switch
+            {
+                ErrorCode.Ok => ServiceErrorCode.None,
+                ErrorCode.Collision => ServiceErrorCode.NameConflict,
+                _ => ServiceErrorCode.Unknown
+            };
         }
     }
 }

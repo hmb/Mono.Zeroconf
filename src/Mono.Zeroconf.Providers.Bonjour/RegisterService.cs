@@ -42,7 +42,7 @@ namespace Mono.Zeroconf.Providers.Bonjour
     
         private Native.DNSServiceRegisterReply register_reply_handler;
     
-        public event RegisterServiceEventHandler Response;
+        public event EventHandler<RegisterServiceEventArgs>? Response;
     
         public RegisterService()
         {
@@ -144,11 +144,8 @@ namespace Mono.Zeroconf.Providers.Bonjour
                 ReplyDomain = domain;
                 args.IsRegistered = true;
             }
-            
-            RegisterServiceEventHandler handler = Response;
-            if(handler != null) {
-                handler(this, args);
-            }
+
+            this.Response?.Invoke(this, args);
         }
         
         public bool AutoRename {

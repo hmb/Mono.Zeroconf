@@ -36,8 +36,8 @@ using System.Threading.Tasks;
 
 public interface IServiceBrowser : IEnumerable<IResolvableService>, IDisposable
 {
-    event ServiceBrowseEventHandler ServiceAdded;
-    event ServiceBrowseEventHandler ServiceRemoved;
+    event EventHandler<ServiceBrowseEventArgs>? ServiceAdded;
+    event EventHandler<ServiceBrowseEventArgs>? ServiceRemoved;
 
     Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain);
 }

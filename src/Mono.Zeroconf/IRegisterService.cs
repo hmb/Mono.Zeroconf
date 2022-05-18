@@ -35,7 +35,7 @@ using System.Threading.Tasks;
 
 public interface IRegisterService : IService, IDisposable
 {
-    event RegisterServiceEventHandler Response;
+    event EventHandler<RegisterServiceEventArgs>? Response;
 
     Task Register();
 

@@ -40,7 +40,7 @@ namespace Mono.Zeroconf.Providers.Avahi
         private ushort port;
         private IEntryGroup entry_group;
 
-        public event RegisterServiceEventHandler Response;
+        public event EventHandler<RegisterServiceEventArgs>? Response;
 
         public RegisterService()
         {
@@ -142,14 +142,9 @@ namespace Mono.Zeroconf.Providers.Avahi
                 args.IsRegistered = true;
             }
 
-            RegisterServiceEventHandler handler = Response;
-            if (handler != null)
-            {
-                handler(this, args);
-                return true;
-            }
+            this.Response?.Invoke(this, args);
 
-            return false;
+            return this.Response != null;
         }
 
         public void Dispose()

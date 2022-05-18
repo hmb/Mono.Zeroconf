@@ -54,7 +54,7 @@ public class RegisterService : IRegisterService
         this.registerService.Dispose();
     }
 
-    public event RegisterServiceEventHandler Response
+    public event EventHandler<RegisterServiceEventArgs>? Response
     {
         add => this.registerService.Response += value;
         remove => this.registerService.Response -= value;

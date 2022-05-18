@@ -42,7 +42,7 @@ namespace Mono.Zeroconf.Providers.Bonjour
         private Native.DNSServiceResolveReply resolve_reply_handler;
         private Native.DNSServiceQueryRecordReply query_record_reply_handler;
         
-        public event ServiceResolvedEventHandler Resolved;
+        public event EventHandler<ServiceResolvedEventArgs>? Resolved;
 
         public BrowseService()
         {
@@ -181,11 +181,8 @@ namespace Mono.Zeroconf.Providers.Bonjour
                     } else {
                         hostentry.AddressList = new IPAddress [] { address };
                     }
-                    
-                    ServiceResolvedEventHandler handler = Resolved;
-                    if(handler != null) {
-                        handler(this, new ServiceResolvedEventArgs(this));
-                    }
+
+                    this.Resolved?.Invoke(this, new ServiceResolvedEventArgs(this));
                     
                     break;
                 case ServiceType.TXT:
@@ -207,4 +204,3 @@ namespace Mono.Zeroconf.Providers.Bonjour
         }
     }
 }
-

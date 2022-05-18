@@ -50,13 +50,13 @@ public class ServiceBrowser : IServiceBrowser
         this.browser.Dispose();
     }
 
-    public event ServiceBrowseEventHandler ServiceAdded
+    public event EventHandler<ServiceBrowseEventArgs>? ServiceAdded
     {
         add => this.browser.ServiceAdded += value;
         remove => this.browser.ServiceAdded -= value;
     }
 
-    public event ServiceBrowseEventHandler ServiceRemoved
+    public event EventHandler<ServiceBrowseEventArgs>? ServiceRemoved
     {
         add => this.browser.ServiceRemoved += value;
         remove => this.browser.ServiceRemoved -= value;

@@ -62,8 +62,8 @@ namespace Mono.Zeroconf.Providers.Bonjour
         
         private Thread thread;
         
-        public event ServiceBrowseEventHandler ServiceAdded;
-        public event ServiceBrowseEventHandler ServiceRemoved;
+        public event EventHandler<Mono.Zeroconf.ServiceBrowseEventArgs>? ServiceAdded;
+        public event EventHandler<Mono.Zeroconf.ServiceBrowseEventArgs>? ServiceRemoved;
         
         public ServiceBrowser()
         {
@@ -191,11 +191,8 @@ namespace Mono.Zeroconf.Providers.Bonjour
                         service_table.Add (serviceName, service);
                     }
                 }
-                
-                ServiceBrowseEventHandler handler = ServiceAdded;
-                if(handler != null) {
-                    handler(this, args);
-                }
+
+                this.ServiceAdded?.Invoke(this, args);
             } else {
                 lock (service_table) {
                     if (service_table.ContainsKey (serviceName)) {
@@ -203,10 +200,7 @@ namespace Mono.Zeroconf.Providers.Bonjour
                     }
                 }
                 
-                ServiceBrowseEventHandler handler = ServiceRemoved;
-                if(handler != null) {
-                    handler(this, args);
-                }
+                this.ServiceRemoved?.Invoke(this, args);
             }
         }
     }

@@ -56,7 +56,7 @@ public class BrowseService : Service, IResolvableService, IDisposable
 
     public void Dispose() => this.StopResolve().GetAwaiter().GetResult();
 
-    public event ServiceResolvedEventHandler? Resolved;
+    public event EventHandler<ServiceResolvedEventArgs>? Resolved;
 
     public string FullName { get; private set; }
 

@@ -30,12 +30,13 @@
 
 namespace Mono.Zeroconf;
 
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
 public interface IResolvableService : IService
 {
-    event ServiceResolvedEventHandler Resolved;
+    event EventHandler<ServiceResolvedEventArgs>? Resolved;
 
     Task Resolve();
 

@@ -66,8 +66,8 @@ public class ServiceBrowser : IServiceBrowser
         }
     }
 
-    public event ServiceBrowseEventHandler? ServiceAdded;
-    public event ServiceBrowseEventHandler? ServiceRemoved;
+    public event EventHandler<ServiceBrowseEventArgs>? ServiceAdded;
+    public event EventHandler<ServiceBrowseEventArgs>? ServiceRemoved;
 
     IEnumerator IEnumerable.GetEnumerator()
     {

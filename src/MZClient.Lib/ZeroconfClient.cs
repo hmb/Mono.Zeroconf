@@ -247,7 +247,7 @@ public static class MZClient
         await service.Register();
     }
 
-    private static async void OnServiceAdded(object o, ServiceBrowseEventArgs args)
+    private static async void OnServiceAdded(object? o, ServiceBrowseEventArgs args)
     {
         Console.WriteLine("*** Found name = '{0}', type = '{1}', domain = '{2}'",
             args.Service.Name,
@@ -264,7 +264,7 @@ public static class MZClient
         await args.Service.Resolve();
     }
 
-    private static void OnServiceRemoved(object o, ServiceBrowseEventArgs args)
+    private static void OnServiceRemoved(object? o, ServiceBrowseEventArgs args)
     {
         Console.WriteLine("*** Lost  name = '{0}', type = '{1}', domain = '{2}'",
             args.Service.Name,
@@ -274,7 +274,7 @@ public static class MZClient
         args.Service.Resolved -= OnServiceResolved;
     }
 
-    private static void OnServiceResolved(object o, ServiceResolvedEventArgs args)
+    private static void OnServiceResolved(object? o, ServiceResolvedEventArgs args)
     {
         if (o is not IResolvableService service)
         {
@@ -303,7 +303,7 @@ public static class MZClient
         }
     }
 
-    private static void OnRegisterServiceResponse(object o, RegisterServiceEventArgs args)
+    private static void OnRegisterServiceResponse(object? o, RegisterServiceEventArgs args)
     {
         switch(args.ServiceError) {
             case ServiceErrorCode.NameConflict:

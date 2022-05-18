@@ -50,7 +50,7 @@ public class ServiceBrowser : IServiceBrowser
             this.BrowseService = browseService;
         }
     }
-    
+
     private readonly Dictionary<string, CountedBrowseService> services = new();
     private readonly AsyncLock serviceLock = new();
 
@@ -84,7 +84,6 @@ public class ServiceBrowser : IServiceBrowser
 
     public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string? regtype, string? domain)
     {
-        
         using (await this.serviceLock.Enter())
         {
             if (DBusManager.Server == null)
@@ -100,7 +99,7 @@ public class ServiceBrowser : IServiceBrowser
                 regtype ?? string.Empty,
                 domain ?? string.Empty,
                 (uint)LookupFlags.None);
-            
+
             this.newServiceWatcher = await this.serviceBrowser.WatchItemNewAsync(this.OnServiceNew);
             this.removeServiceWatcher = await this.serviceBrowser.WatchItemRemoveAsync(this.OnServiceRemove);
         }
@@ -121,7 +120,7 @@ public class ServiceBrowser : IServiceBrowser
 
         this.removeServiceWatcher?.Dispose();
         this.removeServiceWatcher = null;
-        
+
         if (this.serviceBrowser != null)
         {
             await this.serviceBrowser.FreeAsync();
@@ -135,7 +134,7 @@ public class ServiceBrowser : IServiceBrowser
 
         this.services.Clear();
     }
-    
+
     private void RaiseServiceAdded(IResolvableService service)
     {
         this.ServiceAdded?.Invoke(this, new ServiceBrowseEventArgs(service));
@@ -146,7 +145,8 @@ public class ServiceBrowser : IServiceBrowser
         this.ServiceRemoved?.Invoke(this, new ServiceBrowseEventArgs(service));
     }
 
-    private async void OnServiceNew((int @interface, int protocol, string name, string regtype, string domain, uint flags) serviceData)
+    private async void OnServiceNew(
+        (int @interface, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
         using (await this.serviceLock.Enter())
         {
@@ -155,7 +155,7 @@ public class ServiceBrowser : IServiceBrowser
                 serviceData.protocol,
                 serviceData.regtype,
                 serviceData.name);
-                
+
             if (this.services.TryGetValue(key, out var existingResolverInstance))
             {
                 ++existingResolverInstance.UsageCount;
@@ -185,7 +185,7 @@ public class ServiceBrowser : IServiceBrowser
                 serviceData.protocol,
                 serviceData.regtype,
                 serviceData.name);
-                
+
             if (!this.services.TryGetValue(key, out var resolverInstance))
             {
                 Console.WriteLine($"ERROR: resolver was never added: {key}");
@@ -201,13 +201,13 @@ public class ServiceBrowser : IServiceBrowser
             }
 
             this.RaiseServiceRemoved(resolverInstance.BrowseService);
-            
+
             await resolverInstance.BrowseService.StopResolve();
-            
+
             this.services.Remove(key);
         }
     }
-    
+
     private static string GetServiceNameKey(int networkInterface, int protocol, string type, string name)
     {
         return $"{networkInterface}_{protocol}_{type}_{name}";

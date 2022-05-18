@@ -147,12 +147,12 @@ public class BrowseService : Service, IResolvableService, IDisposable
 
         // ReSharper disable once UseObjectOrCollectionInitializer
         this.HostEntry = new IPHostEntry();
-            
+
         this.HostEntry.AddressList = new IPAddress[1];
 
         if (IPAddress.TryParse(obj.address, out var ipAddress))
         {
-            this.HostEntry.AddressList[0] = ipAddress;                
+            this.HostEntry.AddressList[0] = ipAddress;
             if ((Protocol)obj.protocol == Protocol.IPv6)
             {
                 this.HostEntry.AddressList[0].ScopeId = obj.@interface;
@@ -160,7 +160,7 @@ public class BrowseService : Service, IResolvableService, IDisposable
         }
         else
         {
-            this.HostEntry.AddressList[0] = IPAddress.None;                
+            this.HostEntry.AddressList[0] = IPAddress.None;
         }
 
         this.HostEntry.HostName = obj.host;

@@ -74,38 +74,36 @@ internal static class ProviderFactory
         
         foreach (var directory in directories)
         {
-            foreach (var file in Directory.GetFiles(directory, "Mono.Zeroconf.Providers.*.dll"))
+            foreach (var fileName in Directory.GetFiles(directory, "Mono.Zeroconf.Providers.*.dll"))
             {
-                if (Path.GetFileName(file) == Path.GetFileName(assemblyPath))
+                if (Path.GetFileName(fileName) == Path.GetFileName(assemblyPath))
                 {
                     continue;
                 }
                 
-                var providerAssembly = Assembly.LoadFile(file);
-                    
-                foreach (Attribute attr in providerAssembly.GetCustomAttributes(false))
-                {
-                    if (attr is not ZeroconfProviderAttribute attribute)
-                    {
-                        continue;
-                    }
-                        
-                    var provider = (IZeroconfProvider?)Activator.CreateInstance(attribute.ProviderType);
+                var providerAssembly = Assembly.LoadFile(fileName);
 
-                    if (provider == null)
-                    {
-                        continue;
-                    }
+                if (providerAssembly.GetCustomAttributes(false).FirstOrDefault(a => a is ZeroconfProviderAttribute) is
+                    not ZeroconfProviderAttribute attribute)
+                {
+                    continue;
+                }
+                
+                var provider = (IZeroconfProvider?)Activator.CreateInstance(attribute.ProviderType);
+
+                if (provider == null)
+                {
+                    continue;
+                }
                             
-                    try
-                    {
-                        provider.Initialize();
-                        providerList.Add(provider);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                try
+                {
+                    provider.Initialize();
+                    providerList.Add(provider);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                 }
             }
         }

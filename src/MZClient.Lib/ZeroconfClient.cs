@@ -134,6 +134,8 @@ public static class MZClient
             Console.WriteLine();
             return 1;
         }
+
+        IServiceBrowser? browser = null;
         
         if(services.Count > 0) {
             foreach(string service_description in services) {
@@ -154,14 +156,16 @@ public static class MZClient
             Console.WriteLine();
             
             // Listen for events of some service type
-            ServiceBrowser browser = new ServiceBrowser();
+            browser = new ServiceBrowser();
             browser.ServiceAdded += OnServiceAdded;
             browser.ServiceRemoved += OnServiceRemoved;
-            await browser.Browse (@interface, address_protocol, type, domain);
+            await browser.Browse(@interface, address_protocol, type, domain);
         }
        
         Console.CancelKeyPress += ConsoleOnCancelKeyPress;
         await endProgram.WaitAsync();
+        
+        browser?.Dispose();
         
         return 0;
     }
@@ -194,16 +198,16 @@ public static class MZClient
             }
         }
                 
-        RegisterService service = new RegisterService();
+        var service = new RegisterService();
         service.Name = name;
         service.RegType = type;
         service.ReplyDomain = "local.";
         service.Port = port;
 
-        TxtRecord? record = null;
+        ITxtRecord? record = null;
         
         if(txt_data != null) {
-            Match txtMatch = Regex.Match(txt_data, @"TXT\s*\[(.*)\]");
+            var txtMatch = Regex.Match(txt_data, @"TXT\s*\[(.*)\]");
 
             if(txtMatch.Groups.Count != 2) {
                 throw new ApplicationException("Invalid TXT record definition syntax");
@@ -265,7 +269,9 @@ public static class MZClient
         Console.WriteLine("*** Lost  name = '{0}', type = '{1}', domain = '{2}'", 
             args.Service.Name,
             args.Service.RegType,
-            args.Service.ReplyDomain);    
+            args.Service.ReplyDomain);
+        
+        args.Service.Resolved -= OnServiceResolved;
     }
     
     private static void OnServiceResolved(object o, ServiceResolvedEventArgs args)

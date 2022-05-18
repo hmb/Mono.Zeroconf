@@ -40,21 +40,10 @@ public class ZeroconfProvider : IZeroconfProvider
 {
     public void Initialize()
     {
-        DBusManager.Initialize();
+        DBusManager.Initialize().GetAwaiter().GetResult();
     }
 
-    public Type ServiceBrowser
-    {
-        get { return typeof(ServiceBrowser); }
-    }
-
-    public Type RegisterService
-    {
-        get { return typeof(RegisterService); }
-    }
-
-    public Type TxtRecord
-    {
-        get { return typeof(TxtRecord); }
-    }
+    public Type ServiceBrowser => typeof(ServiceBrowser);
+    public Type RegisterService => typeof(RegisterService);
+    public Type TxtRecord => typeof(TxtRecord);
 }

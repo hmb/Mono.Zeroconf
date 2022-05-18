@@ -32,152 +32,144 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using Mono.Zeroconf.Providers.Avahi.DBus;
+using Mono.Zeroconf.Providers.Avahi.Threading;
+using Tmds.DBus;
 
-namespace Mono.Zeroconf.Providers.Avahi
+namespace Mono.Zeroconf.Providers.Avahi;
+
+public class BrowseService : Service, IResolvableService, IDisposable
 {
-    public class BrowseService : Service, IResolvableService, IDisposable
+    private readonly AsyncLock serviceLock = new();
+
+    private IServiceResolver? resolver;
+    private IDisposable? failureWatcher;
+    private IDisposable? foundWatcher;
+
+    public BrowseService(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
+        : base(name, regtype, replyDomain, @interface, aprotocol)
     {
-        private string full_name;
-        private IPHostEntry host_entry;
-        private string host_target;
-        private short port;
-        private bool disposed;
-        private IServiceResolver resolver;
-        private IDisposable failureWatcher;
-        private IDisposable foundWatcher;
+        this.FullName = string.Empty;
+        this.HostEntry = null!;
+        this.HostTarget = string.Empty;
+        this.Port = 0;
+    }
 
-        public event ServiceResolvedEventHandler Resolved;
+    public void Dispose() => this.StopResolve().GetAwaiter().GetResult();
 
-        public BrowseService(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
-            : base(name, regtype, replyDomain, @interface, aprotocol)
+    public event ServiceResolvedEventHandler? Resolved;
+
+    public string FullName { get; private set; }
+
+    public IPHostEntry HostEntry { get; private set; }
+
+    public string HostTarget { get; private set; }
+
+    public short Port { get; private set; }
+
+    private void RaiseResolved()
+    {
+        this.Resolved?.Invoke(this, new ServiceResolvedEventArgs(this));
+    }
+
+    public async Task Resolve()
+    {
+        using (await this.serviceLock.Enter())
         {
-        }
-
-        public void Dispose()
-        {
-            lock (this)
+            if (DBusManager.Server == null)
             {
-                disposed = true;
-                DisposeResolver();
-            }
-        }
-
-        private void DisposeResolver()
-        {
-            lock (this)
-            {
-                if (resolver != null)
-                {
-                    failureWatcher.Dispose();
-                    foundWatcher.Dispose();
-                    ;
-                    resolver.FreeAsync().GetAwaiter().GetResult();
-                    resolver = null;
-                }
-            }
-        }
-
-        public async Task Resolve()
-        {
-            if (disposed)
-            {
-                throw new InvalidOperationException(
-                    "The service has been disposed and cannot be resolved. " +
-                    " Perhaps this service was removed?");
+                throw new ConnectException("no connection to the avahi daemon possible");
             }
 
-            //DBusManager.Connection.TrapSignals ();
-
-            Console.WriteLine("Resolve called: lock");
-            lock (this)
+            if (this.resolver != null)
             {
-                if (resolver != null)
-                {
-                    throw new InvalidOperationException("The service is already running a resolve operation");
-                }
+                throw new InvalidOperationException("The service is already running a resolve operation");
             }
 
             Console.WriteLine(
-                $"Resolve called: assigning resolver {AvahiInterface} {(int)AvahiProtocol} {Name} {RegType} {ReplyDomain}");
-            resolver = await DBusManager.Server.ServiceResolverNewAsync(
-                AvahiInterface,
-                (int)AvahiProtocol,
-                Name ?? String.Empty,
-                RegType ?? String.Empty,
-                ReplyDomain ?? String.Empty,
-                (int)AvahiProtocol,
+                $"Resolve called: assigning resolver {this.AvahiInterface} {this.AvahiProtocol} {this.Name} {this.RegType} {this.ReplyDomain}");
+
+            this.resolver = await DBusManager.Server.ServiceResolverNewAsync(
+                this.AvahiInterface,
+                (int)this.AvahiProtocol,
+                this.Name,
+                this.RegType,
+                this.ReplyDomain,
+                (int)this.AvahiProtocol,
                 (uint)LookupFlags.None);
 
             Console.WriteLine("Resolve called: WatchFoundAsync/WatchFailureAsync");
-            failureWatcher = await resolver.WatchFailureAsync(OnResolveFailure);
-            foundWatcher = await resolver.WatchFoundAsync(OnResolveFound);
+            this.foundWatcher = await this.resolver.WatchFoundAsync(this.OnResolveFound);
+            this.failureWatcher = await this.resolver.WatchFailureAsync(OnResolveFailure);
 
             Console.WriteLine("Resolve called: awaited");
-            // DBusManager.Connection.UntrapSignals ();
+        }
+    }
+
+    public async Task StopResolve()
+    {
+        using (await this.serviceLock.Enter())
+        {
+            await this.ClearUnSynchronized();
+        }
+    }
+
+    private async Task ClearUnSynchronized()
+    {
+        if (this.resolver == null)
+        {
+            return;
         }
 
-        protected virtual void OnResolved()
+        this.foundWatcher?.Dispose();
+        this.failureWatcher?.Dispose();
+        await this.resolver.FreeAsync();
+
+        this.resolver = null;
+        this.foundWatcher = null;
+        this.failureWatcher = null;
+    }
+
+    private void OnResolveFound(
+        (int @interface, int protocol, string name, string type, string domain, string host, int aprotocol, string
+            address, ushort port, byte[][] txt, uint flags) obj)
+    {
+
+        this.Name = obj.name;
+        this.RegType = obj.type;
+        this.AvahiInterface = obj.@interface;
+        this.AvahiProtocol = (Protocol)obj.protocol;
+        this.ReplyDomain = obj.domain;
+        this.TxtRecord = new TxtRecord(obj.txt);
+
+        this.FullName = $"{obj.name.Replace(" ", "\\032")}.{obj.type}.{obj.domain}";
+        this.Port = (short)obj.port;
+        this.HostTarget = obj.host;
+
+        // ReSharper disable once UseObjectOrCollectionInitializer
+        this.HostEntry = new IPHostEntry();
+            
+        this.HostEntry.AddressList = new IPAddress[1];
+
+        if (IPAddress.TryParse(obj.address, out var ipAddress))
         {
-            ServiceResolvedEventHandler handler = Resolved;
-            if (handler != null)
+            this.HostEntry.AddressList[0] = ipAddress;                
+            if ((Protocol)obj.protocol == Protocol.IPv6)
             {
-                handler(this, new ServiceResolvedEventArgs(this));
+                this.HostEntry.AddressList[0].ScopeId = obj.@interface;
             }
         }
-
-        private void OnResolveFailure(string error)
+        else
         {
-            DisposeResolver();
+            this.HostEntry.AddressList[0] = IPAddress.None;                
         }
 
-        private void OnResolveFound(
-            (int @interface, int protocol, string name, string type, string domain, string host, int aprotocol, string
-                address, ushort port, byte[][] txt, uint flags) obj)
-        {
-            Console.WriteLine("OnResolveFound");
+        this.HostEntry.HostName = obj.host;
 
-            Name = obj.name;
-            RegType = obj.type;
-            AvahiInterface = obj.@interface;
-            AvahiProtocol = (Protocol)obj.protocol;
-            ReplyDomain = obj.domain;
-            TxtRecord = new TxtRecord(obj.txt);
+        this.RaiseResolved();
+    }
 
-            this.full_name = String.Format("{0}.{1}.{2}", obj.name.Replace(" ", "\\032"), obj.type, obj.domain);
-            this.port = (short)port;
-            this.host_target = obj.host;
-
-            host_entry = new IPHostEntry();
-            host_entry.AddressList = new IPAddress[1];
-            if (IPAddress.TryParse(obj.address, out host_entry.AddressList[0]) &&
-                (Protocol)obj.protocol == Protocol.IPv6)
-            {
-                host_entry.AddressList[0].ScopeId = obj.@interface;
-            }
-
-            host_entry.HostName = obj.host;
-
-            OnResolved();
-        }
-
-        public string FullName
-        {
-            get { return full_name; }
-        }
-
-        public IPHostEntry HostEntry
-        {
-            get { return host_entry; }
-        }
-
-        public string HostTarget
-        {
-            get { return host_target; }
-        }
-
-        public short Port
-        {
-            get { return port; }
-        }
+    private static void OnResolveFailure(string error)
+    {
+        Console.WriteLine("OnResolveFailure");
     }
 }

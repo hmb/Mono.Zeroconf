@@ -81,7 +81,7 @@ public class RegisterService : IRegisterService
         get => this.registerService.ReplyDomain;
         set => this.registerService.ReplyDomain = value;
     }
-    public ITxtRecord TxtRecord
+    public ITxtRecord? TxtRecord
     {
         get => this.registerService.TxtRecord;
         set => this.registerService.TxtRecord = value;

@@ -39,7 +39,7 @@ namespace Mono.Zeroconf.Providers.Bonjour
         protected uint interface_index;
         protected AddressProtocol address_protocol;
         
-        protected ITxtRecord txt_record;
+        protected ITxtRecord? txt_record;
         protected string fullname;
         protected string hosttarget;
         protected ushort port;
@@ -102,7 +102,7 @@ namespace Mono.Zeroconf.Providers.Bonjour
         
         // Resolved Properties
          
-        public ITxtRecord TxtRecord {
+        public ITxtRecord? TxtRecord {
             get { return txt_record; }
             set { txt_record = value; }
         }

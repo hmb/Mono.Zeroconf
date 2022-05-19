@@ -37,7 +37,7 @@ namespace Mono.Zeroconf.Providers.Avahi
         private string reply_domain;
         private int @interface;
         private Protocol aprotocol;
-        private ITxtRecord txt_record;
+        private ITxtRecord? txt_record;
 
         public Service()
         {
@@ -93,7 +93,7 @@ namespace Mono.Zeroconf.Providers.Avahi
             get { return AvahiUtils.ToMzcProtocol(aprotocol); }
         }
 
-        public ITxtRecord TxtRecord
+        public ITxtRecord? TxtRecord
         {
             get { return txt_record; }
             set { txt_record = value; }

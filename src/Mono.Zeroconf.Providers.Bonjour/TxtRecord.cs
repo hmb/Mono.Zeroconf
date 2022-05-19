@@ -30,6 +30,7 @@ using System;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Mono.Zeroconf.Providers.Bonjour
 {
@@ -130,12 +131,17 @@ namespace Mono.Zeroconf.Providers.Bonjour
 
             return new TxtRecordItem(encoding.GetString(key, 0, pos), buffer);
         }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
         
-        public IEnumerator GetEnumerator()
+        public IEnumerator<TxtRecordItem> GetEnumerator()
         {
             return new TxtRecordEnumerator(this);
         }
-        
+
         public override string ToString()
         {
             string ret = String.Empty;
@@ -153,17 +159,18 @@ namespace Mono.Zeroconf.Providers.Bonjour
             
             return ret;
         }
-        
-        public TxtRecordItem this[string key] {
-            get {
-                foreach(TxtRecordItem item in this) {
-                    if(item.Key == key) {
-                        return item;
-                    }
+
+        public TxtRecordItem? FirstOrDefault(string key)
+        {
+            foreach (var item in this)
+            {
+                if (item.Key == key)
+                {
+                    return item;
                 }
-                
-                return null;
             }
+
+            return null;
         }
         
         public IntPtr RawBytes {

@@ -27,10 +27,11 @@
 //
 
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Mono.Zeroconf.Providers.Bonjour
 {
-    internal class TxtRecordEnumerator : IEnumerator
+    internal class TxtRecordEnumerator : IEnumerator<TxtRecordItem>
     {
         private TxtRecord record;
         private TxtRecordItem current_item;
@@ -46,7 +47,11 @@ namespace Mono.Zeroconf.Providers.Bonjour
             index = 0;
             current_item = null;
         }
-        
+
+        object IEnumerator.Current => this.Current;
+
+        public TxtRecordItem Current => this.current_item;
+
         public bool MoveNext()
         {
             if(index < 0 || index >= record.Count) {
@@ -57,8 +62,8 @@ namespace Mono.Zeroconf.Providers.Bonjour
             return current_item != null;
         }
         
-        public object Current {
-            get { return current_item; }
+        public void Dispose()
+        {
         }
     }
 }

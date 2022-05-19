@@ -28,125 +28,99 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Linq;
 
-namespace Mono.Zeroconf.Providers.Avahi
+namespace Mono.Zeroconf.Providers.Avahi;
+
+
+public class TxtRecord : ITxtRecord
 {
-    public class TxtRecord : ITxtRecord
+    private readonly List<TxtRecordItem> recordItems = new();
+
+    // ReSharper disable once ParameterTypeCanBeEnumerable.Local
+    public TxtRecord(byte[][] data)
     {
-        private List<TxtRecordItem> records = new List<TxtRecordItem>();
-
-        private static readonly Encoding encoding = new UTF8Encoding();
-
-        public TxtRecord()
+        foreach (var rawItem in data)
         {
-        }
-
-        public TxtRecord(byte[][] data)
-        {
-            foreach (byte[] raw_item in data)
+            var itemRegex = new Regex(@"""[^""]*""|[^,]+", RegexOptions.IgnorePatternWhitespace);
+            
+            foreach (Match itemMatch in itemRegex.Matches(Encoding.UTF8.GetString(rawItem)))
             {
-                Regex item_regex = new Regex(@"""[^""]*""|[^,]+", RegexOptions.IgnorePatternWhitespace);
-                foreach (Match item_match in item_regex.Matches(encoding.GetString(raw_item)))
-                {
-                    string item = item_match.Groups[0].Value;
-                    string[] split_item = item.Split(new char[] { '=' }, 2);
+                var item = itemMatch.Groups[0].Value;
+                var splitItem = item.Split(new[] { '=' }, 2);
 
-                    if (split_item.Length == 1)
-                        Add(split_item[0], String.Empty);
-                    else
-                        Add(split_item[0], split_item[1]);
-                }
+                this.Add(splitItem[0], splitItem.Length == 1 ? string.Empty : splitItem[1]);
             }
         }
+    }
 
-        public void Dispose()
+    public void Dispose()
+    {
+    }
+
+    public int Count => this.recordItems.Count;
+    public ITxtRecord BaseRecord => this;
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
+    }
+
+    // ReSharper disable once MemberCanBePrivate.Global
+    public IEnumerator<TxtRecordItem> GetEnumerator()
+    {
+        return this.recordItems.GetEnumerator();
+    }
+
+    public void Add(string key, string value)
+    {
+        this.recordItems.Add(new TxtRecordItem(key, value));
+    }
+
+    public void Add(string key, byte[] value)
+    {
+        this.recordItems.Add(new TxtRecordItem(key, value));
+    }
+
+    public void Add(TxtRecordItem item)
+    {
+        this.recordItems.Add(item);
+    }
+
+    public void Remove(string key)
+    {
+        var item = this.recordItems.FirstOrDefault(item => item.Key == key);
+        if (item != null)
         {
+            this.recordItems.Remove(item);
+        }
+    }
+
+    public TxtRecordItem GetItemAt(int index)
+    {
+        return this.recordItems[index];
+    }
+
+    public TxtRecordItem? FirstOrDefault(string key)
+    {
+        return this.recordItems.FirstOrDefault(item => item.Key == key);
+    }
+
+    internal static byte[][] Render(ITxtRecord record)
+    {
+        var items = new byte[record.Count][];
+        var index = 0;
+
+        foreach (TxtRecordItem item in record)
+        {
+            var txt = $"{item.Key}={item.ValueString}";
+            items[index++] = Encoding.UTF8.GetBytes(txt);
         }
 
-        public void Add(string key, string value)
-        {
-            records.Add(new TxtRecordItem(key, value));
-        }
-
-        public void Add(string key, byte[] value)
-        {
-            records.Add(new TxtRecordItem(key, value));
-        }
-
-        public void Add(TxtRecordItem item)
-        {
-            records.Add(item);
-        }
-
-        public void Remove(string key)
-        {
-            TxtRecordItem item = Find(key);
-            if (item != null)
-            {
-                records.Remove(item);
-            }
-        }
-
-        public TxtRecordItem Find(string key)
-        {
-            foreach (TxtRecordItem item in records)
-            {
-                if (item.Key == key)
-                {
-                    return item;
-                }
-            }
-
-            return null;
-        }
-
-        public TxtRecordItem GetItemAt(int index)
-        {
-            return records[index] as TxtRecordItem;
-        }
-
-        internal static byte[][] Render(ITxtRecord record)
-        {
-            byte[][] items = new byte[record.Count][];
-            int index = 0;
-
-            foreach (TxtRecordItem item in record)
-            {
-                string txt = String.Format("{0}={1}", item.Key, item.ValueString);
-                items[index++] = encoding.GetBytes(txt);
-            }
-
-            return items;
-        }
-
-        public IEnumerator<TxtRecordItem> GetEnumerator()
-        {
-            return records.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public TxtRecordItem this[string key]
-        {
-            get { return Find(key); }
-        }
-
-        public int Count
-        {
-            get { return records.Count; }
-        }
-
-        public ITxtRecord BaseRecord
-        {
-            get { return this; }
-        }
+        return items;
     }
 }

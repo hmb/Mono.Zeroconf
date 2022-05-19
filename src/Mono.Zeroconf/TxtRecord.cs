@@ -90,6 +90,9 @@ public class TxtRecord : ITxtRecord
     {
         return this.BaseRecord.GetItemAt(index);
     }
-        
-    public TxtRecordItem this[string index] => this.BaseRecord[index];
+
+    public TxtRecordItem? FirstOrDefault(string key)
+    {
+        return this.BaseRecord.FirstOrDefault(key);
+    }
 }

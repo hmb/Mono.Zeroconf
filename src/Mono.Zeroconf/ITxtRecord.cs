@@ -45,6 +45,5 @@ public interface ITxtRecord : IEnumerable, IDisposable
     void Remove(string key);
 
     TxtRecordItem GetItemAt(int index);
-
-    TxtRecordItem this[string key] { get; }
+    TxtRecordItem? FirstOrDefault(string key);
 }

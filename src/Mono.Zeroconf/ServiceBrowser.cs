@@ -38,11 +38,25 @@ namespace Mono.Zeroconf;
 
 public class ServiceBrowser : IServiceBrowser
 {
+    private const string LocalDomain = "local";
+    
     private readonly IServiceBrowser browser;
 
-    public ServiceBrowser()
+    public static ServiceBrowser CreateFromProvider()
     {
-        this.browser = (IServiceBrowser)Activator.CreateInstance(ProviderFactory.SelectedProvider.ServiceBrowser);
+        var browser = (IServiceBrowser?)Activator.CreateInstance(ProviderFactory.SelectedProvider.ServiceBrowser);
+        
+        if (browser == null)
+        {
+            throw new ProviderObjectCreateException("The ServiceBrowser could not be created");
+        }
+
+        return new ServiceBrowser(browser);
+    }
+
+    private ServiceBrowser(IServiceBrowser browser)
+    {
+        this.browser = browser;
     }
 
     public void Dispose()
@@ -72,9 +86,9 @@ public class ServiceBrowser : IServiceBrowser
         return this.browser.GetEnumerator();
     }
     
-    public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
+    public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string? domain)
     {
-        await this.browser.Browse(interfaceIndex, addressProtocol, regtype, domain ?? "local");
+        await this.browser.Browse(interfaceIndex, addressProtocol, regtype, domain ?? LocalDomain);
     }
 
     public async Task Browse(uint interfaceIndex, string regtype, string domain)

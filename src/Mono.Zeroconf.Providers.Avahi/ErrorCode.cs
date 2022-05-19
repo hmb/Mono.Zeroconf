@@ -28,6 +28,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// ReSharper disable InconsistentNaming
 namespace Mono.Zeroconf.Providers.Avahi
 {
     public enum ErrorCode

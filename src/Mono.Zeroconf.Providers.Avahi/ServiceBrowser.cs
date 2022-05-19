@@ -42,13 +42,13 @@ public class ServiceBrowser : IServiceBrowser
 {
     private class CountedBrowseService
     {
-        public readonly BrowseService BrowseService;
-        public int UsageCount = 1;
-
         public CountedBrowseService(BrowseService browseService)
         {
             this.BrowseService = browseService;
         }
+
+        public readonly BrowseService BrowseService;
+        public int UsageCount = 1;
     }
 
     private readonly Dictionary<string, CountedBrowseService> services = new();

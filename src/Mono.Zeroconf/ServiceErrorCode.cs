@@ -28,12 +28,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// ReSharper disable InconsistentNaming
 namespace Mono.Zeroconf;
 
 // These are just copied from Bonjour
 public enum ServiceErrorCode {
     None                = 0,
-    Unknown             = -65537,       /* 0xFFFE FFFF */
+    Unknown             = -65537,       // 0xFFFE FFFF
     NoSuchName          = -65538,
     NoMemory            = -65539,
     BadParam            = -65540,
@@ -46,7 +47,7 @@ public enum ServiceErrorCode {
     NameConflict        = -65548,
     Invalid             = -65549,
     Firewall            = -65550,
-    Incompatible        = -65551,        /* client library incompatible with daemon */
+    Incompatible        = -65551,        // client library incompatible with daemon
     BadInterfaceIndex   = -65552,
     Refused             = -65553,
     NoSuchRecord        = -65554,

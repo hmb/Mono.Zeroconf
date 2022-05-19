@@ -41,6 +41,12 @@ internal static class ProviderFactory
     private static IZeroconfProvider[]? providers;
     private static IZeroconfProvider? selectedProvider;
 
+    public static IZeroconfProvider SelectedProvider
+    {
+        get => selectedProvider ?? DefaultProvider;
+        set => selectedProvider = value;
+    }
+
     private static IZeroconfProvider DefaultProvider
     {
         get
@@ -48,12 +54,6 @@ internal static class ProviderFactory
             providers ??= LoadProvidersFromFilesystem();
             return providers[0];
         }
-    }
-
-    public static IZeroconfProvider SelectedProvider
-    {
-        get => selectedProvider ?? DefaultProvider;
-        set => selectedProvider = value;
     }
 
     private static IZeroconfProvider[] LoadProvidersFromFilesystem()

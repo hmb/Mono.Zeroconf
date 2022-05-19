@@ -34,8 +34,8 @@ namespace Mono.Zeroconf.Providers;
 
 public interface IZeroconfProvider
 {
-    void Initialize();
     Type ServiceBrowser { get; }
     Type RegisterService { get; }
     Type TxtRecord { get; }
+    void Initialize();
 }

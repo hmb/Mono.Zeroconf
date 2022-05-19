@@ -156,7 +156,7 @@ public static class MZClient
             Console.WriteLine();
 
             // Listen for events of some service type
-            browser = new ServiceBrowser();
+            browser = ServiceBrowser.CreateFromProvider();
             browser.ServiceAdded += OnServiceAdded;
             browser.ServiceRemoved += OnServiceRemoved;
             await browser.Browse(@interface, address_protocol, type, domain);
@@ -198,7 +198,7 @@ public static class MZClient
             }
         }
 
-        var service = new RegisterService();
+        var service = Mono.Zeroconf.RegisterService.CreateFromProvider();
         service.Name = name;
         service.RegType = type;
         service.ReplyDomain = "local.";
@@ -229,7 +229,7 @@ public static class MZClient
                     throw new ApplicationException("Invalid key = 'value' syntax for TXT record item");
                 }
 
-                record ??= new TxtRecord();
+                record ??= TxtRecord.CreateFromProvider();
                 record.Add(key, val);
             }
         }

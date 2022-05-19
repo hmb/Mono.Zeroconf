@@ -35,6 +35,9 @@ using System.Collections;
 
 public interface ITxtRecord : IEnumerable, IDisposable
 {
+    ITxtRecord BaseRecord { get; }
+    int Count { get; }
+
     void Add(string key, string value);
     void Add(string key, byte[] value);
     void Add(TxtRecordItem item);
@@ -44,7 +47,4 @@ public interface ITxtRecord : IEnumerable, IDisposable
     TxtRecordItem GetItemAt(int index);
 
     TxtRecordItem this[string key] { get; }
-    int Count { get; }
-
-    ITxtRecord BaseRecord { get; }
 }

@@ -29,7 +29,6 @@
 //
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using Mono.Zeroconf.Providers.Avahi.DBus;
 using Tmds.DBus;
@@ -38,22 +37,12 @@ namespace Mono.Zeroconf.Providers.Avahi;
 
 using Mono.Zeroconf.Providers.Avahi.Threading;
 
-public static class DBusManagerH
-{
-    public static Task Initialize()
-    {
-        return DBusManager.Initialize();
-    }
-}
-
 internal static class DBusManager
 {
     private const string AvahiDbusName = "org.freedesktop.Avahi";
     private const uint MinimumAvahiApiVersion = 515;
 
     private static readonly AsyncLock s_serverLock = new();
-
-    public static IServer? Server { get; private set; }
 
     public static async Task Initialize()
     {
@@ -80,4 +69,6 @@ internal static class DBusManager
             }
         }
     }
+
+    public static IServer? Server { get; private set; }
 }

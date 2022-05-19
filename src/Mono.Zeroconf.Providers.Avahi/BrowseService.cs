@@ -66,11 +66,6 @@ public class BrowseService : Service, IResolvableService, IDisposable
 
     public short Port { get; private set; }
 
-    private void RaiseResolved()
-    {
-        this.Resolved?.Invoke(this, new ServiceResolvedEventArgs(this));
-    }
-
     public async Task Resolve()
     {
         using (await this.serviceLock.Enter())
@@ -127,6 +122,11 @@ public class BrowseService : Service, IResolvableService, IDisposable
         this.resolver = null;
         this.foundWatcher = null;
         this.failureWatcher = null;
+    }
+
+    private void RaiseResolved()
+    {
+        this.Resolved?.Invoke(this, new ServiceResolvedEventArgs(this));
     }
 
     private void OnResolveFound(

@@ -38,15 +38,21 @@ public class RegisterService : IRegisterService
 {
     private readonly IRegisterService registerService;
 
-    public RegisterService()
+    public static RegisterService CreateFromProvider()
     {
-        this.registerService =
-            (IRegisterService)Activator.CreateInstance(ProviderFactory.SelectedProvider.RegisterService);
-    }
+        var registerService = (IRegisterService?)Activator.CreateInstance(ProviderFactory.SelectedProvider.RegisterService);
+        
+        if (registerService == null)
+        {
+            throw new ProviderObjectCreateException("The RegisterService could not be created");
+        }
 
-    public async Task Register()
+        return new RegisterService(registerService);
+    }
+    
+    private RegisterService(IRegisterService registerService)
     {
-        await this.registerService.Register();
+        this.registerService = registerService;
     }
 
     public void Dispose()
@@ -65,34 +71,34 @@ public class RegisterService : IRegisterService
         get => this.registerService.Name;
         set => this.registerService.Name = value;
     }
-
     public string RegType
     {
         get => this.registerService.RegType;
         set => this.registerService.RegType = value;
     }
-
     public string ReplyDomain
     {
         get => this.registerService.ReplyDomain;
         set => this.registerService.ReplyDomain = value;
     }
-
     public ITxtRecord TxtRecord
     {
         get => this.registerService.TxtRecord;
         set => this.registerService.TxtRecord = value;
     }
-
     public short Port
     {
         get => this.registerService.Port;
         set => this.registerService.Port = value;
     }
-
     public ushort UPort
     {
         get => this.registerService.UPort;
         set => this.registerService.UPort = value;
+    }
+
+    public async Task Register()
+    {
+        await this.registerService.Register();
     }
 }

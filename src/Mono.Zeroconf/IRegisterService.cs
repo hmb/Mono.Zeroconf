@@ -37,12 +37,12 @@ public interface IRegisterService : IService, IDisposable
 {
     event EventHandler<RegisterServiceEventArgs>? Response;
 
-    Task Register();
-
     new string Name { get; set; }
     new string RegType { get; set; }
     new string ReplyDomain { get; set; }
 
     short Port { get; set; }
     ushort UPort { get; set; }
+
+    Task Register();
 }

@@ -36,15 +36,36 @@ namespace Mono.Zeroconf;
 
 public class TxtRecord : ITxtRecord
 {
-    public ITxtRecord BaseRecord { get; }
-
-    public int Count => this.BaseRecord.Count;
-    
-    public TxtRecord()
+    public static TxtRecord CreateFromProvider()
     {
-        this.BaseRecord = (ITxtRecord)Activator.CreateInstance(ProviderFactory.SelectedProvider.TxtRecord);
+        var baseRecord = (ITxtRecord?)Activator.CreateInstance(ProviderFactory.SelectedProvider.TxtRecord);
+        
+        if (baseRecord == null)
+        {
+            throw new ProviderObjectCreateException("The TxtRecord could not be created");
+        }
+
+        return new TxtRecord(baseRecord);
+    }
+    
+    private TxtRecord(ITxtRecord baseRecord)
+    {
+        this.BaseRecord = baseRecord;
+    }
+
+    public void Dispose()
+    {
+        this.BaseRecord.Dispose();
     }
         
+    public ITxtRecord BaseRecord { get; }
+    public int Count => this.BaseRecord.Count;
+    
+    public IEnumerator GetEnumerator()
+    {
+        return this.BaseRecord.GetEnumerator();
+    }
+
     public void Add(string key, string value)
     {
         this.BaseRecord.Add(key, value);
@@ -70,15 +91,5 @@ public class TxtRecord : ITxtRecord
         return this.BaseRecord.GetItemAt(index);
     }
         
-    public IEnumerator GetEnumerator()
-    {
-        return this.BaseRecord.GetEnumerator();
-    }
-
     public TxtRecordItem this[string index] => this.BaseRecord[index];
-
-    public void Dispose()
-    {
-        this.BaseRecord.Dispose();
-    }
 }

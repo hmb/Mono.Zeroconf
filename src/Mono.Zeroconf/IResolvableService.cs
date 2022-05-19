@@ -38,12 +38,12 @@ public interface IResolvableService : IService
 {
     event EventHandler<ServiceResolvedEventArgs>? Resolved;
 
-    Task Resolve();
-
     string FullName { get; }
     IPHostEntry HostEntry { get; }
     string HostTarget { get; }
     uint NetworkInterface { get; }
     AddressProtocol AddressProtocol { get; }
     short Port { get; }
+
+    Task Resolve();
 }

@@ -1,11 +1,9 @@
-//
-// TxtRecordItem.cs
+﻿//
+// ProviderObjectCreateException.cs
 //
 // Authors:
-//    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -30,30 +28,11 @@
 
 namespace Mono.Zeroconf;
 
-using System.Text;
+using System;
 
-public class TxtRecordItem
+public class ProviderObjectCreateException : Exception
 {
-    public TxtRecordItem(string key, byte [] valueRaw)
+    public ProviderObjectCreateException(string message) : base(message)
     {
-        this.Key = key;
-        this.ValueRaw = valueRaw;
-        this.ValueString = Encoding.UTF8.GetString(this.ValueRaw);
-    }
-        
-    public TxtRecordItem(string key, string valueString)
-    {
-        this.Key = key;
-        this.ValueString = valueString;
-        this.ValueRaw = Encoding.UTF8.GetBytes(valueString);
-    }
-        
-    public string Key { get; }
-    public byte[] ValueRaw { get; }
-    public string ValueString { get; }
-    
-    public override string ToString()
-    {
-        return $"{this.Key} = {this.ValueString}";
     }
 }

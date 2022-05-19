@@ -37,6 +37,7 @@ using System.Threading.Tasks;
 public interface IResolvableService : IService
 {
     event EventHandler<ServiceResolvedEventArgs>? Resolved;
+    event EventHandler<string>? ResolveFailure;
 
     string FullName { get; }
     IPHostEntry HostEntry { get; }

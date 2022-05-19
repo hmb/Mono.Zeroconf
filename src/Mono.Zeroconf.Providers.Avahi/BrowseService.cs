@@ -57,6 +57,7 @@ public class BrowseService : Service, IResolvableService, IDisposable
     public void Dispose() => this.StopResolve().GetAwaiter().GetResult();
 
     public event EventHandler<ServiceResolvedEventArgs>? Resolved;
+    public event EventHandler<string>? ResolveFailure;
 
     public string FullName { get; private set; }
 
@@ -94,7 +95,7 @@ public class BrowseService : Service, IResolvableService, IDisposable
 
             Console.WriteLine("Resolve called: WatchFoundAsync/WatchFailureAsync");
             this.foundWatcher = await this.resolver.WatchFoundAsync(this.OnResolveFound);
-            this.failureWatcher = await this.resolver.WatchFailureAsync(OnResolveFailure);
+            this.failureWatcher = await this.resolver.WatchFailureAsync(this.OnResolveFailure);
 
             Console.WriteLine("Resolve called: awaited");
         }
@@ -129,11 +130,15 @@ public class BrowseService : Service, IResolvableService, IDisposable
         this.Resolved?.Invoke(this, new ServiceResolvedEventArgs(this));
     }
 
+    private void RaiseResolveFailure(string error)
+    {
+        this.ResolveFailure?.Invoke(this, error);
+    }
+    
     private void OnResolveFound(
         (int @interface, int protocol, string name, string type, string domain, string host, int aprotocol, string
             address, ushort port, byte[][] txt, uint flags) obj)
     {
-
         this.Name = obj.name;
         this.RegType = obj.type;
         this.AvahiInterface = obj.@interface;
@@ -168,8 +173,8 @@ public class BrowseService : Service, IResolvableService, IDisposable
         this.RaiseResolved();
     }
 
-    private static void OnResolveFailure(string error)
+    private void OnResolveFailure(string error)
     {
-        Console.WriteLine("OnResolveFailure");
+        this.RaiseResolveFailure(error);
     }
 }

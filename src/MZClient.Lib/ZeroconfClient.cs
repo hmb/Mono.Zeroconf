@@ -261,6 +261,7 @@ public static class MZClient
 
         Console.WriteLine("resolving shares");
         args.Service.Resolved += OnServiceResolved;
+        args.Service.ResolveFailure += OnServiceResolveFailure;
         await args.Service.Resolve();
     }
 
@@ -272,6 +273,7 @@ public static class MZClient
             args.Service.ReplyDomain);
 
         args.Service.Resolved -= OnServiceResolved;
+        args.Service.ResolveFailure += OnServiceResolveFailure;
     }
 
     private static void OnServiceResolved(object? o, ServiceResolvedEventArgs args)
@@ -303,6 +305,11 @@ public static class MZClient
         }
     }
 
+    private static void OnServiceResolveFailure(object? sender, string error)
+    {
+        Console.Write($"Error resolving service: {error}");
+    }
+    
     private static void OnRegisterServiceResponse(object? o, RegisterServiceEventArgs args)
     {
         switch(args.ServiceError) {

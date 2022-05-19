@@ -43,6 +43,7 @@ namespace Mono.Zeroconf.Providers.Bonjour
         private Native.DNSServiceQueryRecordReply query_record_reply_handler;
         
         public event EventHandler<ServiceResolvedEventArgs>? Resolved;
+        public event EventHandler<string>? ResolveFailure;
 
         public BrowseService()
         {

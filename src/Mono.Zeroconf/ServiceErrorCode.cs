@@ -32,6 +32,7 @@
 namespace Mono.Zeroconf;
 
 // These are just copied from Bonjour
+// TODO use correct hex constants, after checking the implications ad possible side effects
 public enum ServiceErrorCode {
     None                = 0,
     Unknown             = -65537,       // 0xFFFE FFFF

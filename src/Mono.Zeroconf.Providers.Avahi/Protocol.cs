@@ -31,7 +31,7 @@
 // ReSharper disable InconsistentNaming
 namespace Mono.Zeroconf.Providers.Avahi
 {
-    public enum Protocol : int
+    public enum Protocol
     {
         Unspecified = -1,
         IPv4 = 0,

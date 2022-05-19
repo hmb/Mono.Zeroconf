@@ -72,7 +72,7 @@ namespace Mono.Zeroconf.Providers.Avahi
         DnsFormErr = -36,
         DnsServFail = -37,
         DnsNxDomain = -38,
-        DnsNoTimp = -39,
+        DnsNotImplemented = -39,
         DnsRefused = -40,
         DnsYxDomain = -41,
         DnsYxRrSet = -42,

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj" />
+    <ProjectReference Include="..\Mono.Zeroconf\Mono.Zeroconf.csproj" />
+  </ItemGroup>
+
+</Project>

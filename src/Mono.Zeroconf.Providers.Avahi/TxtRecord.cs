@@ -109,18 +109,4 @@ public class TxtRecord : ITxtRecord
     {
         return this.recordItems.FirstOrDefault(item => item.Key == key);
     }
-
-    internal static byte[][] Render(ITxtRecord record)
-    {
-        var items = new byte[record.Count][];
-        var index = 0;
-
-        foreach (TxtRecordItem item in record)
-        {
-            var txt = $"{item.Key}={item.ValueString}";
-            items[index++] = Encoding.UTF8.GetBytes(txt);
-        }
-
-        return items;
-    }
 }

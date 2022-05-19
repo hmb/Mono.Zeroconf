@@ -32,71 +32,38 @@ namespace Mono.Zeroconf.Providers.Avahi
 {
     public class Service : IService
     {
-        private string name;
-        private string regtype;
-        private string reply_domain;
-        private int @interface;
-        private Protocol aprotocol;
-        private ITxtRecord? txt_record;
-
-        public Service()
+        protected Service()
         {
-            this.@interface = -1; // Unspecified
+            this.Name = string.Empty;
+            this.RegType = string.Empty;
+            this.ReplyDomain = string.Empty;
+            this.AvahiInterface = -1;
+            this.AvahiProtocol = Protocol.Unspecified;
         }
 
-        public Service(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
+        protected Service(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
         {
-            this.name = name;
-            this.regtype = regtype;
-            this.reply_domain = replyDomain;
-            this.@interface = @interface;
-            this.aprotocol = aprotocol;
+            this.Name = name;
+            this.RegType = regtype;
+            this.ReplyDomain = replyDomain;
+            this.AvahiInterface = @interface;
+            this.AvahiProtocol = aprotocol;
         }
 
-        protected int AvahiInterface
-        {
-            get { return @interface; }
-            set { @interface = value; }
-        }
+        public string Name { get; set; }
 
-        protected Protocol AvahiProtocol
-        {
-            get { return aprotocol; }
-            set { aprotocol = value; }
-        }
+        public string RegType { get; set; }
 
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+        public string ReplyDomain { get; set; }
 
-        public string RegType
-        {
-            get { return regtype; }
-            set { regtype = value; }
-        }
+        protected int AvahiInterface { get; set; }
 
-        public string ReplyDomain
-        {
-            get { return reply_domain; }
-            set { reply_domain = value; }
-        }
+        protected Protocol AvahiProtocol { get; set; }
 
-        public uint NetworkInterface
-        {
-            get { return AvahiUtils.ToMzcInterface(@interface); }
-        }
+        public uint NetworkInterface => AvahiUtils.ToMzcInterface(this.AvahiInterface);
 
-        public AddressProtocol AddressProtocol
-        {
-            get { return AvahiUtils.ToMzcProtocol(aprotocol); }
-        }
+        public AddressProtocol AddressProtocol => AvahiUtils.ToMzcProtocol(this.AvahiProtocol);
 
-        public ITxtRecord? TxtRecord
-        {
-            get { return txt_record; }
-            set { txt_record = value; }
-        }
+        public ITxtRecord? TxtRecord { get; set; }
     }
 }

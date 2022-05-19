@@ -78,26 +78,33 @@ internal static class ProviderFactory
             {
                 if (Path.GetFileName(fileName) == Path.GetFileName(assemblyPath))
                 {
+                    // Console.WriteLine($"provider {fileName} is own assembly");
                     continue;
                 }
                 
+                Console.WriteLine($"load provider {fileName}");
+
                 var providerAssembly = Assembly.LoadFile(fileName);
 
                 if (providerAssembly.GetCustomAttributes(false).FirstOrDefault(a => a is ZeroconfProviderAttribute) is
                     not ZeroconfProviderAttribute attribute)
                 {
+                    // Console.WriteLine($"provider has no ZeroconfProviderAttribute {fileName}");
                     continue;
                 }
                 
+                Console.WriteLine($"create instance {attribute.ProviderType}");
                 var provider = (IZeroconfProvider?)Activator.CreateInstance(attribute.ProviderType);
 
                 if (provider == null)
                 {
+                    // Console.WriteLine($"create instance failed");
                     continue;
                 }
                             
                 try
                 {
+                    // Console.WriteLine($"init provider {provider}");
                     provider.Initialize();
                     providerList.Add(provider);
                 }

@@ -158,10 +158,12 @@ public class ServiceBrowser : IServiceBrowser
 
             if (this.services.TryGetValue(key, out var existingResolverInstance))
             {
+                Console.WriteLine($"resolver {key} was already added, increment usage");
                 ++existingResolverInstance.UsageCount;
             }
             else
             {
+                Console.WriteLine($"create new resolver {key}");
                 var newBrowseService = new BrowseService(
                     serviceData.name,
                     serviceData.regtype,
@@ -192,7 +194,7 @@ public class ServiceBrowser : IServiceBrowser
                 return;
             }
 
-            Console.WriteLine($"decrement usage count {resolverInstance.UsageCount} of the resolver: {key}");
+            Console.WriteLine($"decrement usage count {resolverInstance.UsageCount} on resolver {key}");
             --resolverInstance.UsageCount;
 
             if (resolverInstance.UsageCount > 0)
@@ -202,6 +204,7 @@ public class ServiceBrowser : IServiceBrowser
 
             this.RaiseServiceRemoved(resolverInstance.BrowseService);
 
+            Console.WriteLine($"usage count on resolver {key} down to zero, remove it");
             await resolverInstance.BrowseService.StopResolve();
 
             this.services.Remove(key);

@@ -177,7 +177,7 @@ public static class MZClient
 
     private static async Task RegisterService(string serviceDescription)
     {
-        Match match = Regex.Match(serviceDescription, @"(_[a-z]+._tcp|udp)\s*(\d+)\s*(.*)");
+        var match = Regex.Match(serviceDescription, @"(_[a-z]+\._(?:tcp|udp))\s*(\d+)\s*(.*)");
         if(match.Groups.Count < 4) {
             throw new ApplicationException("Invalid service description syntax");
         }

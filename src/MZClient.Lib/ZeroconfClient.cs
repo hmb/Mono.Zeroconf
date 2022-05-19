@@ -307,14 +307,13 @@ public static class MZClient
     {
         switch(args.ServiceError) {
             case ServiceErrorCode.NameConflict:
-                Console.WriteLine("*** Name Collision! '{0}' is already registered",
-                    args.Service.Name);
+                Console.WriteLine($"*** Name Collision! '{args.Service?.Name}' is already registered");
                 break;
             case ServiceErrorCode.None:
-                Console.WriteLine("*** Registered name = '{0}'", args.Service.Name);
+                Console.WriteLine($"*** Registered name = '{args.Service?.Name}'");
                 break;
             case ServiceErrorCode.Unknown:
-                Console.WriteLine("*** Error registering name = '{0}'", args.Service.Name);
+                Console.WriteLine($"*** Error registering name = '{args.Service?.Name}'");
                 break;
         }
     }

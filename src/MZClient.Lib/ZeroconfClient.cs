@@ -44,7 +44,7 @@ public static class MZClient
     private static readonly SemaphoreSlim endProgram = new(0, 1);
     private static AddressProtocol address_protocol = AddressProtocol.Any;
     private static uint @interface;
-    private static string domain = "local";
+    private static string domain = ServiceBrowserConstants.LocalDomain;
     private static bool resolve_shares;
     private static bool verbose;
 

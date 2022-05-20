@@ -32,6 +32,7 @@ namespace Mono.Zeroconf;
 
 using System.Text;
 
+// TODO create an interface for this as well, perhaps move into core lib
 public class TxtRecordItem
 {
     public TxtRecordItem(string key, byte [] valueRaw)

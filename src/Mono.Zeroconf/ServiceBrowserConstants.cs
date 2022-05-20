@@ -1,11 +1,9 @@
 //
-// TxtRecord.cs
+// ServiceBrowserConstants.cs
 //
 // Authors:
-//    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -30,55 +28,7 @@
 
 namespace Mono.Zeroconf;
 
-using System.Collections;
-
-public class TxtRecord : ITxtRecord
+public static class ServiceBrowserConstants
 {
-    public TxtRecord(ITxtRecord baseRecord)
-    {
-        this.BaseRecord = baseRecord;
-    }
-
-    public void Dispose()
-    {
-        this.BaseRecord.Dispose();
-    }
-        
-    public ITxtRecord BaseRecord { get; }
-    public int Count => this.BaseRecord.Count;
-    
-    public IEnumerator GetEnumerator()
-    {
-        return this.BaseRecord.GetEnumerator();
-    }
-
-    public void Add(string key, string value)
-    {
-        this.BaseRecord.Add(key, value);
-    }
-        
-    public void Add(string key, byte [] value)
-    {
-        this.BaseRecord.Add(key, value);
-    }
-        
-    public void Add(TxtRecordItem item)
-    {
-        this.BaseRecord.Add(item);
-    }
-        
-    public void Remove(string key)
-    {
-        this.BaseRecord.Remove(key);
-    }
-        
-    public TxtRecordItem GetItemAt(int index)
-    {
-        return this.BaseRecord.GetItemAt(index);
-    }
-
-    public TxtRecordItem? FirstOrDefault(string key)
-    {
-        return this.BaseRecord.FirstOrDefault(key);
-    }
+    public const string LocalDomain = "local";
 }

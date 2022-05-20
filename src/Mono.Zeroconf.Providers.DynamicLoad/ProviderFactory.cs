@@ -66,9 +66,8 @@ public class ProviderFactory : IProviderFactory
             throw new ProviderObjectCreateException("The ServiceBrowser could not be created");
         }
 
-        return new ServiceBrowser(browser);
+        return browser;
     }
-
     
     public IRegisterService CreateRegisterService()
     {
@@ -79,19 +78,19 @@ public class ProviderFactory : IProviderFactory
             throw new ProviderObjectCreateException("The RegisterService could not be created");
         }
 
-        return new RegisterService(registerService);
+        return registerService;
     }
 
     public ITxtRecord CreateTxtRecord()
     {
-        var baseRecord = (ITxtRecord?)Activator.CreateInstance(this.SelectedProviderObjectTypes.TxtRecord);
+        var txtRecord = (ITxtRecord?)Activator.CreateInstance(this.SelectedProviderObjectTypes.TxtRecord);
         
-        if (baseRecord == null)
+        if (txtRecord == null)
         {
             throw new ProviderObjectCreateException("The TxtRecord could not be created");
         }
 
-        return new TxtRecord(baseRecord);
+        return txtRecord;
     }
 
     private static IZeroconfProviderObjectTypes[] LoadProvidersFromFilesystem()

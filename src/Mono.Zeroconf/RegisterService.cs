@@ -38,19 +38,7 @@ public class RegisterService : IRegisterService
 {
     private readonly IRegisterService registerService;
 
-    public static RegisterService CreateFromProvider()
-    {
-        var registerService = (IRegisterService?)Activator.CreateInstance(ProviderFactory.SelectedProvider.RegisterService);
-        
-        if (registerService == null)
-        {
-            throw new ProviderObjectCreateException("The RegisterService could not be created");
-        }
-
-        return new RegisterService(registerService);
-    }
-    
-    private RegisterService(IRegisterService registerService)
+    public RegisterService(IRegisterService registerService)
     {
         this.registerService = registerService;
     }

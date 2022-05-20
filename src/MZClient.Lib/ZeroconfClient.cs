@@ -37,6 +37,8 @@ using Mono.Zeroconf;
 
 namespace MZClient.Lib;
 
+using Mono.Zeroconf.Providers;
+
 public static class MZClient
 {
     private const string app_name = "mzclient";
@@ -49,6 +51,8 @@ public static class MZClient
 
     public static async Task<int> MainLib(string [] args)
     {
+        var providerFactory = new ProviderFactory();
+        
         string type = "_workstation._tcp";
         bool show_help = false;
         ArrayList services = new ArrayList();
@@ -139,7 +143,7 @@ public static class MZClient
 
         if(services.Count > 0) {
             foreach(string service_description in services) {
-                await RegisterService(service_description);
+                await RegisterService(providerFactory, service_description);
             }
         } else {
             if (verbose) {
@@ -156,7 +160,7 @@ public static class MZClient
             Console.WriteLine();
 
             // Listen for events of some service type
-            browser = ServiceBrowser.CreateFromProvider();
+            browser = providerFactory.CreateServiceBrowser();
             browser.ServiceAdded += OnServiceAdded;
             browser.ServiceRemoved += OnServiceRemoved;
             await browser.Browse(@interface, address_protocol, type, domain);
@@ -175,7 +179,7 @@ public static class MZClient
         endProgram.Release();
     }
 
-    private static async Task RegisterService(string serviceDescription)
+    private static async Task RegisterService(IProviderFactory providerFactory, string serviceDescription)
     {
         var match = Regex.Match(serviceDescription, @"(_[a-z]+\._(?:tcp|udp))\s*(\d+)\s*(.*)");
         if(match.Groups.Count < 4) {
@@ -198,7 +202,7 @@ public static class MZClient
             }
         }
 
-        var service = Mono.Zeroconf.RegisterService.CreateFromProvider();
+        var service = providerFactory.CreateRegisterService();
         service.Name = name;
         service.RegType = type;
         service.ReplyDomain = "local.";
@@ -229,7 +233,7 @@ public static class MZClient
                     throw new ApplicationException("Invalid key = 'value' syntax for TXT record item");
                 }
 
-                record ??= TxtRecord.CreateFromProvider();
+                record ??= providerFactory.CreateTxtRecord();
                 record.Add(key, val);
             }
         }
@@ -288,12 +292,12 @@ public static class MZClient
             service.FullName, service.HostEntry.AddressList[0], service.HostEntry.HostName, service.Port,
             service.NetworkInterface, service.AddressProtocol);
 
-        ITxtRecord record = service.TxtRecord;
-        int record_count = record.Count;
+        var record = service.TxtRecord;
+        var record_count = record?.Count ?? 0;
         if(record_count > 0) {
             Console.Write(", TXT Record = [");
-            for(int i = 0, n = record.Count; i < n; i++) {
-                TxtRecordItem item = record.GetItemAt(i);
+            for(int i = 0, n = record_count; i < n; i++) {
+                var item = record!.GetItemAt(i);
                 Console.Write("{0} = '{1}'", item.Key, item.ValueString);
                 if(i < n - 1) {
                     Console.Write(", ");
@@ -301,7 +305,7 @@ public static class MZClient
             }
             Console.WriteLine("]");
         } else {
-            Console.WriteLine("");
+            Console.WriteLine();
         }
     }
 

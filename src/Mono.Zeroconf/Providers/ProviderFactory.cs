@@ -36,27 +36,64 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-internal static class ProviderFactory
+public class ProviderFactory : IProviderFactory
 {
-    private static IZeroconfProvider[]? providers;
-    private static IZeroconfProvider? selectedProvider;
+    private IZeroconfProviderObjectTypes[]? providerObjectTypes;
+    private IZeroconfProviderObjectTypes? selectedProviderObjectTypes;
 
-    public static IZeroconfProvider SelectedProvider
-    {
-        get => selectedProvider ?? DefaultProvider;
-        set => selectedProvider = value;
-    }
-
-    private static IZeroconfProvider DefaultProvider
+    private IZeroconfProviderObjectTypes DefaultProviderObjectTypes
     {
         get
         {
-            providers ??= LoadProvidersFromFilesystem();
-            return providers[0];
+            this.providerObjectTypes ??= LoadProvidersFromFilesystem();
+            return this.providerObjectTypes[0];
         }
     }
 
-    private static IZeroconfProvider[] LoadProvidersFromFilesystem()
+    private IZeroconfProviderObjectTypes SelectedProviderObjectTypes
+    {
+        get => this.selectedProviderObjectTypes ?? this.DefaultProviderObjectTypes;
+        set => this.selectedProviderObjectTypes = value;
+    }
+
+    public IServiceBrowser CreateServiceBrowser()
+    {
+        var browser = (IServiceBrowser?)Activator.CreateInstance(this.SelectedProviderObjectTypes.ServiceBrowser);
+        
+        if (browser == null)
+        {
+            throw new ProviderObjectCreateException("The ServiceBrowser could not be created");
+        }
+
+        return new ServiceBrowser(browser);
+    }
+
+    
+    public IRegisterService CreateRegisterService()
+    {
+        var registerService = (IRegisterService?)Activator.CreateInstance(this.SelectedProviderObjectTypes.RegisterService);
+        
+        if (registerService == null)
+        {
+            throw new ProviderObjectCreateException("The RegisterService could not be created");
+        }
+
+        return new RegisterService(registerService);
+    }
+
+    public ITxtRecord CreateTxtRecord()
+    {
+        var baseRecord = (ITxtRecord?)Activator.CreateInstance(this.SelectedProviderObjectTypes.TxtRecord);
+        
+        if (baseRecord == null)
+        {
+            throw new ProviderObjectCreateException("The TxtRecord could not be created");
+        }
+
+        return new TxtRecord(baseRecord);
+    }
+
+    private static IZeroconfProviderObjectTypes[] LoadProvidersFromFilesystem()
     {
         var envPath = Environment.GetEnvironmentVariable("MONO_ZEROCONF_PROVIDERS");
         var directories = new List<string>();
@@ -70,7 +107,7 @@ internal static class ProviderFactory
         
         directories.Add(Path.GetDirectoryName(assemblyPath) ?? Directory.GetCurrentDirectory());
 
-        var providerList = new List<IZeroconfProvider>();
+        var providerList = new List<IZeroconfProviderObjectTypes>();
         
         foreach (var directory in directories)
         {
@@ -93,8 +130,8 @@ internal static class ProviderFactory
                     continue;
                 }
                 
-                Console.WriteLine($"create instance {attribute.ProviderType}");
-                var provider = (IZeroconfProvider?)Activator.CreateInstance(attribute.ProviderType);
+                Console.WriteLine($"create instance {attribute.ZeroconfProviderObjectTypes}");
+                var provider = (IZeroconfProviderObjectTypes?)Activator.CreateInstance(attribute.ZeroconfProviderObjectTypes);
 
                 if (provider == null)
                 {

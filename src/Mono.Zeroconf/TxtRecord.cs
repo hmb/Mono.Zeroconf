@@ -28,27 +28,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Collections;
-using Mono.Zeroconf.Providers;
-
 namespace Mono.Zeroconf;
+
+using System.Collections;
 
 public class TxtRecord : ITxtRecord
 {
-    public static TxtRecord CreateFromProvider()
-    {
-        var baseRecord = (ITxtRecord?)Activator.CreateInstance(ProviderFactory.SelectedProvider.TxtRecord);
-        
-        if (baseRecord == null)
-        {
-            throw new ProviderObjectCreateException("The TxtRecord could not be created");
-        }
-
-        return new TxtRecord(baseRecord);
-    }
-    
-    private TxtRecord(ITxtRecord baseRecord)
+    public TxtRecord(ITxtRecord baseRecord)
     {
         this.BaseRecord = baseRecord;
     }

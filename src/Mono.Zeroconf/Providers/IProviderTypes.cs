@@ -1,5 +1,5 @@
 //
-// ZeroconfProviderAttribute.cs
+// IZeroconfProvider.cs
 //
 // Authors:
 //    Aaron Bockover    <abockover@novell.com>
@@ -32,13 +32,10 @@ using System;
 
 namespace Mono.Zeroconf.Providers;
 
-[AttributeUsage(AttributeTargets.Assembly)]
-public class ZeroconfProviderAttribute : Attribute
+public interface IProviderTypes
 {
-    public ZeroconfProviderAttribute(Type zeroconfProviderObjectTypes)
-    {
-        this.ZeroconfProviderObjectTypes = zeroconfProviderObjectTypes;
-    }
-        
-    public Type ZeroconfProviderObjectTypes { get; }
+    Type ServiceBrowser { get; }
+    Type RegisterService { get; }
+    Type TxtRecord { get; }
+    void Initialize();
 }

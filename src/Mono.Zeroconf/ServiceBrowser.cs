@@ -42,19 +42,7 @@ public class ServiceBrowser : IServiceBrowser
     
     private readonly IServiceBrowser browser;
 
-    public static ServiceBrowser CreateFromProvider()
-    {
-        var browser = (IServiceBrowser?)Activator.CreateInstance(ProviderFactory.SelectedProvider.ServiceBrowser);
-        
-        if (browser == null)
-        {
-            throw new ProviderObjectCreateException("The ServiceBrowser could not be created");
-        }
-
-        return new ServiceBrowser(browser);
-    }
-
-    private ServiceBrowser(IServiceBrowser browser)
+    public ServiceBrowser(IServiceBrowser browser)
     {
         this.browser = browser;
     }
@@ -91,6 +79,7 @@ public class ServiceBrowser : IServiceBrowser
         await this.browser.Browse(interfaceIndex, addressProtocol, regtype, domain ?? LocalDomain);
     }
 
+    // TODO move into an extension 
     public async Task Browse(uint interfaceIndex, string regtype, string domain)
     {
         await this.Browse(interfaceIndex, AddressProtocol.Any, regtype, domain);

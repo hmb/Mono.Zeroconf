@@ -1,10 +1,12 @@
 //
 // ZeroconfProvider.cs
 //
-// Authors:
-//    Aaron Bockover  <abockover@novell.com>
+// Author:
+//    Aaron Bockover    <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2007-2008 Novell, Inc.
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -13,10 +15,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,35 +30,20 @@
 
 using System;
 using Mono.Zeroconf.Providers;
-using Mono.Zeroconf.Providers.Bonjour;
+using Mono.Zeroconf.Providers.Avahi;
 
-[assembly:ZeroconfProvider(typeof(ZeroconfProvider))]
+[assembly: ZeroconfProvider(typeof(ZeroconfProviderObjectTypes))]
 
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Mono.Zeroconf.Providers.Avahi;
+
+public class ZeroconfProviderObjectTypes : IZeroconfProviderObjectTypes
 {
-    public static class Zeroconf
+    public void Initialize()
     {
-        public static void Initialize()
-        {
-            var error = Native.DNSServiceCreateConnection(out var sd_ref);
-            
-            if(error != ServiceError.NoError) {
-                throw new ServiceErrorException(error);
-            }
-            
-            sd_ref.Deallocate();
-        }
+        DBusManager.Initialize().GetAwaiter().GetResult();
     }
 
-    public class ZeroconfProvider : IZeroconfProvider
-    {
-        public void Initialize()
-        {
-            Zeroconf.Initialize();
-        }
-        
-        public Type ServiceBrowser => typeof(ServiceBrowser);
-        public Type RegisterService => typeof(RegisterService);
-        public Type TxtRecord => typeof(TxtRecord);
-    }
+    public Type ServiceBrowser => typeof(ServiceBrowser);
+    public Type RegisterService => typeof(RegisterService);
+    public Type TxtRecord => typeof(TxtRecord);
 }

@@ -28,13 +28,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using Mono.Zeroconf.Providers;
+using Mono.Zeroconf.Providers.Abstraction;
 using Mono.Zeroconf.Providers.Avahi;
 
 [assembly: ZeroconfProvider(typeof(ZeroconfProviderObjectTypes))]
 
 namespace Mono.Zeroconf.Providers.Avahi;
+
+using System;
+using Mono.Zeroconf.Providers.Abstraction;
 
 public class ZeroconfProviderObjectTypes : IZeroconfProviderObjectTypes
 {

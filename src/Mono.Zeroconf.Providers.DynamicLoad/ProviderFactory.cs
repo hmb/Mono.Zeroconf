@@ -28,13 +28,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf.Providers;
+namespace Mono.Zeroconf.Providers.DynamicLoad;
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Mono.Zeroconf.Providers.Abstraction;
 
 public class ProviderFactory : IProviderFactory
 {

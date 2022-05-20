@@ -26,18 +26,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// ReSharper disable InconsistentNaming
+
+namespace MZClient.Lib;
+
 using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Mono.Zeroconf;
-
-// ReSharper disable InconsistentNaming
-
-namespace MZClient.Lib;
-
-using Mono.Zeroconf.Providers;
+using Mono.Zeroconf.Providers.DynamicLoad;
 
 public static class MZClient
 {

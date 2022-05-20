@@ -26,37 +26,38 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using Mono.Zeroconf.Providers;
+using Mono.Zeroconf.Providers.Abstraction;
 using Mono.Zeroconf.Providers.Bonjour;
 
 [assembly:ZeroconfProvider(typeof(ZeroconfProviderObjectTypes))]
 
-namespace Mono.Zeroconf.Providers.Bonjour
-{
-    public static class Zeroconf
-    {
-        public static void Initialize()
-        {
-            var error = Native.DNSServiceCreateConnection(out var sd_ref);
-            
-            if(error != ServiceError.NoError) {
-                throw new ServiceErrorException(error);
-            }
-            
-            sd_ref.Deallocate();
-        }
-    }
+namespace Mono.Zeroconf.Providers.Bonjour;
 
-    public class ZeroconfProviderObjectTypes : IZeroconfProviderObjectTypes
+using System;
+using Mono.Zeroconf.Providers.Abstraction;
+
+public static class Zeroconf
+{
+    public static void Initialize()
     {
-        public void Initialize()
-        {
-            Zeroconf.Initialize();
+        var error = Native.DNSServiceCreateConnection(out var sd_ref);
+            
+        if(error != ServiceError.NoError) {
+            throw new ServiceErrorException(error);
         }
-        
-        public Type ServiceBrowser => typeof(ServiceBrowser);
-        public Type RegisterService => typeof(RegisterService);
-        public Type TxtRecord => typeof(TxtRecord);
+            
+        sd_ref.Deallocate();
     }
+}
+
+public class ZeroconfProviderObjectTypes : IZeroconfProviderObjectTypes
+{
+    public void Initialize()
+    {
+        Zeroconf.Initialize();
+    }
+        
+    public Type ServiceBrowser => typeof(ServiceBrowser);
+    public Type RegisterService => typeof(RegisterService);
+    public Type TxtRecord => typeof(TxtRecord);
 }

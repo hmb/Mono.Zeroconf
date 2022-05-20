@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mono.Zeroconf.Providers.Abstraction\Mono.Zeroconf.Providers.Abstraction.csproj" />
     <ProjectReference Include="..\Mono.Zeroconf\Mono.Zeroconf.csproj" />
   </ItemGroup>
 

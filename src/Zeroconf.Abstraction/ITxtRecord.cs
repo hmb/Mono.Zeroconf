@@ -30,10 +30,7 @@
 
 namespace Zeroconf.Abstraction;
 
-using System;
-using System.Collections;
-
-public interface ITxtRecord : IEnumerable, IDisposable
+public interface ITxtRecord : IEnumerable<TxtRecordItem>, IDisposable
 {
     ITxtRecord BaseRecord { get; }
     int Count { get; }

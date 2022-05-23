@@ -1,12 +1,10 @@
 //
-// TxtRecordItem.cs
+// ZeroconfProvider.cs
 //
 // Authors:
-//    Aaron Bockover    <abockover@novell.com>
-//    Holger Böhnke     <zeroconf@biz.amarin.de>
+//    Aaron Bockover  <abockover@novell.com>
 //
 // Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
-// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -28,33 +26,38 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf;
+using Mono.Zeroconf.Providers.Abstraction;
+using Mono.Zeroconf.Providers.Bonjour;
 
-using System.Text;
+[assembly:ZeroconfProvider(typeof(ZeroconfProviderObjectTypes))]
 
-// TODO create an interface for this as well, perhaps move into core lib
-public class TxtRecordItem
+namespace Mono.Zeroconf.Providers.Bonjour;
+
+using System;
+using Mono.Zeroconf.Providers.Abstraction;
+
+public static class Zeroconf
 {
-    public TxtRecordItem(string key, byte [] valueRaw)
+    public static void Initialize()
     {
-        this.Key = key;
-        this.ValueRaw = valueRaw;
-        this.ValueString = Encoding.UTF8.GetString(this.ValueRaw);
+        var error = Native.DNSServiceCreateConnection(out var sd_ref);
+            
+        if(error != ServiceError.NoError) {
+            throw new ServiceErrorException(error);
+        }
+            
+        sd_ref.Deallocate();
+    }
+}
+
+public class ZeroconfProviderObjectTypes : IZeroconfProviderObjectTypes
+{
+    public void Initialize()
+    {
+        Zeroconf.Initialize();
     }
         
-    public TxtRecordItem(string key, string valueString)
-    {
-        this.Key = key;
-        this.ValueString = valueString;
-        this.ValueRaw = Encoding.UTF8.GetBytes(valueString);
-    }
-        
-    public string Key { get; }
-    public byte[] ValueRaw { get; }
-    public string ValueString { get; }
-    
-    public override string ToString()
-    {
-        return $"{this.Key} = {this.ValueString}";
-    }
+    public Type ServiceBrowser => typeof(ServiceBrowser);
+    public Type RegisterService => typeof(RegisterService);
+    public Type TxtRecord => typeof(TxtRecord);
 }

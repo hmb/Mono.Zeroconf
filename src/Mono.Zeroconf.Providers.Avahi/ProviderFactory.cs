@@ -1,11 +1,9 @@
 //
-// IZeroconfProvider.cs
+// ProviderFactory.cs
 //
 // Authors:
-//    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -28,14 +26,34 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
+namespace Mono.Zeroconf.Providers.Avahi;
 
-namespace Mono.Zeroconf.Providers;
+using System.Threading.Tasks;
 
-public interface IZeroconfProvider
+public class ProviderFactory : IProviderFactory
 {
-    Type ServiceBrowser { get; }
-    Type RegisterService { get; }
-    Type TxtRecord { get; }
-    void Initialize();
+    public async Task StartAsync()
+    {
+        await DBusManager.Initialize();
+    }
+
+    public Task StopAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public IServiceBrowser CreateServiceBrowser()
+    {
+        return new ServiceBrowser();
+    }
+    
+    public IRegisterService CreateRegisterService()
+    {
+        return new RegisterService();
+    }
+
+    public ITxtRecord CreateTxtRecord()
+    {
+        return new TxtRecord();
+    }
 }

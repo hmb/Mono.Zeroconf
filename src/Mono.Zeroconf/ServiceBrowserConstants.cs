@@ -1,10 +1,10 @@
 //
-// ZeroconfProvider.cs
+// ServiceBrowserConstants.cs
 //
 // Authors:
-//    Aaron Bockover  <abockover@novell.com>
+//    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,37 +26,9 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using Mono.Zeroconf.Providers;
-using Mono.Zeroconf.Providers.Bonjour;
+namespace Mono.Zeroconf;
 
-[assembly:ZeroconfProvider(typeof(ZeroconfProvider))]
-
-namespace Mono.Zeroconf.Providers.Bonjour
+public static class ServiceBrowserConstants
 {
-    public static class Zeroconf
-    {
-        public static void Initialize()
-        {
-            var error = Native.DNSServiceCreateConnection(out var sd_ref);
-            
-            if(error != ServiceError.NoError) {
-                throw new ServiceErrorException(error);
-            }
-            
-            sd_ref.Deallocate();
-        }
-    }
-
-    public class ZeroconfProvider : IZeroconfProvider
-    {
-        public void Initialize()
-        {
-            Zeroconf.Initialize();
-        }
-        
-        public Type ServiceBrowser => typeof(ServiceBrowser);
-        public Type RegisterService => typeof(RegisterService);
-        public Type TxtRecord => typeof(TxtRecord);
-    }
+    public const string LocalDomain = "local";
 }

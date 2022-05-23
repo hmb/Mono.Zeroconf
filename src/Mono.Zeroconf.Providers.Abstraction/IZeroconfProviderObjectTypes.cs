@@ -1,5 +1,5 @@
 //
-// TxtRecordItem.cs
+// IZeroconfProvider.cs
 //
 // Authors:
 //    Aaron Bockover    <abockover@novell.com>
@@ -28,33 +28,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf;
+namespace Mono.Zeroconf.Providers.Abstraction;
 
-using System.Text;
+using System;
 
-// TODO create an interface for this as well, perhaps move into core lib
-public class TxtRecordItem
+public interface IZeroconfProviderObjectTypes
 {
-    public TxtRecordItem(string key, byte [] valueRaw)
-    {
-        this.Key = key;
-        this.ValueRaw = valueRaw;
-        this.ValueString = Encoding.UTF8.GetString(this.ValueRaw);
-    }
-        
-    public TxtRecordItem(string key, string valueString)
-    {
-        this.Key = key;
-        this.ValueString = valueString;
-        this.ValueRaw = Encoding.UTF8.GetBytes(valueString);
-    }
-        
-    public string Key { get; }
-    public byte[] ValueRaw { get; }
-    public string ValueString { get; }
-    
-    public override string ToString()
-    {
-        return $"{this.Key} = {this.ValueString}";
-    }
+    Type ServiceBrowser { get; }
+    Type RegisterService { get; }
+    Type TxtRecord { get; }
+    void Initialize();
 }

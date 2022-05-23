@@ -1,5 +1,5 @@
 //
-// TxtRecordItem.cs
+// ZeroconfProviderAttribute.cs
 //
 // Authors:
 //    Aaron Bockover    <abockover@novell.com>
@@ -28,33 +28,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf;
+namespace Mono.Zeroconf.Providers.Abstraction;
 
-using System.Text;
+using System;
 
-// TODO create an interface for this as well, perhaps move into core lib
-public class TxtRecordItem
+[AttributeUsage(AttributeTargets.Assembly)]
+public class ZeroconfProviderAttribute : Attribute
 {
-    public TxtRecordItem(string key, byte [] valueRaw)
+    public ZeroconfProviderAttribute(Type zeroconfProviderObjectTypes)
     {
-        this.Key = key;
-        this.ValueRaw = valueRaw;
-        this.ValueString = Encoding.UTF8.GetString(this.ValueRaw);
+        this.ZeroconfProviderObjectTypes = zeroconfProviderObjectTypes;
     }
         
-    public TxtRecordItem(string key, string valueString)
-    {
-        this.Key = key;
-        this.ValueString = valueString;
-        this.ValueRaw = Encoding.UTF8.GetBytes(valueString);
-    }
-        
-    public string Key { get; }
-    public byte[] ValueRaw { get; }
-    public string ValueString { get; }
-    
-    public override string ToString()
-    {
-        return $"{this.Key} = {this.ValueString}";
-    }
+    public Type ZeroconfProviderObjectTypes { get; }
 }

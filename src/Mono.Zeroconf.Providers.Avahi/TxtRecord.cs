@@ -42,6 +42,10 @@ public class TxtRecord : ITxtRecord
     private readonly List<TxtRecordItem> recordItems = new();
 
     // ReSharper disable once ParameterTypeCanBeEnumerable.Local
+    public TxtRecord()
+    {
+    }
+
     public TxtRecord(byte[][] data)
     {
         foreach (var rawItem in data)

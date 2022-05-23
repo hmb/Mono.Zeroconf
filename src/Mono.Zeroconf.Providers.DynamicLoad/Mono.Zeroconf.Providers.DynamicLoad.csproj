@@ -2,12 +2,15 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj" />
+    <Compile Remove="Class1.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Mono.Zeroconf.Providers.Abstraction\Mono.Zeroconf.Providers.Abstraction.csproj" />
     <ProjectReference Include="..\Mono.Zeroconf\Mono.Zeroconf.csproj" />
   </ItemGroup>

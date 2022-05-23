@@ -1,11 +1,9 @@
 //
-// ZeroconfProvider.cs
+// ProviderFactory.cs
 //
-// Author:
-//    Aaron Bockover    <abockover@novell.com>
+// Authors:
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2007-2008 Novell, Inc.
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -15,10 +13,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-//
+// 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,22 +26,35 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using Mono.Zeroconf.Providers;
-using Mono.Zeroconf.Providers.Avahi;
+namespace Mono.Zeroconf.Providers.Bonjour;
 
-[assembly: ZeroconfProvider(typeof(ZeroconfProvider))]
+using System.Threading.Tasks;
 
-namespace Mono.Zeroconf.Providers.Avahi;
-
-public class ZeroconfProvider : IZeroconfProvider
+public class ProviderFactory : IProviderFactory
 {
-    public void Initialize()
+    public Task StartAsync()
     {
-        DBusManager.Initialize().GetAwaiter().GetResult();
+        Zeroconf.Initialize();
+        return Task.CompletedTask;
     }
 
-    public Type ServiceBrowser => typeof(ServiceBrowser);
-    public Type RegisterService => typeof(RegisterService);
-    public Type TxtRecord => typeof(TxtRecord);
+    public Task StopAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public IServiceBrowser CreateServiceBrowser()
+    {
+        return new ServiceBrowser();
+    }
+    
+    public IRegisterService CreateRegisterService()
+    {
+        return new RegisterService();
+    }
+
+    public ITxtRecord CreateTxtRecord()
+    {
+        return new TxtRecord();
+    }
 }

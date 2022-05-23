@@ -1,11 +1,11 @@
 //
-// TxtRecordItem.cs
+// ZeroconfProvider.cs
 //
-// Authors:
+// Author:
 //    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
+// Copyright (C) 2007-2008 Novell, Inc.
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -15,10 +15,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -28,33 +28,24 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf;
+using Mono.Zeroconf.Providers.Abstraction;
+using Mono.Zeroconf.Providers.Avahi;
 
-using System.Text;
+[assembly: ZeroconfProvider(typeof(ZeroconfProviderObjectTypes))]
 
-// TODO create an interface for this as well, perhaps move into core lib
-public class TxtRecordItem
+namespace Mono.Zeroconf.Providers.Avahi;
+
+using System;
+using Mono.Zeroconf.Providers.Abstraction;
+
+public class ZeroconfProviderObjectTypes : IZeroconfProviderObjectTypes
 {
-    public TxtRecordItem(string key, byte [] valueRaw)
+    public void Initialize()
     {
-        this.Key = key;
-        this.ValueRaw = valueRaw;
-        this.ValueString = Encoding.UTF8.GetString(this.ValueRaw);
+        DBusManager.Initialize().GetAwaiter().GetResult();
     }
-        
-    public TxtRecordItem(string key, string valueString)
-    {
-        this.Key = key;
-        this.ValueString = valueString;
-        this.ValueRaw = Encoding.UTF8.GetBytes(valueString);
-    }
-        
-    public string Key { get; }
-    public byte[] ValueRaw { get; }
-    public string ValueString { get; }
-    
-    public override string ToString()
-    {
-        return $"{this.Key} = {this.ValueString}";
-    }
+
+    public Type ServiceBrowser => typeof(ServiceBrowser);
+    public Type RegisterService => typeof(RegisterService);
+    public Type TxtRecord => typeof(TxtRecord);
 }

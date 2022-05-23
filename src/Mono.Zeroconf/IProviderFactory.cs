@@ -1,11 +1,9 @@
-//
-// ZeroconfProviderAttribute.cs
+﻿//
+// ProviderFactory.cs
 //
 // Authors:
-//    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -28,17 +26,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
+namespace Mono.Zeroconf;
 
-namespace Mono.Zeroconf.Providers;
+using System.Threading.Tasks;
 
-[AttributeUsage(AttributeTargets.Assembly)]
-public class ZeroconfProviderAttribute : Attribute
+public interface IProviderFactory
 {
-    public ZeroconfProviderAttribute(Type providerType)
-    {
-        this.ProviderType = providerType;
-    }
-        
-    public Type ProviderType { get; }
+    Task StartAsync();
+    Task StopAsync();
+    
+    IServiceBrowser CreateServiceBrowser();
+    IRegisterService CreateRegisterService();
+    ITxtRecord CreateTxtRecord();
 }

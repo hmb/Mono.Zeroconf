@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mono.Zeroconf.Providers.DynamicLoad\Mono.Zeroconf.Providers.DynamicLoad.csproj" />
     <ProjectReference Include="..\Mono.Zeroconf\Mono.Zeroconf.csproj" />
   </ItemGroup>
 

@@ -26,9 +26,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf.Providers.Avahi;
+namespace Zeroconf.Avahi;
 
 using System.Text;
+using Zeroconf.Abstraction;
 
 internal static class TxtRecordExtension
 {

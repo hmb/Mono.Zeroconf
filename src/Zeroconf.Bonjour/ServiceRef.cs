@@ -26,10 +26,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Zeroconf.Bonjour
 {
+    using System;
+
     public struct ServiceRef
     {
         public static readonly ServiceRef Zero;

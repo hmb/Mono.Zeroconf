@@ -1,4 +1,4 @@
-﻿namespace Mono.Zeroconf.Providers.Avahi.Threading;
+﻿namespace Zeroconf.Avahi.Threading;
 
 using System;
 using System.Threading;

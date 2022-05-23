@@ -1,4 +1,4 @@
-namespace Mono.Zeroconf;
+namespace Zeroconf.Abstraction;
 
 using System.Threading.Tasks;
 

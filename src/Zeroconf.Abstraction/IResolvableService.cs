@@ -28,7 +28,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf;
+namespace Zeroconf.Abstraction;
 
 using System;
 using System.Net;

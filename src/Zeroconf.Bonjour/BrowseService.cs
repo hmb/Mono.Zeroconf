@@ -26,14 +26,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Collections;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Zeroconf.Bonjour
 {
+    using System;
+    using System.Collections;
+    using System.Net;
+    using System.Runtime.InteropServices;
+    using System.Threading.Tasks;
+    using Zeroconf.Abstraction;
+
     public sealed class BrowseService : Service, IResolvableService
     {
         private bool is_resolved = false;

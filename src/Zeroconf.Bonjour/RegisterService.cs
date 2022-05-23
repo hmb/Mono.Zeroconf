@@ -26,14 +26,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Zeroconf.Bonjour
 {
+    using System;
+    using System.Net;
+    using System.Runtime.InteropServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Zeroconf.Abstraction;
+
     public sealed class RegisterService : Service, IRegisterService, IDisposable
     {
         private Thread thread;

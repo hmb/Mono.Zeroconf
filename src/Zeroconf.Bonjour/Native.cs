@@ -26,11 +26,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Runtime.InteropServices;
-
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Zeroconf.Bonjour
 {
+    using System;
+    using System.Runtime.InteropServices;
+
     public static class Native
     {
         // ServiceRef

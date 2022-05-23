@@ -26,10 +26,11 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System.Net;
-
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Zeroconf.Bonjour
 {
+    using System.Net;
+    using Zeroconf.Abstraction;
+
     public abstract class Service : IService
     {
         protected ServiceFlags flags = ServiceFlags.None;

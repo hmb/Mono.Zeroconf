@@ -28,14 +28,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+namespace Zeroconf.Avahi;
+
 using System;
 using System.Threading.Tasks;
-using Mono.Zeroconf.Providers.Avahi.DBus;
-
-namespace Mono.Zeroconf.Providers.Avahi;
-
-using Mono.Zeroconf.Providers.Avahi.Threading;
 using Tmds.DBus;
+using Zeroconf.Abstraction;
+using Zeroconf.Avahi.DBus;
+using Zeroconf.Avahi.Threading;
 
 public class RegisterService : Service, IRegisterService
 {

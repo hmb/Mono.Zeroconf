@@ -26,15 +26,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Zeroconf.Bonjour
 {
-    public class ServiceBrowseEventArgs : Mono.Zeroconf.ServiceBrowseEventArgs
+    using System.Collections;
+    using Zeroconf.Abstraction;
+
+    public class ServiceBrowseEventArgs : Zeroconf.Abstraction.ServiceBrowseEventArgs
     {
         private bool more_coming;
         
@@ -62,8 +59,8 @@ namespace Mono.Zeroconf.Providers.Bonjour
         
         private Thread thread;
         
-        public event EventHandler<Mono.Zeroconf.ServiceBrowseEventArgs>? ServiceAdded;
-        public event EventHandler<Mono.Zeroconf.ServiceBrowseEventArgs>? ServiceRemoved;
+        public event EventHandler<Zeroconf.Abstraction.ServiceBrowseEventArgs>? ServiceAdded;
+        public event EventHandler<Zeroconf.Abstraction.ServiceBrowseEventArgs>? ServiceRemoved;
         
         public ServiceBrowser()
         {

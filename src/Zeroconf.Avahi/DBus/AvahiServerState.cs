@@ -26,14 +26,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf.Providers.Avahi.DBus
+namespace Zeroconf.Avahi.DBus;
+
+public enum AvahiServerState
 {
-    public enum AvahiServerState 
-    {
-        Invalid,
-        Registering,
-        Running,
-        Collision,
-        Failure
-    }
+    Invalid,
+    Registering,
+    Running,
+    Collision,
+    Failure
 }

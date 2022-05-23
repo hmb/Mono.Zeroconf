@@ -28,14 +28,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+namespace Zeroconf.Avahi;
+
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Linq;
-
-namespace Mono.Zeroconf.Providers.Avahi;
-
+using Zeroconf.Abstraction;
 
 public class TxtRecord : ITxtRecord
 {

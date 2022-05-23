@@ -28,8 +28,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf.Providers.Avahi
+namespace Zeroconf.Avahi
 {
+    using Zeroconf.Abstraction;
+
     public class Service : IService
     {
         protected Service()

@@ -28,15 +28,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+namespace Zeroconf.Avahi;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
-using Mono.Zeroconf.Providers.Avahi.Threading;
+using System.Threading.Tasks;
 using Tmds.DBus;
-
-namespace Mono.Zeroconf.Providers.Avahi;
+using Zeroconf.Abstraction;
+using Zeroconf.Avahi.Threading;
 
 public class ServiceBrowser : IServiceBrowser
 {

@@ -29,7 +29,7 @@
 //
 
 // ReSharper disable InconsistentNaming
-namespace Mono.Zeroconf;
+namespace Zeroconf.Abstraction;
 
 // These are just copied from Bonjour
 // TODO use correct hex constants, after checking the implications ad possible side effects

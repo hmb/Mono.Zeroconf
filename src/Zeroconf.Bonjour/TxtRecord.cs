@@ -26,14 +26,15 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Collections;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Collections.Generic;
-
-namespace Mono.Zeroconf.Providers.Bonjour
+namespace Zeroconf.Bonjour
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Runtime.InteropServices;
+    using System.Text;
+    using Zeroconf.Abstraction;
+
     public class TxtRecord : ITxtRecord
     {
         private IntPtr handle = IntPtr.Zero;

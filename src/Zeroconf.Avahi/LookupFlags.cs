@@ -28,10 +28,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-
-namespace Mono.Zeroconf.Providers.Avahi
+namespace Zeroconf.Avahi
 {
+    using System;
+
     [Flags]
     public enum LookupFlags : uint
     {

@@ -26,15 +26,16 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Mono.Zeroconf.Providers.Bonjour;
+namespace Zeroconf.Bonjour;
 
 using System.Threading.Tasks;
+using Zeroconf.Abstraction;
 
 public class ProviderFactory : IProviderFactory
 {
     public Task StartAsync()
     {
-        Zeroconf.Initialize();
+        BonjourInit.Initialize();
         return Task.CompletedTask;
     }
 

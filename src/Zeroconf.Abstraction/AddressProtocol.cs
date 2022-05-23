@@ -30,7 +30,7 @@
 
 // ReSharper disable InconsistentNaming
 
-namespace Mono.Zeroconf;
+namespace Zeroconf.Abstraction;
 
 public enum AddressProtocol
 {

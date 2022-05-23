@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mono.Zeroconf.Providers.Abstraction\Mono.Zeroconf.Providers.Abstraction.csproj" />
-    <ProjectReference Include="..\Mono.Zeroconf\Mono.Zeroconf.csproj" />
+    <ProjectReference Include="..\Zeroconf.Abstraction\Zeroconf.Abstraction.csproj" />
+    <ProjectReference Include="..\Zeroconf.Providers.Abstraction\Zeroconf.Providers.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>

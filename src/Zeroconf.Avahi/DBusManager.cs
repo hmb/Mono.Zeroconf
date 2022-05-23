@@ -28,14 +28,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+namespace Zeroconf.Avahi;
+
 using System;
 using System.Threading.Tasks;
-using Mono.Zeroconf.Providers.Avahi.DBus;
 using Tmds.DBus;
-
-namespace Mono.Zeroconf.Providers.Avahi;
-
-using Mono.Zeroconf.Providers.Avahi.Threading;
+using Zeroconf.Avahi.DBus;
+using Zeroconf.Avahi.Threading;
 
 internal static class DBusManager
 {

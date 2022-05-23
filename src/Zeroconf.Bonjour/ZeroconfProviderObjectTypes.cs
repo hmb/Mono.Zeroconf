@@ -26,17 +26,17 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using Mono.Zeroconf.Providers.Abstraction;
-using Mono.Zeroconf.Providers.Bonjour;
+using Zeroconf.Bonjour;
+using Zeroconf.Providers.Abstraction;
 
 [assembly:ZeroconfProvider(typeof(ZeroconfProviderObjectTypes))]
 
-namespace Mono.Zeroconf.Providers.Bonjour;
+namespace Zeroconf.Bonjour;
 
 using System;
-using Mono.Zeroconf.Providers.Abstraction;
+using Zeroconf.Providers.Abstraction;
 
-public static class Zeroconf
+public static class BonjourInit
 {
     public static void Initialize()
     {
@@ -54,7 +54,7 @@ public class ZeroconfProviderObjectTypes : IZeroconfProviderObjectTypes
 {
     public void Initialize()
     {
-        Zeroconf.Initialize();
+        BonjourInit.Initialize();
     }
         
     public Type ServiceBrowser => typeof(ServiceBrowser);

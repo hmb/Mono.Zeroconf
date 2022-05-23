@@ -21,5 +21,5 @@ interface IEntryGroup : IDBusObject
     Task UpdateServiceTxtAsync(int Interface, int Protocol, uint Flags, string Name, string Type, string Domain, byte[][] Txt);
     Task AddAddressAsync(int Interface, int Protocol, uint Flags, string Name, string Address);
     Task AddRecordAsync(int Interface, int Protocol, uint Flags, string Name, ushort Clazz, ushort Type, uint Ttl, byte[] Rdata);
-    Task<IDisposable> WatchStateChangedAsync(Action<(int state, string error)> handler, Action<Exception> onError = null);
+    Task<IDisposable> WatchStateChangedAsync(Action<(int state, string error)> handler, Action<Exception>? onError = null);
 }

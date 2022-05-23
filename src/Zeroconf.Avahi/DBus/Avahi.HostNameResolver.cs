@@ -12,6 +12,6 @@ using Tmds.DBus;
 interface IHostNameResolver : IDBusObject
 {
     Task FreeAsync();
-    Task<IDisposable> WatchFoundAsync(Action<(int @interface, int protocol, string name, int aprotocol, string address, uint flags)> handler, Action<Exception> onError = null);
-    Task<IDisposable> WatchFailureAsync(Action<string> handler, Action<Exception> onError = null);
+    Task<IDisposable> WatchFoundAsync(Action<(int @interface, int protocol, string name, int aprotocol, string address, uint flags)> handler, Action<Exception>? onError = null);
+    Task<IDisposable> WatchFailureAsync(Action<string> handler, Action<Exception>? onError = null);
 }

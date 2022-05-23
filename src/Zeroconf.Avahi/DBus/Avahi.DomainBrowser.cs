@@ -12,9 +12,9 @@ using Tmds.DBus;
 interface IDomainBrowser : IDBusObject
 {
     Task FreeAsync();
-    Task<IDisposable> WatchItemNewAsync(Action<(int @interface, int protocol, string domain, uint flags)> handler, Action<Exception> onError = null);
-    Task<IDisposable> WatchItemRemoveAsync(Action<(int @interface, int protocol, string domain, uint flags)> handler, Action<Exception> onError = null);
-    Task<IDisposable> WatchFailureAsync(Action<string> handler, Action<Exception> onError = null);
-    Task<IDisposable> WatchAllForNowAsync(Action handler, Action<Exception> onError = null);
-    Task<IDisposable> WatchCacheExhaustedAsync(Action handler, Action<Exception> onError = null);
+    Task<IDisposable> WatchItemNewAsync(Action<(int @interface, int protocol, string domain, uint flags)> handler, Action<Exception>? onError = null);
+    Task<IDisposable> WatchItemRemoveAsync(Action<(int @interface, int protocol, string domain, uint flags)> handler, Action<Exception>? onError = null);
+    Task<IDisposable> WatchFailureAsync(Action<string> handler, Action<Exception>? onError = null);
+    Task<IDisposable> WatchAllForNowAsync(Action handler, Action<Exception>? onError = null);
+    Task<IDisposable> WatchCacheExhaustedAsync(Action handler, Action<Exception>? onError = null);
 }

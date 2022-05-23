@@ -35,5 +35,5 @@ interface IServer : IDBusObject
     Task<IHostNameResolver> HostNameResolverNewAsync(int Interface, int Protocol, string Name, int Aprotocol, uint Flags);
     Task<IAddressResolver> AddressResolverNewAsync(int Interface, int Protocol, string Address, uint Flags);
     Task<IRecordBrowser> RecordBrowserNewAsync(int Interface, int Protocol, string Name, ushort Clazz, ushort Type, uint Flags);
-    Task<IDisposable> WatchStateChangedAsync(Action<(int state, string error)> handler, Action<Exception> onError = null);
+    Task<IDisposable> WatchStateChangedAsync(Action<(int state, string error)> handler, Action<Exception>? onError = null);
 }

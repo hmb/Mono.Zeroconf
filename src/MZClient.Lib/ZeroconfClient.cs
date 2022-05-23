@@ -51,6 +51,7 @@ public static class MZClient
     public static async Task<int> MainLib(string [] args)
     {
         var providerFactory = new ProviderFactory();
+        await providerFactory.StartAsync();
         
         string type = "_workstation._tcp";
         bool show_help = false;

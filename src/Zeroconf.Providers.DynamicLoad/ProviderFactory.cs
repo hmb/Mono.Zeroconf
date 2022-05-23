@@ -128,7 +128,7 @@ public class ProviderFactory : IProviderFactory
         
         foreach (var directory in directories)
         {
-            foreach (var fileName in Directory.GetFiles(directory, "Mono.Zeroconf.Providers.*.dll"))
+            foreach (var fileName in Directory.GetFiles(directory, "Zeroconf.Provider.*.dll"))
             {
                 if (Path.GetFileName(fileName) == Path.GetFileName(assemblyPath))
                 {

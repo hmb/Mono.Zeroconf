@@ -33,14 +33,9 @@ using Zeroconf.Abstraction;
 
 public class ProviderFactory : IProviderFactory
 {
-    public async Task StartAsync()
+    public async Task Initialize()
     {
-        await DBusManager.Initialize();
-    }
-
-    public Task StopAsync()
-    {
-        return Task.CompletedTask;
+        await AvahiInit.Initialize();
     }
 
     public IServiceBrowser CreateServiceBrowser()

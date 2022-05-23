@@ -33,14 +33,9 @@ using Zeroconf.Abstraction;
 
 public class ProviderFactory : IProviderFactory
 {
-    public Task StartAsync()
+    public Task Initialize()
     {
         BonjourInit.Initialize();
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync()
-    {
         return Task.CompletedTask;
     }
 

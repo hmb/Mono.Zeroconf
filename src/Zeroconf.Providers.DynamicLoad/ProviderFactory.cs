@@ -63,14 +63,9 @@ public class ProviderFactory : IProviderFactory
         set => this.selectedProviderObjectTypes = value;
     }
 
-    public Task StartAsync()
+    public Task Initialize()
     {
         this.providerObjectTypes = LoadProvidersFromFilesystem();
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync()
-    {
         return Task.CompletedTask;
     }
 

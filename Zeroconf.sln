@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Providers.Abstract
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Providers.DynamicLoad", "src\Zeroconf.Providers.DynamicLoad\Zeroconf.Providers.DynamicLoad.csproj", "{8CF4F3F9-6071-420C-85C1-D50F8459A0BC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Provider.Avahi", "src\Zeroconf.Provider.Avahi\Zeroconf.Provider.Avahi.csproj", "{90BFB93A-7302-48BD-8E39-14508F116295}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Provider.Bonjour", "src\Zeroconf.Provider.Bonjour\Zeroconf.Provider.Bonjour.csproj", "{348F5434-C31C-45AC-B613-AAE2DC0E9BA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +48,10 @@ Global
 		{EEA10DEF-A405-48E6-BF6E-E66ABBE3ED93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CF4F3F9-6071-420C-85C1-D50F8459A0BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8CF4F3F9-6071-420C-85C1-D50F8459A0BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90BFB93A-7302-48BD-8E39-14508F116295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90BFB93A-7302-48BD-8E39-14508F116295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{348F5434-C31C-45AC-B613-AAE2DC0E9BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{348F5434-C31C-45AC-B613-AAE2DC0E9BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		name = Mono.Zeroconf

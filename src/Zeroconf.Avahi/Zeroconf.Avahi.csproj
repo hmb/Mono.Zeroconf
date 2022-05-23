@@ -5,13 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyName>Zeroconf.Provider.Avahi</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj" />
     <ProjectReference Include="..\Zeroconf.Abstraction\Zeroconf.Abstraction.csproj" />
-    <ProjectReference Include="..\Zeroconf.Providers.Abstraction\Zeroconf.Providers.Abstraction.csproj" />
   </ItemGroup>
 
 </Project>

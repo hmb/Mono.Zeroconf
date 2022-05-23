@@ -32,8 +32,7 @@ using System.Threading.Tasks;
 
 public interface IProviderFactory
 {
-    Task StartAsync();
-    Task StopAsync();
+    Task Initialize();
     
     IServiceBrowser CreateServiceBrowser();
     IRegisterService CreateRegisterService();

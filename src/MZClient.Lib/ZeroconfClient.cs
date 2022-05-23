@@ -35,8 +35,8 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using Mono.Zeroconf;
-using Mono.Zeroconf.Providers.DynamicLoad;
+using Zeroconf.Abstraction;
+using Zeroconf.Providers.DynamicLoad;
 
 public static class MZClient
 {
@@ -51,6 +51,7 @@ public static class MZClient
     public static async Task<int> MainLib(string [] args)
     {
         var providerFactory = new ProviderFactory();
+        await providerFactory.StartAsync();
         
         string type = "_workstation._tcp";
         bool show_help = false;

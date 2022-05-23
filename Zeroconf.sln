@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual C# Express 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MZClient.Lib", "src\MZClient.Lib\MZClient.Lib.csproj", "{B6D42D18-5EE5-482F-8D74-2D6FE4DBC4EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MZClient.Win", "src\MZClient.Win\MZClient.Win.csproj", "{41DE096F-1D5A-4C5D-BA57-5BC6A31E721A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MZClient.Linux", "src\MZClient.Linux\MZClient.Linux.csproj", "{51E65D95-5A75-48C4-96C1-4604BD4638C3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "References", "References", "{87DDDCDC-9B80-4B0F-A2D4-DEAA273F7D44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tmds.DBus", "..\Tmds.DBus\src\Tmds.DBus\Tmds.DBus.csproj", "{76EC2A7A-B4C9-4788-BCBC-00C576DDD2C9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Abstraction", "src\Zeroconf.Abstraction\Zeroconf.Abstraction.csproj", "{CD65E80D-D75F-4EFC-AD6E-9F8188C00A15}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Avahi", "src\Zeroconf.Avahi\Zeroconf.Avahi.csproj", "{F62803F9-BFFA-498A-B6DA-5F5A2D1CC178}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Bonjour", "src\Zeroconf.Bonjour\Zeroconf.Bonjour.csproj", "{8C84840F-0457-4E0D-8B6B-906230541D40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Providers.Abstraction", "src\Zeroconf.Providers.Abstraction\Zeroconf.Providers.Abstraction.csproj", "{EEA10DEF-A405-48E6-BF6E-E66ABBE3ED93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zeroconf.Providers.DynamicLoad", "src\Zeroconf.Providers.DynamicLoad\Zeroconf.Providers.DynamicLoad.csproj", "{8CF4F3F9-6071-420C-85C1-D50F8459A0BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B6D42D18-5EE5-482F-8D74-2D6FE4DBC4EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D42D18-5EE5-482F-8D74-2D6FE4DBC4EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41DE096F-1D5A-4C5D-BA57-5BC6A31E721A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41DE096F-1D5A-4C5D-BA57-5BC6A31E721A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51E65D95-5A75-48C4-96C1-4604BD4638C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51E65D95-5A75-48C4-96C1-4604BD4638C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76EC2A7A-B4C9-4788-BCBC-00C576DDD2C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76EC2A7A-B4C9-4788-BCBC-00C576DDD2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD65E80D-D75F-4EFC-AD6E-9F8188C00A15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD65E80D-D75F-4EFC-AD6E-9F8188C00A15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F62803F9-BFFA-498A-B6DA-5F5A2D1CC178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F62803F9-BFFA-498A-B6DA-5F5A2D1CC178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C84840F-0457-4E0D-8B6B-906230541D40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C84840F-0457-4E0D-8B6B-906230541D40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA10DEF-A405-48E6-BF6E-E66ABBE3ED93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA10DEF-A405-48E6-BF6E-E66ABBE3ED93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CF4F3F9-6071-420C-85C1-D50F8459A0BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CF4F3F9-6071-420C-85C1-D50F8459A0BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		name = Mono.Zeroconf
+		version = 0.1
+		StartupItem = src\MZClient\MZClient.csproj
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{76EC2A7A-B4C9-4788-BCBC-00C576DDD2C9} = {87DDDCDC-9B80-4B0F-A2D4-DEAA273F7D44}
+	EndGlobalSection
+EndGlobal

@@ -35,7 +35,7 @@ namespace Zeroconf.Bonjour
     internal class TxtRecordEnumerator : IEnumerator<TxtRecordItem>
     {
         private TxtRecord record;
-        private TxtRecordItem current_item;
+        private TxtRecordItem? current_item;
         private int index;
         
         public TxtRecordEnumerator(TxtRecord record)
@@ -51,7 +51,7 @@ namespace Zeroconf.Bonjour
 
         object IEnumerator.Current => this.Current;
 
-        public TxtRecordItem Current => this.current_item;
+        public TxtRecordItem Current => this.current_item ?? throw new IndexOutOfRangeException();
 
         public bool MoveNext()
         {

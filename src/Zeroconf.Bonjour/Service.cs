@@ -63,7 +63,7 @@ namespace Zeroconf.Bonjour
                 return false;
             }
             
-            return (o as Service).Name == Name;
+            return (o as Service)?.Name == Name;
         }
         
         public override int GetHashCode()

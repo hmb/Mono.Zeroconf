@@ -37,7 +37,7 @@ namespace Zeroconf.Bonjour
 
     public sealed class RegisterService : Service, IRegisterService, IDisposable
     {
-        private Thread thread;
+        private Thread? thread;
         private ServiceRef sd_ref;
         private bool auto_rename = true;
     
@@ -100,7 +100,7 @@ namespace Zeroconf.Bonjour
         public void ProcessRegister()
         {
             ushort txt_rec_length = 0;
-            byte [] txt_rec = null;
+            byte []? txt_rec = null;
             
             if(TxtRecord != null) {
                 txt_rec_length = ((TxtRecord)TxtRecord.BaseRecord).RawLength;

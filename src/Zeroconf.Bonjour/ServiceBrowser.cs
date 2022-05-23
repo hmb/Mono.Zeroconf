@@ -57,7 +57,7 @@ namespace Zeroconf.Bonjour
         
         private Native.DNSServiceBrowseReply browse_reply_handler;
         
-        private Thread thread;
+        private Thread? thread;
         
         public event EventHandler<Zeroconf.Abstraction.ServiceBrowseEventArgs>? ServiceAdded;
         public event EventHandler<Zeroconf.Abstraction.ServiceBrowseEventArgs>? ServiceRemoved;

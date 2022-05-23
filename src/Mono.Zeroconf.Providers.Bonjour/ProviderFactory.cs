@@ -28,8 +28,21 @@
 
 namespace Mono.Zeroconf.Providers.Bonjour;
 
+using System.Threading.Tasks;
+
 public class ProviderFactory : IProviderFactory
 {
+    public Task StartAsync()
+    {
+        Zeroconf.Initialize();
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     public IServiceBrowser CreateServiceBrowser()
     {
         return new ServiceBrowser();

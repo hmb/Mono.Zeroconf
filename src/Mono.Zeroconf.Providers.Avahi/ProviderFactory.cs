@@ -28,8 +28,20 @@
 
 namespace Mono.Zeroconf.Providers.Avahi;
 
+using System.Threading.Tasks;
+
 public class ProviderFactory : IProviderFactory
 {
+    public async Task StartAsync()
+    {
+        await DBusManager.Initialize();
+    }
+
+    public Task StopAsync()
+    {
+        return Task.CompletedTask;
+    }
+
     public IServiceBrowser CreateServiceBrowser()
     {
         return new ServiceBrowser();

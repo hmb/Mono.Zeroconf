@@ -46,7 +46,12 @@ public class ProviderFactory : IProviderFactory
     {
         get
         {
-            this.providerObjectTypes ??= LoadProvidersFromFilesystem();
+            if (this.providerObjectTypes == null || this.providerObjectTypes.Length == 0)
+            {
+                throw new Exception(
+                    "No Zeroconf providers could be found or initialized. Necessary daemon may not be running.");
+            }
+
             return this.providerObjectTypes[0];
         }
     }
@@ -55,6 +60,17 @@ public class ProviderFactory : IProviderFactory
     {
         get => this.selectedProviderObjectTypes ?? this.DefaultProviderObjectTypes;
         set => this.selectedProviderObjectTypes = value;
+    }
+
+    public Task StartAsync()
+    {
+        this.providerObjectTypes = LoadProvidersFromFilesystem();
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync()
+    {
+        return Task.CompletedTask;
     }
 
     public IServiceBrowser CreateServiceBrowser()

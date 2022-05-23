@@ -28,8 +28,13 @@
 
 namespace Mono.Zeroconf;
 
+using System.Threading.Tasks;
+
 public interface IProviderFactory
 {
+    Task StartAsync();
+    Task StopAsync();
+    
     IServiceBrowser CreateServiceBrowser();
     IRegisterService CreateRegisterService();
     ITxtRecord CreateTxtRecord();

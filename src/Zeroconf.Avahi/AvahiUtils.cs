@@ -61,7 +61,7 @@ public static class AvahiUtils
         return interfaceIndex switch
         {
             ZeroconfConstants.InterfaceIndexAny => AvahiInterfaceIndexAny,
-            _ => (int)interfaceIndex - 1
+            _ => (int)interfaceIndex
         };
     }
 
@@ -70,7 +70,7 @@ public static class AvahiUtils
         return interfaceIndex switch
         {
             AvahiInterfaceIndexAny => ZeroconfConstants.InterfaceIndexAny,
-            _ => (uint)interfaceIndex + 1
+            _ => (uint)interfaceIndex
         };
     }
 

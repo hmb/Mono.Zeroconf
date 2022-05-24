@@ -40,9 +40,7 @@ public interface IRegisterService : IService, IDisposable
     new string Name { get; set; }
     new string RegType { get; set; }
     new string ReplyDomain { get; set; }
-
-    short Port { get; set; }
-    ushort UPort { get; set; }
+    ushort Port { get; set; }
 
     Task Register();
 }

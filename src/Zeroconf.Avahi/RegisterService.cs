@@ -72,13 +72,7 @@ public class RegisterService : Service, IRegisterService
 
     public event EventHandler<RegisterServiceEventArgs>? Response;
 
-    public short Port
-    {
-        get => (short)this.UPort;
-        set => this.UPort = (ushort)value;
-    }
-
-    public ushort UPort { get; set; }
+    public ushort Port { get; set; }
 
     public async Task Register()
     {
@@ -115,13 +109,14 @@ public class RegisterService : Service, IRegisterService
 
             await this.entryGroup.AddServiceAsync(
                 this.AvahiInterfaceIndex,
-                (int)this.AvahiIpProtocolType,
+                this.AvahiIpProtocolType.ToNativeAvahiProtocolType(),
+                // TODO add cast function
                 (uint)PublishFlags.None,
                 this.Name,
                 this.RegType,
                 this.ReplyDomain,
                 string.Empty,
-                this.UPort,
+                this.Port,
                 avahiTxtRecord);
 
             await this.entryGroup.CommitAsync();

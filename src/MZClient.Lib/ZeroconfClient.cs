@@ -187,7 +187,7 @@ public static class MZClient
         }
 
         string type = match.Groups[1].Value.Trim();
-        short port = Convert.ToInt16(match.Groups[2].Value);
+        ushort port = Convert.ToUInt16(match.Groups[2].Value);
         string name = match.Groups[3].Value.Trim();
 
         int txt_pos = name.IndexOf("TXT", StringComparison.InvariantCulture);

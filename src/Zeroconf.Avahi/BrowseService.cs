@@ -70,7 +70,7 @@ public class BrowseService : Service, IResolvableService, IDisposable
 
     public Abstraction.IpProtocolType IpProtocolType => AvahiUtils.AvahiToZeroconfIpAddressProtocol(this.AvahiIpProtocolType);
 
-    public short Port { get; private set; }
+    public ushort Port { get; private set; }
 
     public async Task Resolve()
     {
@@ -158,7 +158,7 @@ public class BrowseService : Service, IResolvableService, IDisposable
         this.HostEntry.AddressList = new IPAddress[1];
         this.HostEntry.AddressList[0] = ParseIpAddress(obj.address, this.AvahiIpProtocolType, this.AvahiInterfaceIndex);
 
-        this.Port = (short)obj.port;
+        this.Port = obj.port;
         this.TxtRecord = new TxtRecord(obj.txt);
         
         this.RaiseResolved();

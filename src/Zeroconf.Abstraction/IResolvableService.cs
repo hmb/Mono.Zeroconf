@@ -44,7 +44,7 @@ public interface IResolvableService : IService
     string HostTarget { get; }
     uint InterfaceIndex { get; }
     IpProtocolType IpProtocolType { get; }
-    short Port { get; }
+    ushort Port { get; }
 
     Task Resolve();
 }

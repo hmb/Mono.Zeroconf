@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MZClient.Lib\MZClient.Lib.csproj" />
-    <ProjectReference Include="..\Zeroconf.Bonjour\Zeroconf.Bonjour.csproj" />
+    <ProjectReference Include="..\Zeroconf.Provider.Bonjour\Zeroconf.Provider.Bonjour.csproj" />
   </ItemGroup>
 
 </Project>

@@ -43,11 +43,11 @@ public class BrowseService : Service, IResolvableService, IDisposable
     private readonly AsyncLock serviceLock = new();
 
     private IServiceResolver? resolver;
-    private IDisposable? failureWatcher;
     private IDisposable? foundWatcher;
+    private IDisposable? failureWatcher;
 
-    public BrowseService(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
-        : base(name, regtype, replyDomain, @interface, aprotocol)
+    public BrowseService(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
+        : base(name, regtype, replyDomain, interfaceIndex, ipProtocolType)
     {
         this.FullName = string.Empty;
         this.HostEntry = null!;
@@ -66,6 +66,10 @@ public class BrowseService : Service, IResolvableService, IDisposable
 
     public string HostTarget { get; private set; }
 
+    public uint InterfaceIndex => AvahiUtils.AvahiToZeroconfInterfaceIndex(this.AvahiInterfaceIndex);
+
+    public Abstraction.IpProtocolType IpProtocolType => AvahiUtils.AvahiToZeroconfIpAddressProtocol(this.AvahiIpProtocolType);
+
     public short Port { get; private set; }
 
     public async Task Resolve()
@@ -83,15 +87,15 @@ public class BrowseService : Service, IResolvableService, IDisposable
             }
 
             Console.WriteLine(
-                $"Resolve called: assigning resolver {this.AvahiInterface} {this.AvahiProtocol} {this.Name} {this.RegType} {this.ReplyDomain}");
+                $"Resolve called: assigning resolver {this.AvahiInterfaceIndex} {this.AvahiIpProtocolType} {this.Name} {this.RegType} {this.ReplyDomain}");
 
             this.resolver = await DBusManager.Server.ServiceResolverNewAsync(
-                this.AvahiInterface,
-                (int)this.AvahiProtocol,
+                this.AvahiInterfaceIndex, // TODO Any ?
+                (int)this.AvahiIpProtocolType,
                 this.Name,
                 this.RegType,
                 this.ReplyDomain,
-                (int)this.AvahiProtocol,
+                (int)this.AvahiIpProtocolType,
                 (uint)LookupFlags.None);
 
             Console.WriteLine("Resolve called: WatchFoundAsync/WatchFailureAsync");
@@ -137,45 +141,46 @@ public class BrowseService : Service, IResolvableService, IDisposable
     }
     
     private void OnResolveFound(
-        (int @interface, int protocol, string name, string type, string domain, string host, int aprotocol, string
-            address, ushort port, byte[][] txt, uint flags) obj)
+        (int interfaceIndex, int protocol, string name, string regtype, string domain, string host, int aprotocol, string address, ushort port, byte[][] txt, uint flags) obj)
     {
+        this.FullName = $"{obj.name.Replace(" ", "\\032")}.{obj.regtype}.{obj.domain}";
+        
+        this.AvahiInterfaceIndex = obj.interfaceIndex;
+        this.AvahiIpProtocolType = (IpProtocolType)obj.protocol;
         this.Name = obj.name;
-        this.RegType = obj.type;
-        this.AvahiInterface = obj.@interface;
-        this.AvahiProtocol = (Protocol)obj.protocol;
+        this.RegType = obj.regtype;
         this.ReplyDomain = obj.domain;
-        this.TxtRecord = new TxtRecord(obj.txt);
-
-        this.FullName = $"{obj.name.Replace(" ", "\\032")}.{obj.type}.{obj.domain}";
-        this.Port = (short)obj.port;
         this.HostTarget = obj.host;
 
         // ReSharper disable once UseObjectOrCollectionInitializer
         this.HostEntry = new IPHostEntry();
-
-        this.HostEntry.AddressList = new IPAddress[1];
-
-        if (IPAddress.TryParse(obj.address, out var ipAddress))
-        {
-            this.HostEntry.AddressList[0] = ipAddress;
-            if ((Protocol)obj.protocol == Protocol.IPv6)
-            {
-                this.HostEntry.AddressList[0].ScopeId = obj.@interface;
-            }
-        }
-        else
-        {
-            this.HostEntry.AddressList[0] = IPAddress.None;
-        }
-
         this.HostEntry.HostName = obj.host;
+        this.HostEntry.AddressList = new IPAddress[1];
+        this.HostEntry.AddressList[0] = ParseIpAddress(obj.address, this.AvahiIpProtocolType, this.AvahiInterfaceIndex);
 
+        this.Port = (short)obj.port;
+        this.TxtRecord = new TxtRecord(obj.txt);
+        
         this.RaiseResolved();
     }
 
     private void OnResolveFailure(string error)
     {
         this.RaiseResolveFailure(error);
+    }
+
+    private static IPAddress ParseIpAddress(string address, IpProtocolType ipProtocolType, int interfaceIndex)
+    {
+        if (!IPAddress.TryParse(address, out var ipAddress))
+        {
+            return IPAddress.None;
+        }
+        
+        if (ipProtocolType == Avahi.IpProtocolType.IPv6)
+        {
+            ipAddress.ScopeId = interfaceIndex;
+        }
+
+        return ipAddress;
     }
 }

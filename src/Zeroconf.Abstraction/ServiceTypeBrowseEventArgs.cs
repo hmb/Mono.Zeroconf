@@ -1,9 +1,11 @@
-﻿//
-// ProviderFactory.cs
+//
+// IServiceBrowser.cs
 //
 // Authors:
+//    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
+// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -28,14 +30,14 @@
 
 namespace Zeroconf.Abstraction;
 
-using System.Threading.Tasks;
+using System;
 
-public interface IProviderFactory
+public class ServiceTypeBrowseEventArgs : EventArgs
 {
-    Task Initialize();
-
-    IServiceTypeBrowser CreateServiceTypeBrowser();
-    IServiceBrowser CreateServiceBrowser();
-    IRegisterService CreateRegisterService();
-    ITxtRecord CreateTxtRecord();
+    public ServiceTypeBrowseEventArgs(IServiceType serviceType)
+    {
+        this.ServiceType = serviceType;
+    }
+        
+    public IServiceType ServiceType { get; }
 }

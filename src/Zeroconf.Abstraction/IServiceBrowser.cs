@@ -39,5 +39,5 @@ public interface IServiceBrowser : IEnumerable<IResolvableService>, IDisposable
     event EventHandler<ServiceBrowseEventArgs>? ServiceAdded;
     event EventHandler<ServiceBrowseEventArgs>? ServiceRemoved;
 
-    Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain);
+    Task Browse(uint interfaceIndex, IpProtocolType protocolType, string regtype, string domain);
 }

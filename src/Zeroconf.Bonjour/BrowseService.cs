@@ -124,7 +124,7 @@ namespace Zeroconf.Bonjour
             // Run an A query to resolve the IP address
             ServiceRef sd_ref;
             
-            if (AddressProtocol == AddressProtocol.Any || AddressProtocol == AddressProtocol.IPv4) {
+            if (this.IpProtocolType == IpProtocolType.Any || this.IpProtocolType == IpProtocolType.IPv4) {
                 ServiceError error = Native.DNSServiceQueryRecord(out sd_ref, ServiceFlags.None, interfaceIndex,
                     hosttarget, ServiceType.A, ServiceClass.IN, query_record_reply_handler, IntPtr.Zero);
                 
@@ -135,7 +135,7 @@ namespace Zeroconf.Bonjour
                 sd_ref.Process();
             }
             
-            if (AddressProtocol == AddressProtocol.Any || AddressProtocol == AddressProtocol.IPv6) {
+            if (this.IpProtocolType == IpProtocolType.Any || this.IpProtocolType == IpProtocolType.IPv6) {
                 ServiceError error = Native.DNSServiceQueryRecord(out sd_ref, ServiceFlags.None, interfaceIndex,
                     hosttarget, ServiceType.AAAA, ServiceClass.IN, query_record_reply_handler, IntPtr.Zero);
                 

@@ -48,7 +48,7 @@ namespace Zeroconf.Bonjour
     public class ServiceBrowser : IServiceBrowser, IDisposable
     {
         private uint interface_index;
-        private AddressProtocol address_protocol;
+        private IpProtocolType protocolType;
         private string regtype;
         private string domain;
         
@@ -67,17 +67,17 @@ namespace Zeroconf.Bonjour
             browse_reply_handler = new Native.DNSServiceBrowseReply(OnBrowseReply);
         }
         
-        public Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
+        public Task Browse(uint interfaceIndex, IpProtocolType protocolType, string regtype, string domain)
         {
-            Configure(interfaceIndex, addressProtocol, regtype, domain);
+            Configure(interfaceIndex, protocolType, regtype, domain);
             StartAsync();
             return Task.CompletedTask;
         }
 
-        public void Configure(uint interfaceIndex, AddressProtocol addressProtocol, string regtype, string domain)
+        public void Configure(uint interfaceIndex, IpProtocolType protocolType, string regtype, string domain)
         {
             this.interface_index = interfaceIndex;
-            this.address_protocol = addressProtocol;
+            this.protocolType = protocolType;
             this.regtype = regtype;
             this.domain = domain;
             
@@ -175,7 +175,7 @@ namespace Zeroconf.Bonjour
             service.RegType = regtype;
             service.ReplyDomain = replyDomain;
             service.InterfaceIndex = interfaceIndex;
-            service.AddressProtocol = address_protocol;
+            service.IpProtocolType = this.protocolType;
             
             ServiceBrowseEventArgs args = new ServiceBrowseEventArgs(
                 service, (flags & ServiceFlags.MoreComing) != 0);

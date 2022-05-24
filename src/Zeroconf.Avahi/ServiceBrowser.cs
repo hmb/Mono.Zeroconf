@@ -83,7 +83,7 @@ public class ServiceBrowser : IServiceBrowser
         }
     }
 
-    public async Task Browse(uint interfaceIndex, AddressProtocol addressProtocol, string? regtype, string? domain)
+    public async Task Browse(uint interfaceIndex, Abstraction.IpProtocolType protocolType, string? regtype, string? domain)
     {
         using (await this.serviceLock.Enter())
         {
@@ -95,22 +95,14 @@ public class ServiceBrowser : IServiceBrowser
             await this.ClearUnSynchronized();
 
             this.serviceBrowser = await DBusManager.Server.ServiceBrowserNewAsync(
-                AvahiUtils.FromMzcInterface(interfaceIndex),
-                (int)AvahiUtils.FromMzcProtocol(addressProtocol),
+                AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
+                (int)AvahiUtils.ZeroconfToAvahiIpAddressProtocol(protocolType),
                 regtype ?? string.Empty,
                 domain ?? string.Empty,
                 (uint)LookupFlags.None);
 
             this.newServiceWatcher = await this.serviceBrowser.WatchItemNewAsync(this.OnServiceNew);
             this.removeServiceWatcher = await this.serviceBrowser.WatchItemRemoveAsync(this.OnServiceRemove);
-        }
-    }
-
-    public async Task Clear()
-    {
-        using (await this.serviceLock.Enter())
-        {
-            await this.ClearUnSynchronized();
         }
     }
 
@@ -147,12 +139,12 @@ public class ServiceBrowser : IServiceBrowser
     }
 
     private async void OnServiceNew(
-        (int @interface, int protocol, string name, string regtype, string domain, uint flags) serviceData)
+        (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
         using (await this.serviceLock.Enter())
         {
             var key = GetServiceNameKey(
-                serviceData.@interface,
+                serviceData.interfaceIndex,
                 serviceData.protocol,
                 serviceData.regtype,
                 serviceData.name);
@@ -169,22 +161,23 @@ public class ServiceBrowser : IServiceBrowser
                     serviceData.name,
                     serviceData.regtype,
                     serviceData.domain,
-                    serviceData.@interface,
-                    (Protocol)serviceData.protocol);
+                    serviceData.interfaceIndex,
+                    (IpProtocolType)serviceData.protocol);
 
                 this.services.Add(key, new CountedBrowseService(newBrowseService));
+                
                 this.RaiseServiceAdded(newBrowseService);
             }
         }
     }
 
     private async void OnServiceRemove(
-        (int @interface, int protocol, string name, string regtype, string domain, uint flags) serviceData)
+        (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
         using (await this.serviceLock.Enter())
         {
             var key = GetServiceNameKey(
-                serviceData.@interface,
+                serviceData.interfaceIndex,
                 serviceData.protocol,
                 serviceData.regtype,
                 serviceData.name);

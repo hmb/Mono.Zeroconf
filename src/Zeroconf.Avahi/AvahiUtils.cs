@@ -28,61 +28,59 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Zeroconf.Avahi
+namespace Zeroconf.Avahi;
+
+using Zeroconf.Abstraction;
+
+public static class AvahiUtils
 {
-    using Zeroconf.Abstraction;
+    public const int AvahiInterfaceIndexAny = -1;
 
-    public static class AvahiUtils
+    public static IpProtocolType ZeroconfToAvahiIpAddressProtocol(Abstraction.IpProtocolType ipProtocolType)
     {
-        private const int MonoZeroconfAnyInterface = 0;
-        private const int AvahiAnyInterface = -1;
-
-        public static Protocol FromMzcProtocol(AddressProtocol addressProtocol)
+        return ipProtocolType switch
         {
-            return addressProtocol switch
-            {
-                AddressProtocol.IPv4 => Protocol.IPv4,
-                AddressProtocol.IPv6 => Protocol.IPv6,
-                _ => Protocol.Unspecified
-            };
-        }
+            Abstraction.IpProtocolType.IPv4 => IpProtocolType.IPv4,
+            Abstraction.IpProtocolType.IPv6 => IpProtocolType.IPv6,
+            _ => IpProtocolType.Unspecified
+        };
+    }
 
-        public static AddressProtocol ToMzcProtocol(Protocol addressProtocol)
+    public static Abstraction.IpProtocolType AvahiToZeroconfIpAddressProtocol(IpProtocolType ipProtocolType)
+    {
+        return ipProtocolType switch
         {
-            return addressProtocol switch
-            {
-                Protocol.IPv4 => AddressProtocol.IPv4,
-                Protocol.IPv6 => AddressProtocol.IPv6,
-                _ => AddressProtocol.Any
-            };
-        }
+            IpProtocolType.IPv4 => Abstraction.IpProtocolType.IPv4,
+            IpProtocolType.IPv6 => Abstraction.IpProtocolType.IPv6,
+            _ => Abstraction.IpProtocolType.Any
+        };
+    }
 
-        public static int FromMzcInterface(uint @interface)
+    public static int ZeroconfToAvahiInterfaceIndex(uint interfaceIndex)
+    {
+        return interfaceIndex switch
         {
-            return @interface switch
-            {
-                MonoZeroconfAnyInterface => AvahiAnyInterface,
-                _ => (int)@interface - 1
-            };
-        }
+            ZeroconfConstants.InterfaceIndexAny => AvahiInterfaceIndexAny,
+            _ => (int)interfaceIndex - 1
+        };
+    }
 
-        public static uint ToMzcInterface(int @interface)
+    public static uint AvahiToZeroconfInterfaceIndex(int interfaceIndex)
+    {
+        return interfaceIndex switch
         {
-            return @interface switch
-            {
-                AvahiAnyInterface => MonoZeroconfAnyInterface,
-                _ => (uint)@interface + 1
-            };
-        }
+            AvahiInterfaceIndexAny => ZeroconfConstants.InterfaceIndexAny,
+            _ => (uint)interfaceIndex + 1
+        };
+    }
 
-        public static ServiceErrorCode ErrorCodeToServiceError(ErrorCode error)
+    public static ServiceErrorCode AvahiToZeroconfErrorCode(ErrorCode error)
+    {
+        return error switch
         {
-            return error switch
-            {
-                ErrorCode.Ok => ServiceErrorCode.None,
-                ErrorCode.Collision => ServiceErrorCode.NameConflict,
-                _ => ServiceErrorCode.Unknown
-            };
-        }
+            ErrorCode.Ok => ServiceErrorCode.None,
+            ErrorCode.Collision => ServiceErrorCode.NameConflict,
+            _ => ServiceErrorCode.Unknown
+        };
     }
 }

@@ -38,7 +38,7 @@ namespace Zeroconf.Bonjour
         protected string reply_domain;
         protected string regtype;
         protected uint interface_index;
-        protected AddressProtocol address_protocol;
+        protected IpProtocolType protocol_type;
         
         protected ITxtRecord? txt_record;
         protected string fullname;
@@ -81,9 +81,9 @@ namespace Zeroconf.Bonjour
             set { interface_index = value; }
         }
 
-        public AddressProtocol AddressProtocol {
-            get { return address_protocol; }
-            set { address_protocol = value; }
+        public IpProtocolType IpProtocolType {
+            get { return this.protocol_type; }
+            set { this.protocol_type = value; }
         }
         
         public string Name {

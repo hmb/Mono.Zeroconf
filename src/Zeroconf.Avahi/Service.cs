@@ -28,44 +28,39 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Zeroconf.Avahi
+namespace Zeroconf.Avahi;
+
+using Zeroconf.Abstraction;
+
+public class Service : IService
 {
-    using Zeroconf.Abstraction;
-
-    public class Service : IService
+    protected Service()
     {
-        protected Service()
-        {
-            this.Name = string.Empty;
-            this.RegType = string.Empty;
-            this.ReplyDomain = string.Empty;
-            this.AvahiInterface = -1;
-            this.AvahiProtocol = Protocol.Unspecified;
-        }
-
-        protected Service(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
-        {
-            this.Name = name;
-            this.RegType = regtype;
-            this.ReplyDomain = replyDomain;
-            this.AvahiInterface = @interface;
-            this.AvahiProtocol = aprotocol;
-        }
-
-        public string Name { get; set; }
-
-        public string RegType { get; set; }
-
-        public string ReplyDomain { get; set; }
-
-        protected int AvahiInterface { get; set; }
-
-        protected Protocol AvahiProtocol { get; set; }
-
-        public uint NetworkInterface => AvahiUtils.ToMzcInterface(this.AvahiInterface);
-
-        public AddressProtocol AddressProtocol => AvahiUtils.ToMzcProtocol(this.AvahiProtocol);
-
-        public ITxtRecord? TxtRecord { get; set; }
+        this.Name = string.Empty;
+        this.RegType = string.Empty;
+        this.ReplyDomain = string.Empty;
+        this.AvahiInterfaceIndex = AvahiUtils.AvahiInterfaceIndexAny;
+        this.AvahiIpProtocolType = IpProtocolType.Unspecified;
     }
+
+    protected Service(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
+    {
+        this.Name = name;
+        this.RegType = regtype;
+        this.ReplyDomain = replyDomain;
+        this.AvahiInterfaceIndex = interfaceIndex;
+        this.AvahiIpProtocolType = ipProtocolType;
+    }
+
+    public string Name { get; set; }
+
+    public string RegType { get; set; }
+
+    public string ReplyDomain { get; set; }
+
+    public ITxtRecord? TxtRecord { get; set; }
+
+    protected int AvahiInterfaceIndex { get; set; }
+
+    protected IpProtocolType AvahiIpProtocolType { get; set; }
 }

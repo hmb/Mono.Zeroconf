@@ -69,6 +69,11 @@ public class ProviderFactory : IProviderFactory
         return Task.CompletedTask;
     }
 
+    public IServiceTypeBrowser CreateServiceTypeBrowser()
+    {
+        throw new NotImplementedException();
+    }
+
     public IServiceBrowser CreateServiceBrowser()
     {
         var browser = (IServiceBrowser?)Activator.CreateInstance(this.SelectedProviderObjectTypes.ServiceBrowser);

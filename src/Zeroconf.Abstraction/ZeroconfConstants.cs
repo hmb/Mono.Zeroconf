@@ -28,7 +28,8 @@
 
 namespace Zeroconf.Abstraction;
 
-public static class ServiceBrowserConstants
+public static class ZeroconfConstants
 {
+    public const int InterfaceIndexAny = 0;
     public const string LocalDomain = "local";
 }

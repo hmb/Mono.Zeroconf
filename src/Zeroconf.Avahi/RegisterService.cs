@@ -47,8 +47,8 @@ public class RegisterService : Service, IRegisterService
     {
     }
     
-    public RegisterService(string name, string regtype, string replyDomain, int @interface, Protocol aprotocol)
-        : base(name, regtype, replyDomain, @interface, aprotocol)
+    public RegisterService(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
+        : base(name, regtype, replyDomain, interfaceIndex, ipProtocolType)
     {
     }
 
@@ -114,8 +114,8 @@ public class RegisterService : Service, IRegisterService
             var avahiTxtRecord = this.TxtRecord?.Render() ?? Array.Empty<byte[]>();
 
             await this.entryGroup.AddServiceAsync(
-                this.AvahiInterface,
-                (int)this.AvahiProtocol,
+                this.AvahiInterfaceIndex,
+                (int)this.AvahiIpProtocolType,
                 (uint)PublishFlags.None,
                 this.Name,
                 this.RegType,
@@ -158,7 +158,7 @@ public class RegisterService : Service, IRegisterService
         {
             Service = this,
             IsRegistered = false,
-            ServiceError = AvahiUtils.ErrorCodeToServiceError(errorCode)
+            ServiceError = AvahiUtils.AvahiToZeroconfErrorCode(errorCode)
         };
 
         if (errorCode == ErrorCode.Ok)

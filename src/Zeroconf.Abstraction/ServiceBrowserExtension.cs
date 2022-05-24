@@ -6,16 +6,16 @@ public static class ServiceBrowserExtension
 {
     public static async Task Browse(this IServiceBrowser serviceBrowser, uint interfaceIndex, string regtype, string domain)
     {
-        await serviceBrowser.Browse(interfaceIndex, AddressProtocol.Any, regtype, domain);
+        await serviceBrowser.Browse(interfaceIndex, IpProtocolType.Any, regtype, domain);
     }
 
-    public static async Task Browse(this IServiceBrowser serviceBrowser, AddressProtocol addressProtocol, string regtype, string domain)
+    public static async Task Browse(this IServiceBrowser serviceBrowser, IpProtocolType ipProtocolType, string regtype, string domain)
     {
-        await serviceBrowser.Browse(0, addressProtocol, regtype, domain);
+        await serviceBrowser.Browse(ZeroconfConstants.InterfaceIndexAny, ipProtocolType, regtype, domain);
     }
 
     public static async Task Browse(this IServiceBrowser serviceBrowser, string regtype, string domain)
     {
-        await serviceBrowser.Browse(0, AddressProtocol.Any, regtype, domain);
+        await serviceBrowser.Browse(ZeroconfConstants.InterfaceIndexAny, IpProtocolType.Any, regtype, domain);
     }
 }

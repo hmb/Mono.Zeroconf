@@ -1,9 +1,11 @@
-﻿//
-// ProviderFactory.cs
 //
-// Authors:
+// Protocol.cs
+//
+// Author:
+//    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
+// Copyright (C) 2008 Novell, Inc.
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -13,10 +15,10 @@
 // distribute, sublicense, and/or sell copies of the Software, and to
 // permit persons to whom the Software is furnished to do so, subject to
 // the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be
 // included in all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -26,16 +28,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Zeroconf.Abstraction;
-
-using System.Threading.Tasks;
-
-public interface IProviderFactory
+// ReSharper disable InconsistentNaming
+namespace Zeroconf.Avahi
 {
-    Task Initialize();
-
-    IServiceTypeBrowser CreateServiceTypeBrowser();
-    IServiceBrowser CreateServiceBrowser();
-    IRegisterService CreateRegisterService();
-    ITxtRecord CreateTxtRecord();
+    public enum IpProtocolType
+    {
+        Unspecified = -1,
+        IPv4 = 0,
+        IPv6 = 1
+    }
 }

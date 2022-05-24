@@ -39,6 +39,11 @@ public class ProviderFactory : IProviderFactory
         return Task.CompletedTask;
     }
 
+    public IServiceTypeBrowser CreateServiceTypeBrowser()
+    {
+        throw new NotImplementedException();
+    }
+
     public IServiceBrowser CreateServiceBrowser()
     {
         return new ServiceBrowser();

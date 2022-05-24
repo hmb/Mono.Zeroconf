@@ -42,9 +42,9 @@ public static class MZClient
 {
     private const string app_name = "mzclient";
     private static readonly SemaphoreSlim endProgram = new(0, 1);
-    private static AddressProtocol address_protocol = AddressProtocol.Any;
+    private static IpProtocolType protocol_type = IpProtocolType.Any;
     private static uint @interface;
-    private static string domain = ServiceBrowserConstants.LocalDomain;
+    private static string domain = ZeroconfConstants.LocalDomain;
     private static bool resolve_shares;
     private static bool verbose;
 
@@ -86,9 +86,9 @@ public static class MZClient
                 case "--aprotocol":
                     string proto = args[++i].ToLower ().Trim ();
                     switch (proto) {
-                        case "ipv4": case "4": address_protocol = AddressProtocol.IPv4; break;
-                        case "ipv6": case "6": address_protocol = AddressProtocol.IPv6; break;
-                        case "any": case "all": address_protocol = AddressProtocol.Any; break;
+                        case "ipv4": case "4": protocol_type = IpProtocolType.IPv4; break;
+                        case "ipv6": case "6": protocol_type = IpProtocolType.IPv6; break;
+                        case "any": case "all": protocol_type = IpProtocolType.Any; break;
                         default:
                             Console.Error.WriteLine ("Invalid IP Address Protocol, '{0}'", args[i]);
                             show_help = true;
@@ -149,7 +149,7 @@ public static class MZClient
             if (verbose) {
                 Console.WriteLine ("Creating a ServiceBrowser with the following settings:");
                 Console.WriteLine ("  Interface         = {0}", @interface == 0 ? "0 (All)" : @interface.ToString ());
-                Console.WriteLine ("  Address Protocol  = {0}", address_protocol);
+                Console.WriteLine ("  Address Protocol  = {0}", protocol_type);
                 Console.WriteLine ("  Domain            = {0}", domain);
                 Console.WriteLine ("  Registration Type = {0}", type);
                 Console.WriteLine ("  Resolve Shares    = {0}", resolve_shares);
@@ -163,7 +163,7 @@ public static class MZClient
             browser = providerFactory.CreateServiceBrowser();
             browser.ServiceAdded += OnServiceAdded;
             browser.ServiceRemoved += OnServiceRemoved;
-            await browser.Browse(@interface, address_protocol, type, domain);
+            await browser.Browse(@interface, protocol_type, type, domain);
         }
 
         Console.CancelKeyPress += ConsoleOnCancelKeyPress;
@@ -181,7 +181,7 @@ public static class MZClient
 
     private static async Task RegisterService(IProviderFactory providerFactory, string serviceDescription)
     {
-        var match = Regex.Match(serviceDescription, @"(_[a-z]+\._(?:tcp|udp))\s*(\d+)\s*(.*)");
+        var match = Regex.Match(serviceDescription, @"(_[a-z][_a-z]*\._(?:tcp|udp))\s*(\d+)\s*(.*)");
         if(match.Groups.Count < 4) {
             throw new ApplicationException("Invalid service description syntax");
         }
@@ -290,7 +290,7 @@ public static class MZClient
         Console.Write ("*** Resolved name = '{0}', host ip = '{1}', hostname = {2}, port = '{3}', " +
             "interface = '{4}', address type = '{5}'",
             service.FullName, service.HostEntry.AddressList[0], service.HostEntry.HostName, service.Port,
-            service.NetworkInterface, service.AddressProtocol);
+            service.InterfaceIndex, service.IpProtocolType);
 
         var record = service.TxtRecord;
         var record_count = record?.Count ?? 0;

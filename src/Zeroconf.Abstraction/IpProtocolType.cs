@@ -1,11 +1,11 @@
 //
-// Protocol.cs
+// AddressProtocol.cs
 //
 // Author:
 //    Aaron Bockover    <abockover@novell.com>
 //    Holger Böhnke     <zeroconf@biz.amarin.de>
 //
-// Copyright (C) 2008 Novell, Inc.
+// Copyright (C) 2006-2007 Novell, Inc (http://www.novell.com)
 // Copyright (C) 2022 Holger Böhnke, (http://www.amarin.de)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -29,12 +29,12 @@
 //
 
 // ReSharper disable InconsistentNaming
-namespace Zeroconf.Avahi
+
+namespace Zeroconf.Abstraction;
+
+public enum IpProtocolType
 {
-    public enum Protocol
-    {
-        Unspecified = -1,
-        IPv4 = 0,
-        IPv6 = 1
-    }
+    Any,
+    IPv4,
+    IPv6
 }

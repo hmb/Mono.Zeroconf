@@ -38,6 +38,11 @@ public class ProviderFactory : IProviderFactory
         await AvahiInit.Initialize();
     }
 
+    public IServiceTypeBrowser CreateServiceTypeBrowser()
+    {
+        return new ServiceTypeBrowser();
+    }
+    
     public IServiceBrowser CreateServiceBrowser()
     {
         return new ServiceBrowser();

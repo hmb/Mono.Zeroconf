@@ -116,7 +116,7 @@ namespace Zeroconf.Bonjour
             
             InterfaceIndex = interfaceIndex;
             FullName = fullname;
-            this.port = port;
+            this.port = (ushort)IPAddress.NetworkToHostOrder((short)port);
             TxtRecord = new TxtRecord(txtLen, txtRecord);
 
             sdRef.Deallocate();

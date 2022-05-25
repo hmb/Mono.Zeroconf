@@ -43,12 +43,12 @@ public class ServiceBrowser : IServiceBrowser
 {
     private class CountedBrowseService
     {
-        public CountedBrowseService(BrowseService browseService)
+        public CountedBrowseService(ServiceResolver serviceResolver)
         {
-            this.BrowseService = browseService;
+            this.ServiceResolver = serviceResolver;
         }
 
-        public readonly BrowseService BrowseService;
+        public readonly ServiceResolver ServiceResolver;
         public int UsageCount = 1;
     }
 
@@ -79,7 +79,7 @@ public class ServiceBrowser : IServiceBrowser
     {
         using (this.serviceLock.Enter().GetAwaiter().GetResult())
         {
-            return this.services.Values.Select(bs => bs.BrowseService).ToList().GetEnumerator();
+            return this.services.Values.Select(sr => sr.ServiceResolver).ToList().GetEnumerator();
         }
     }
 
@@ -122,7 +122,8 @@ public class ServiceBrowser : IServiceBrowser
 
         foreach (var service in this.services.Values)
         {
-            service.BrowseService.Dispose();
+            this.RaiseServiceRemoved(service.ServiceResolver);
+            service.ServiceResolver.Dispose();
         }
 
         this.services.Clear();
@@ -157,7 +158,7 @@ public class ServiceBrowser : IServiceBrowser
             else
             {
                 Console.WriteLine($"create new resolver {key}");
-                var newBrowseService = new BrowseService(
+                var newBrowseService = new ServiceResolver(
                     serviceData.name,
                     serviceData.regtype,
                     serviceData.domain,
@@ -196,10 +197,10 @@ public class ServiceBrowser : IServiceBrowser
                 return;
             }
 
-            this.RaiseServiceRemoved(resolverInstance.BrowseService);
+            this.RaiseServiceRemoved(resolverInstance.ServiceResolver);
 
             Console.WriteLine($"usage count on resolver {key} down to zero, remove it");
-            await resolverInstance.BrowseService.StopResolve();
+            await resolverInstance.ServiceResolver.StopResolve();
 
             this.services.Remove(key);
         }

@@ -38,7 +38,7 @@ using Zeroconf.Abstraction;
 using Zeroconf.Avahi.DBus;
 using Zeroconf.Avahi.Threading;
 
-public class BrowseService : Service, IResolvableService, IDisposable
+public class ServiceResolver : Service, IResolvableService, IDisposable
 {
     private readonly AsyncLock serviceLock = new();
 
@@ -46,7 +46,7 @@ public class BrowseService : Service, IResolvableService, IDisposable
     private IDisposable? foundWatcher;
     private IDisposable? failureWatcher;
 
-    public BrowseService(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
+    public ServiceResolver(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
         : base(name, regtype, replyDomain, interfaceIndex, ipProtocolType)
     {
         this.FullName = string.Empty;

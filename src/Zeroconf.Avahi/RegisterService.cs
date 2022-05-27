@@ -39,15 +39,20 @@ using Zeroconf.Avahi.Threading;
 
 public class RegisterService : Service, IRegisterService
 {
-    private readonly AsyncLock serviceLock = new(); 
+    private readonly AsyncLock serviceLock = new();
     private IEntryGroup? entryGroup;
     private IDisposable? stateChangeWatcher;
 
     public RegisterService()
     {
     }
-    
-    public RegisterService(int interfaceIndex, IpProtocolType ipProtocolType, string name, string regType, string replyDomain)
+
+    public RegisterService(
+        int interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string name,
+        string regType,
+        string replyDomain)
         : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
     }
@@ -63,7 +68,7 @@ public class RegisterService : Service, IRegisterService
 
             this.stateChangeWatcher?.Dispose();
             this.stateChangeWatcher = null;
-            
+
             this.entryGroup.ResetAsync().GetAwaiter().GetResult();
             this.entryGroup.FreeAsync().GetAwaiter().GetResult();
             this.entryGroup = null;
@@ -82,7 +87,7 @@ public class RegisterService : Service, IRegisterService
             {
                 throw new ConnectException("no connection to the avahi daemon possible");
             }
-            
+
             if (await DBusManager.Server.GetStateAsync() != AvahiServerState.Running)
             {
                 throw new ApplicationException("Avahi server is not rRunning");
@@ -104,7 +109,7 @@ public class RegisterService : Service, IRegisterService
             {
                 throw new ApplicationException("no avahi entry group present");
             }
-            
+
             var avahiTxtRecord = this.TxtRecord?.Render() ?? Array.Empty<byte[]>();
 
             await this.entryGroup.AddServiceAsync(
@@ -134,12 +139,14 @@ public class RegisterService : Service, IRegisterService
                 {
                     throw new ApplicationException();
                 }
+
                 break;
             case EntryGroupState.Failure:
                 if (!this.RaiseResponse(ErrorCode.Failure))
                 {
                     throw new ApplicationException();
                 }
+
                 break;
             case EntryGroupState.Established:
                 this.RaiseResponse(ErrorCode.Ok);

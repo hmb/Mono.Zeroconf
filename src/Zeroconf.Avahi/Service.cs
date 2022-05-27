@@ -43,7 +43,12 @@ public class Service : IService
         this.ReplyDomain = string.Empty;
     }
 
-    protected Service(int interfaceIndex, IpProtocolType ipProtocolType, string name, string regType, string replyDomain)
+    protected Service(
+        int interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string name,
+        string regType,
+        string replyDomain)
     {
         this.AvahiInterfaceIndex = interfaceIndex;
         this.AvahiIpProtocolType = ipProtocolType;

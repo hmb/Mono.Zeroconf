@@ -64,7 +64,11 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
     private IDisposable? newServiceTypeWatcher;
     private IDisposable? removeServiceTypeWatcher;
 
-    public ServiceTypeBrowser(ILoggerFactory loggerFactory, int interfaceIndex, IpProtocolType ipProtocolType, string replyDomain)
+    public ServiceTypeBrowser(
+        ILoggerFactory loggerFactory,
+        int interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string replyDomain)
     {
         this.loggerFactory = loggerFactory;
         this.logger = loggerFactory.CreateLogger<ServiceTypeBrowser>();
@@ -89,7 +93,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
     public string ReplyDomain { get; }
 
-    
+
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.GetEnumerator();
@@ -124,7 +128,8 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
                 (uint)LookupFlags.None);
 
             this.newServiceTypeWatcher = await this.serviceTypeBrowser.WatchItemNewAsync(this.OnServiceTypeNew);
-            this.removeServiceTypeWatcher = await this.serviceTypeBrowser.WatchItemRemoveAsync(this.OnServiceTypeRemove);
+            this.removeServiceTypeWatcher =
+                await this.serviceTypeBrowser.WatchItemRemoveAsync(this.OnServiceTypeRemove);
         }
     }
 
@@ -172,7 +177,8 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
         this.ServiceTypeRemoved?.Invoke(this, new ServiceTypeBrowseEventArgs(service));
     }
 
-    private async void OnServiceTypeNew((int interfaceIndex, int ipProtocolType, string regtype, string domain, uint flags) serviceType)
+    private async void OnServiceTypeNew(
+        (int interfaceIndex, int ipProtocolType, string regtype, string domain, uint flags) serviceType)
     {
         using (await this.serviceBrowsersLock.Enter("OnServiceTypeNew"))
         {
@@ -204,7 +210,8 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
         }
     }
 
-    private async void OnServiceTypeRemove((int interfaceIndex, int ipProtocolType, string regtype, string domain, uint flags) serviceType)
+    private async void OnServiceTypeRemove(
+        (int interfaceIndex, int ipProtocolType, string regtype, string domain, uint flags) serviceType)
     {
         using (await this.serviceBrowsersLock.Enter("OnServiceTypeRemove"))
         {

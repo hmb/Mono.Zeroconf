@@ -35,7 +35,7 @@ using System;
 public class ServiceResolvedEventArgs : EventArgs
 {
     public IResolvableService Service { get; }
-    
+
     public ServiceResolvedEventArgs(IResolvableService service)
     {
         this.Service = service;

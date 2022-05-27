@@ -58,7 +58,7 @@ public class ServiceBrowser : IServiceBrowser
     private readonly Dictionary<string, CountedResolver> serviceResolvers = new();
     private readonly AsyncLock serviceBrowserLock;
     private readonly AsyncLock serviceResolverLock;
-    
+
     private readonly int interfaceIndex;
     private readonly IpProtocolType ipProtocolType;
 
@@ -66,7 +66,12 @@ public class ServiceBrowser : IServiceBrowser
     private IDisposable? newServiceWatcher;
     private IDisposable? removeServiceWatcher;
 
-    public ServiceBrowser(ILoggerFactory loggerFactory, int interfaceIndex, IpProtocolType ipProtocolType, string regType, string replyDomain)
+    public ServiceBrowser(
+        ILoggerFactory loggerFactory,
+        int interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string regType,
+        string replyDomain)
     {
         this.loggerFactory = loggerFactory;
         this.logger = loggerFactory.CreateLogger<ServiceBrowser>();
@@ -77,7 +82,7 @@ public class ServiceBrowser : IServiceBrowser
         this.RegType = regType;
         this.ReplyDomain = replyDomain;
     }
-    
+
     public void Dispose()
     {
         this.StopBrowse().GetAwaiter().GetResult();
@@ -92,7 +97,7 @@ public class ServiceBrowser : IServiceBrowser
 
     public string RegType { get; }
     public string ReplyDomain { get; }
-    
+
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.GetEnumerator();
@@ -150,7 +155,7 @@ public class ServiceBrowser : IServiceBrowser
                 await this.serviceBrowser.FreeAsync();
                 this.serviceBrowser = null;
             }
-            
+
             await this.ClearResolvers();
         }
     }
@@ -179,7 +184,8 @@ public class ServiceBrowser : IServiceBrowser
         this.ServiceRemoved?.Invoke(this, new ServiceBrowseEventArgs(service));
     }
 
-    private async void OnServiceNew((int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
+    private async void OnServiceNew(
+        (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
         using (await this.serviceResolverLock.Enter("OnServiceNew"))
         {
@@ -212,7 +218,8 @@ public class ServiceBrowser : IServiceBrowser
         }
     }
 
-    private async void OnServiceRemove((int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
+    private async void OnServiceRemove(
+        (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
         using (await this.serviceResolverLock.Enter("OnServiceRemove"))
         {

@@ -38,6 +38,6 @@ public class ServiceBrowseEventArgs : EventArgs
     {
         this.Service = service;
     }
-        
+
     public IResolvableService Service { get; }
 }

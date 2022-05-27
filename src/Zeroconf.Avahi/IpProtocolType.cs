@@ -29,6 +29,7 @@
 //
 
 // ReSharper disable InconsistentNaming
+
 namespace Zeroconf.Avahi;
 
 public enum IpProtocolType

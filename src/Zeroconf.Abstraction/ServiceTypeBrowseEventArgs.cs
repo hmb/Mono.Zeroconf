@@ -38,6 +38,6 @@ public class ServiceTypeBrowseEventArgs : EventArgs
     {
         this.ServiceBrowser = serviceBrowser;
     }
-        
+
     public IServiceBrowser ServiceBrowser { get; }
 }

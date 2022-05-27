@@ -48,7 +48,13 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
     private IDisposable? foundWatcher;
     private IDisposable? failureWatcher;
 
-    public ServiceResolver(ILoggerFactory loggerFactory, int interfaceIndex, IpProtocolType ipProtocolType, string name, string regType, string replyDomain)
+    public ServiceResolver(
+        ILoggerFactory loggerFactory,
+        int interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string name,
+        string regType,
+        string replyDomain)
         : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
         this.logger = loggerFactory.CreateLogger<ServiceResolver>();
@@ -72,7 +78,8 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
 
     public uint InterfaceIndex => AvahiUtils.AvahiToZeroconfInterfaceIndex(this.AvahiInterfaceIndex);
 
-    public Abstraction.IpProtocolType IpProtocolType => AvahiUtils.AvahiToZeroconfIpProtocolType(this.AvahiIpProtocolType);
+    public Abstraction.IpProtocolType IpProtocolType =>
+        AvahiUtils.AvahiToZeroconfIpProtocolType(this.AvahiIpProtocolType);
 
     public ushort Port { get; private set; }
 
@@ -126,7 +133,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
             this.logger.LogDebug("failure dispose");
             this.failureWatcher?.Dispose();
             this.failureWatcher = null;
-            
+
             this.logger.LogDebug("FreeAsync");
             await this.resolver.FreeAsync();
             this.resolver = null;
@@ -142,11 +149,13 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
     {
         this.ResolveFailure?.Invoke(this, error);
     }
-    
-    private void OnResolveFound((int interfaceIndex, int protocol, string name, string regtype, string domain, string host, int aprotocol, string address, ushort port, byte[][] txt, uint flags) obj)
+
+    private void OnResolveFound(
+        (int interfaceIndex, int protocol, string name, string regtype, string domain, string host, int aprotocol,
+            string address, ushort port, byte[][] txt, uint flags) obj)
     {
         this.FullName = $"{obj.name.Replace(" ", "\\032")}.{obj.regtype}.{obj.domain}";
-        
+
         this.AvahiInterfaceIndex = obj.interfaceIndex;
         this.AvahiIpProtocolType = (IpProtocolType)obj.protocol;
         this.Name = obj.name;
@@ -162,7 +171,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
 
         this.Port = obj.port;
         this.TxtRecord = new TxtRecord(obj.txt);
-        
+
         this.RaiseResolved();
     }
 
@@ -177,7 +186,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
         {
             return IPAddress.None;
         }
-        
+
         if (ipProtocolType == Avahi.IpProtocolType.IPv6)
         {
             ipAddress.ScopeId = interfaceIndex;

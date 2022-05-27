@@ -53,6 +53,6 @@ public interface IProviderFactory
         string replyDomain);
 
     IRegisterService CreateRegisterService();
-    
+
     ITxtRecord CreateTxtRecord();
 }

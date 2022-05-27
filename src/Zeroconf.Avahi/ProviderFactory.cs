@@ -88,7 +88,7 @@ public class ProviderFactory : IProviderFactory
             regtype,
             domain);
     }
-    
+
     public IRegisterService CreateRegisterService()
     {
         return new RegisterService();

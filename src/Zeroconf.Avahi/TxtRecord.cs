@@ -51,7 +51,7 @@ public class TxtRecord : ITxtRecord
         foreach (var rawItem in data)
         {
             var itemRegex = new Regex(@"""[^""]*""|[^,]+", RegexOptions.IgnorePatternWhitespace);
-            
+
             foreach (Match itemMatch in itemRegex.Matches(Encoding.UTF8.GetString(rawItem)))
             {
                 var item = itemMatch.Groups[0].Value;

@@ -29,6 +29,7 @@
 //
 
 // ReSharper disable InconsistentNaming
+
 namespace Zeroconf.Abstraction;
 
 // These are just copied from Bonjour

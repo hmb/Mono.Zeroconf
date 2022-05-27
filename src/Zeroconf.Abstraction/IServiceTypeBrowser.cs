@@ -40,9 +40,9 @@ public interface IServiceTypeBrowser : IEnumerable<IServiceBrowser>, IDisposable
     event EventHandler<ServiceTypeBrowseEventArgs>? ServiceTypeRemoved;
 
     uint InterfaceIndex { get; }
-    IpProtocolType IpProtocolType  { get; }
+    IpProtocolType IpProtocolType { get; }
     string ReplyDomain { get; }
-    
+
     Task Browse();
     Task StopBrowse();
 }

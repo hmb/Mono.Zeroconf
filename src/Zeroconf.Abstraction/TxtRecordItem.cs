@@ -35,24 +35,24 @@ using System.Text;
 // TODO create an interface for this as well, perhaps move into core lib
 public class TxtRecordItem
 {
-    public TxtRecordItem(string key, byte [] valueRaw)
+    public TxtRecordItem(string key, byte[] valueRaw)
     {
         this.Key = key;
         this.ValueRaw = valueRaw;
         this.ValueString = Encoding.UTF8.GetString(this.ValueRaw);
     }
-        
+
     public TxtRecordItem(string key, string valueString)
     {
         this.Key = key;
         this.ValueString = valueString;
         this.ValueRaw = Encoding.UTF8.GetBytes(valueString);
     }
-        
+
     public string Key { get; }
     public byte[] ValueRaw { get; }
     public string ValueString { get; }
-    
+
     public override string ToString()
     {
         return $"{this.Key} = {this.ValueString}";

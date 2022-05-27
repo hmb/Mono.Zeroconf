@@ -20,12 +20,12 @@ public static class AsyncLockExtension
     public static async Task<IDisposable> Enter(this AsyncLock semaphore, string? description = null)
     {
         var cleanedDescription = string.IsNullOrEmpty(description) ? string.Empty : " " + description;
-        semaphore.Logger?.LogDebug("enter semaphore{Description}", cleanedDescription);
+        semaphore.Logger?.LogTrace("enter semaphore{Description}", cleanedDescription);
 
         var wrapper = new LockHolder(semaphore, cleanedDescription);
         await wrapper.Semaphore.WaitAsync();
 
-        semaphore.Logger?.LogDebug("semaphore entered{Description}", cleanedDescription);
+        semaphore.Logger?.LogTrace("semaphore entered{Description}", cleanedDescription);
 
         return wrapper;
     }
@@ -43,7 +43,7 @@ public static class AsyncLockExtension
 
         public void Dispose()
         {
-            this.Semaphore.Logger?.LogDebug("leave semaphore{Description}", this.description);
+            this.Semaphore.Logger?.LogTrace("leave semaphore{Description}", this.description);
             this.Semaphore.Release();
         }
     }

@@ -125,7 +125,6 @@ public class ServiceBrowser : IServiceBrowser
                 throw new InvalidOperationException("The service browser is already running");
             }
 
-            this.logger.LogDebug("browse: ServiceBrowserNewAsync");
             this.serviceBrowser = await DBusManager.Server.ServiceBrowserNewAsync(
                 this.interfaceIndex,
                 (int)this.ipProtocolType,
@@ -133,9 +132,7 @@ public class ServiceBrowser : IServiceBrowser
                 this.ReplyDomain,
                 (uint)LookupFlags.None);
 
-            this.logger.LogDebug("browse: WatchItemNewAsync");
             this.newServiceWatcher = await this.serviceBrowser.WatchItemNewAsync(this.OnServiceNew);
-            this.logger.LogDebug("browse: WatchItemRemoveAsync");
             this.removeServiceWatcher = await this.serviceBrowser.WatchItemRemoveAsync(this.OnServiceRemove);
         }
     }
@@ -198,12 +195,12 @@ public class ServiceBrowser : IServiceBrowser
 
             if (this.serviceResolvers.TryGetValue(key, out var existingServiceResolver))
             {
-                this.logger.LogDebug($"resolver {key} was already added, increment usage");
+                this.logger.LogDebug("resolver {Key} was already added, increment usage", key);
                 ++existingServiceResolver.UsageCount;
             }
             else
             {
-                this.logger.LogDebug($"create new resolver {key}");
+                this.logger.LogDebug("create new resolver {Key}", key);
                 var newServiceResolver = new ServiceResolver(
                     this.loggerFactory,
                     serviceData.interfaceIndex,
@@ -232,11 +229,11 @@ public class ServiceBrowser : IServiceBrowser
 
             if (!this.serviceResolvers.TryGetValue(key, out var resolverInstance))
             {
-                this.logger.LogDebug($"ERROR: resolver was never added: {key}");
+                this.logger.LogWarning("resolver {Key} was never added", key);
                 return;
             }
 
-            this.logger.LogDebug($"decrement usage count {resolverInstance.UsageCount} on resolver {key}");
+            this.logger.LogDebug("decrement usage count {Count} on resolver {Key}", resolverInstance.UsageCount, key);
             --resolverInstance.UsageCount;
 
             if (resolverInstance.UsageCount > 0)
@@ -244,7 +241,7 @@ public class ServiceBrowser : IServiceBrowser
                 return;
             }
 
-            this.logger.LogDebug($"usage count on resolver {key} down to zero, remove it");
+            this.logger.LogDebug("usage count on resolver {Key} down to zero, remove it", key);
             this.serviceResolvers.Remove(key);
             this.RaiseServiceRemoved(resolverInstance.ServiceResolver);
             await resolverInstance.ServiceResolver.StopResolve();

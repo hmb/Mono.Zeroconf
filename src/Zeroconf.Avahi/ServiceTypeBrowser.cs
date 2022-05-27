@@ -223,19 +223,22 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
             if (!this.serviceBrowsers.TryGetValue(key, out var existingServiceType))
             {
-                this.logger.LogDebug($"ERROR: resolver was never added: {key}");
+                this.logger.LogWarning("resolver was never added: {Key}", key);
                 return;
             }
 
-            this.logger.LogDebug($"decrement usage count {existingServiceType.UsageCount} on resolver {key}");
+            this.logger.LogDebug(
+                "decrement usage count {Count} on resolver {Key}",
+                existingServiceType.UsageCount,
+                key);
+            
             --existingServiceType.UsageCount;
-
             if (existingServiceType.UsageCount > 0)
             {
                 return;
             }
 
-            this.logger.LogDebug($"usage count on resolver {key} down to zero, remove it");
+            this.logger.LogDebug("usage count on resolver {Key} is down to zero, remove it", key);
             this.serviceBrowsers.Remove(key);
             this.RaiseServiceTypeRemoved(existingServiceType.ServiceBrowser);
             await existingServiceType.ServiceBrowser.StopBrowse();

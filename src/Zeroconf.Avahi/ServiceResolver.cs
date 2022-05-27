@@ -98,10 +98,15 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
             }
 
             this.logger.LogDebug(
-                $"Resolve called: assigning resolver {this.AvahiInterfaceIndex} {this.AvahiIpProtocolType} {this.Name} {this.RegType} {this.ReplyDomain}");
+                "creating resolver {InterfaceIndex} {IpProtocolType} {Name} {RegType} {ReplyDomain}",
+                this.AvahiInterfaceIndex,
+                this.AvahiIpProtocolType,
+                this.Name,
+                this.RegType,
+                this.ReplyDomain);
 
             this.resolver = await DBusManager.Server.ServiceResolverNewAsync(
-                this.AvahiInterfaceIndex, // TODO Any ?
+                this.AvahiInterfaceIndex,
                 (int)this.AvahiIpProtocolType,
                 this.Name,
                 this.RegType,
@@ -109,11 +114,8 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
                 (int)this.AvahiIpProtocolType,
                 (uint)LookupFlags.None);
 
-            this.logger.LogDebug("Resolve called: WatchFoundAsync/WatchFailureAsync");
             this.foundWatcher = await this.resolver.WatchFoundAsync(this.OnResolveFound);
             this.failureWatcher = await this.resolver.WatchFailureAsync(this.OnResolveFailure);
-
-            this.logger.LogDebug("Resolve called: awaited");
         }
     }
 
@@ -126,15 +128,12 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
                 return;
             }
 
-            this.logger.LogDebug("found dispose");
             this.foundWatcher?.Dispose();
             this.foundWatcher = null;
 
-            this.logger.LogDebug("failure dispose");
             this.failureWatcher?.Dispose();
             this.failureWatcher = null;
 
-            this.logger.LogDebug("FreeAsync");
             await this.resolver.FreeAsync();
             this.resolver = null;
         }

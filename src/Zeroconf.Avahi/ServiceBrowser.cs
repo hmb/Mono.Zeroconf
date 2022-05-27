@@ -35,6 +35,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Tmds.DBus;
 using Zeroconf.Abstraction;
 using Zeroconf.Avahi.Threading;
@@ -52,6 +53,8 @@ public class ServiceBrowser : IServiceBrowser
         public int UsageCount = 1;
     }
 
+    private readonly ILoggerFactory loggerFactory;
+    private readonly ILogger logger;
     private readonly Dictionary<string, CountedBrowseService> services = new();
     private readonly AsyncLock serviceLock = new();
     private readonly int interfaceIndex;
@@ -115,6 +118,7 @@ public class ServiceBrowser : IServiceBrowser
 
             await this.ClearUnSynchronized();
 
+            this.logger.LogDebug("browse: ServiceBrowserNewAsync");
             this.serviceBrowser = await DBusManager.Server.ServiceBrowserNewAsync(
                 this.interfaceIndex,
                 (int)this.ipProtocolType,
@@ -122,7 +126,9 @@ public class ServiceBrowser : IServiceBrowser
                 this.ReplyDomain,
                 (uint)LookupFlags.None);
 
+            this.logger.LogDebug("browse: WatchItemNewAsync");
             this.newServiceWatcher = await this.serviceBrowser.WatchItemNewAsync(this.OnServiceNew);
+            this.logger.LogDebug("browse: WatchItemRemoveAsync");
             this.removeServiceWatcher = await this.serviceBrowser.WatchItemRemoveAsync(this.OnServiceRemove);
         }
     }
@@ -206,11 +212,11 @@ public class ServiceBrowser : IServiceBrowser
 
             if (!this.services.TryGetValue(key, out var resolverInstance))
             {
-                Console.WriteLine($"ERROR: resolver was never added: {key}");
+                this.logger.LogDebug($"ERROR: resolver was never added: {key}");
                 return;
             }
 
-            Console.WriteLine($"decrement usage count {resolverInstance.UsageCount} on resolver {key}");
+            this.logger.LogDebug($"decrement usage count {resolverInstance.UsageCount} on resolver {key}");
             --resolverInstance.UsageCount;
 
             if (resolverInstance.UsageCount > 0)
@@ -218,9 +224,9 @@ public class ServiceBrowser : IServiceBrowser
                 return;
             }
 
+            this.logger.LogDebug($"usage count on resolver {key} down to zero, remove it");
             this.RaiseServiceRemoved(resolverInstance.ServiceResolver);
 
-            Console.WriteLine($"usage count on resolver {key} down to zero, remove it");
             await resolverInstance.ServiceResolver.StopResolve();
 
             this.services.Remove(key);

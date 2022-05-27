@@ -33,6 +33,7 @@ namespace Zeroconf.Avahi;
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Tmds.DBus;
 using Zeroconf.Abstraction;
 using Zeroconf.Avahi.DBus;
@@ -40,6 +41,7 @@ using Zeroconf.Avahi.Threading;
 
 public class ServiceResolver : Service, IResolvableService, IDisposable
 {
+    private readonly ILogger logger;
     private readonly AsyncLock serviceLock = new();
 
     private IServiceResolver? resolver;
@@ -49,6 +51,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
     public ServiceResolver(ILoggerFactory loggerFactory, int interfaceIndex, IpProtocolType ipProtocolType, string name, string regType, string replyDomain)
         : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
+        this.logger = loggerFactory.CreateLogger<ServiceResolver>();
         this.FullName = string.Empty;
         this.HostEntry = null!;
         this.HostTarget = string.Empty;
@@ -86,7 +89,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
                 throw new InvalidOperationException("The service is already running a resolve operation");
             }
 
-            Console.WriteLine(
+            this.logger.LogDebug(
                 $"Resolve called: assigning resolver {this.AvahiInterfaceIndex} {this.AvahiIpProtocolType} {this.Name} {this.RegType} {this.ReplyDomain}");
 
             this.resolver = await DBusManager.Server.ServiceResolverNewAsync(
@@ -98,11 +101,11 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
                 (int)this.AvahiIpProtocolType,
                 (uint)LookupFlags.None);
 
-            Console.WriteLine("Resolve called: WatchFoundAsync/WatchFailureAsync");
+            this.logger.LogDebug("Resolve called: WatchFoundAsync/WatchFailureAsync");
             this.foundWatcher = await this.resolver.WatchFoundAsync(this.OnResolveFound);
             this.failureWatcher = await this.resolver.WatchFailureAsync(this.OnResolveFailure);
 
-            Console.WriteLine("Resolve called: awaited");
+            this.logger.LogDebug("Resolve called: awaited");
         }
     }
 

@@ -35,6 +35,13 @@ using IServiceTypeBrowser = Zeroconf.Abstraction.IServiceTypeBrowser;
 
 public class ProviderFactory : IProviderFactory
 {
+    private readonly ILoggerFactory loggerFactory;
+
+    public ProviderFactory(ILoggerFactory loggerFactory)
+    {
+        this.loggerFactory = loggerFactory;
+    }
+
     public async Task Initialize()
     {
         await AvahiInit.Initialize();

@@ -33,6 +33,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Tmds.DBus;
 using Zeroconf.Abstraction;
 using Zeroconf.Avahi.Threading;
@@ -50,8 +51,12 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
         public int UsageCount = 1;
     }
 
+    private readonly ILoggerFactory loggerFactory;
+    private readonly ILogger logger;
     private readonly Dictionary<string, CountedServiceType> serviceTypes = new();
     private readonly AsyncLock serviceTypeLock = new();
+    private readonly int interfaceIndex;
+    private readonly IpProtocolType ipProtocolType;
 
     private DBus.IServiceTypeBrowser? serviceTypeBrowser;
     private IDisposable? newServiceTypeWatcher;
@@ -164,12 +169,12 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
             if (this.serviceTypes.TryGetValue(key, out var existingServiceType))
             {
-                Console.WriteLine($"resolver {key} was already added, increment usage");
+                this.logger.LogDebug("service browser {Key} was already added, increment usage", key);
                 ++existingServiceType.UsageCount;
             }
             else
             {
-                Console.WriteLine($"create new resolver {key}");
+                this.logger.LogDebug("create new service browser {Key}", key);
                 var newServiceType = new ServiceType(
                     serviceType.interfaceIndex,
                     (IpProtocolType)serviceType.ipProtocolType,
@@ -194,11 +199,11 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
             if (!this.serviceTypes.TryGetValue(key, out var existingServiceType))
             {
-                Console.WriteLine($"ERROR: resolver was never added: {key}");
+                this.logger.LogDebug($"ERROR: resolver was never added: {key}");
                 return;
             }
 
-            Console.WriteLine($"decrement usage count {existingServiceType.UsageCount} on resolver {key}");
+            this.logger.LogDebug($"decrement usage count {existingServiceType.UsageCount} on resolver {key}");
             --existingServiceType.UsageCount;
 
             if (existingServiceType.UsageCount > 0)

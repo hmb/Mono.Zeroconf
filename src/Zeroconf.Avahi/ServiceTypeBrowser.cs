@@ -106,7 +106,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
     public async Task Browse()
     {
-        using (await this.serviceTypeLock.Enter())
+        using (await this.serviceTypeBrowserLock.Enter("Browse"))
         {
             if (DBusManager.Server == null)
             {
@@ -160,7 +160,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
     private async void OnServiceTypeNew((int interfaceIndex, int ipProtocolType, string regtype, string domain, uint flags) serviceType)
     {
-        using (await this.serviceTypeLock.Enter())
+        using (await this.serviceBrowsersLock.Enter("OnServiceTypeNew"))
         {
             var key = GetServiceNameKey(
                 serviceType.interfaceIndex,
@@ -190,7 +190,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
     private async void OnServiceTypeRemove((int interfaceIndex, int ipProtocolType, string regtype, string domain, uint flags) serviceType)
     {
-        using (await this.serviceTypeLock.Enter())
+        using (await this.serviceBrowsersLock.Enter("OnServiceTypeRemove"))
         {
             var key = GetServiceNameKey(
                 serviceType.interfaceIndex,

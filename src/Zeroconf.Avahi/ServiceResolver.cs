@@ -42,7 +42,7 @@ using Zeroconf.Avahi.Threading;
 public class ServiceResolver : Service, IResolvableService, IDisposable
 {
     private readonly ILogger logger;
-    private readonly AsyncLock serviceLock = new();
+    private readonly AsyncLock serviceLock;
 
     private IServiceResolver? resolver;
     private IDisposable? foundWatcher;
@@ -52,6 +52,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
         : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
         this.logger = loggerFactory.CreateLogger<ServiceResolver>();
+        this.serviceLock = new AsyncLock(this.logger);
         this.FullName = string.Empty;
         this.HostEntry = null!;
         this.HostTarget = string.Empty;
@@ -77,7 +78,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
 
     public async Task Resolve()
     {
-        using (await this.serviceLock.Enter())
+        using (await this.serviceLock.Enter("Resolve"))
         {
             if (DBusManager.Server == null)
             {
@@ -111,7 +112,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
 
     public async Task StopResolve()
     {
-        using (await this.serviceLock.Enter())
+        using (await this.serviceLock.Enter("StopResolve"))
         {
             await this.ClearUnSynchronized();
         }

@@ -45,7 +45,7 @@ internal static class DBusManager
 
     public static async Task Initialize()
     {
-        using (await s_serverLock.Enter())
+        using (await s_serverLock.Enter("Initialize"))
         {
             if (Server != null)
             {

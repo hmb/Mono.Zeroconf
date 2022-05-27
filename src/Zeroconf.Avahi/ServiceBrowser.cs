@@ -56,7 +56,8 @@ public class ServiceBrowser : IServiceBrowser
     private readonly ILoggerFactory loggerFactory;
     private readonly ILogger logger;
     private readonly Dictionary<string, CountedBrowseService> services = new();
-    private readonly AsyncLock serviceLock = new();
+    private readonly AsyncLock serviceBrowserLock;
+    private readonly AsyncLock serviceResolverLock;
     private readonly int interfaceIndex;
     private readonly IpProtocolType ipProtocolType;
 
@@ -101,7 +102,7 @@ public class ServiceBrowser : IServiceBrowser
 
     public IEnumerator<IResolvableService> GetEnumerator()
     {
-        using (this.serviceLock.Enter().GetAwaiter().GetResult())
+        using (this.serviceResolverLock.Enter("GetEnumerator").GetAwaiter().GetResult())
         {
             return this.services.Values.Select(sr => sr.ServiceResolver).ToList().GetEnumerator();
         }
@@ -109,7 +110,7 @@ public class ServiceBrowser : IServiceBrowser
 
     public async Task Browse()
     {
-        using (await this.serviceLock.Enter())
+        using (await this.serviceBrowserLock.Enter("Browse"))
         {
             if (DBusManager.Server == null)
             {
@@ -169,7 +170,7 @@ public class ServiceBrowser : IServiceBrowser
     private async void OnServiceNew(
         (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
-        using (await this.serviceLock.Enter())
+        using (await this.serviceResolverLock.Enter("OnServiceNew"))
         {
             var key = GetServiceNameKey(
                 serviceData.interfaceIndex,
@@ -179,12 +180,12 @@ public class ServiceBrowser : IServiceBrowser
 
             if (this.services.TryGetValue(key, out var existingResolverInstance))
             {
-                Console.WriteLine($"resolver {key} was already added, increment usage");
+                this.logger.LogDebug($"resolver {key} was already added, increment usage");
                 ++existingResolverInstance.UsageCount;
             }
             else
             {
-                Console.WriteLine($"create new resolver {key}");
+                this.logger.LogDebug($"create new resolver {key}");
                 var newBrowseService = new ServiceResolver(
                     serviceData.name,
                     serviceData.regtype,

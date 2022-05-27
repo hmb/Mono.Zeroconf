@@ -54,7 +54,7 @@ public class RegisterService : Service, IRegisterService
 
     public void Dispose()
     {
-        using (this.serviceLock.Enter().GetAwaiter().GetResult())
+        using (this.serviceLock.Enter("Dispose").GetAwaiter().GetResult())
         {
             if (this.entryGroup == null)
             {
@@ -76,7 +76,7 @@ public class RegisterService : Service, IRegisterService
 
     public async Task Register()
     {
-        using (await this.serviceLock.Enter())
+        using (await this.serviceLock.Enter("Register"))
         {
             if (DBusManager.Server == null)
             {

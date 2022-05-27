@@ -34,8 +34,25 @@ public interface IProviderFactory
 {
     Task Initialize();
 
-    IServiceTypeBrowser CreateServiceTypeBrowser();
-    IServiceBrowser CreateServiceBrowser();
+    public IServiceTypeBrowser CreateServiceTypeBrowser(
+        uint interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string replyDomain);
+
+    public IServiceBrowser CreateServiceBrowser(
+        uint interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string regType,
+        string replyDomain);
+
+    public IResolvableService CreateServiceResolver(
+        uint interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string name,
+        string regType,
+        string replyDomain);
+
     IRegisterService CreateRegisterService();
+    
     ITxtRecord CreateTxtRecord();
 }

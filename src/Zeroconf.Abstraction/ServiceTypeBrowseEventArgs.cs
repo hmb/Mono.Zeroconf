@@ -34,10 +34,10 @@ using System;
 
 public class ServiceTypeBrowseEventArgs : EventArgs
 {
-    public ServiceTypeBrowseEventArgs(IServiceType serviceType)
+    public ServiceTypeBrowseEventArgs(IServiceBrowser serviceBrowser)
     {
-        this.ServiceType = serviceType;
+        this.ServiceBrowser = serviceBrowser;
     }
         
-    public IServiceType ServiceType { get; }
+    public IServiceBrowser ServiceBrowser { get; }
 }

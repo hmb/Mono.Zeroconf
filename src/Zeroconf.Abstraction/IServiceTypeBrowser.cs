@@ -34,10 +34,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-public interface IServiceTypeBrowser : IEnumerable<IServiceType>, IDisposable
+public interface IServiceTypeBrowser : IEnumerable<IServiceBrowser>, IDisposable
 {
     event EventHandler<ServiceTypeBrowseEventArgs>? ServiceTypeAdded;
     event EventHandler<ServiceTypeBrowseEventArgs>? ServiceTypeRemoved;
 
-    Task Browse(uint interfaceIndex, IpProtocolType ipProtocolType, string domain);
+    uint InterfaceIndex { get; }
+    IpProtocolType IpProtocolType  { get; }
+    string ReplyDomain { get; }
+    
+    Task Browse();
+    Task StopBrowse();
 }

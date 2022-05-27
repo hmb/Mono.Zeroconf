@@ -36,20 +36,20 @@ public class Service : IService
 {
     protected Service()
     {
+        this.AvahiInterfaceIndex = AvahiUtils.AvahiInterfaceIndexAny;
+        this.AvahiIpProtocolType = IpProtocolType.Unspecified;
         this.Name = string.Empty;
         this.RegType = string.Empty;
         this.ReplyDomain = string.Empty;
-        this.AvahiInterfaceIndex = AvahiUtils.AvahiInterfaceIndexAny;
-        this.AvahiIpProtocolType = IpProtocolType.Unspecified;
     }
 
-    protected Service(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
+    protected Service(int interfaceIndex, IpProtocolType ipProtocolType, string name, string regType, string replyDomain)
     {
-        this.Name = name;
-        this.RegType = regtype;
-        this.ReplyDomain = replyDomain;
         this.AvahiInterfaceIndex = interfaceIndex;
         this.AvahiIpProtocolType = ipProtocolType;
+        this.Name = name;
+        this.RegType = regType;
+        this.ReplyDomain = replyDomain;
     }
 
     public string Name { get; set; }

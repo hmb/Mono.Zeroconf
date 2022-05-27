@@ -57,6 +57,17 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
     private IDisposable? newServiceTypeWatcher;
     private IDisposable? removeServiceTypeWatcher;
 
+    public ServiceTypeBrowser(ILoggerFactory loggerFactory, int interfaceIndex, IpProtocolType ipProtocolType, string replyDomain)
+    {
+        this.loggerFactory = loggerFactory;
+        this.logger = loggerFactory.CreateLogger<ServiceTypeBrowser>();
+        this.serviceTypeBrowserLock = new AsyncLock(this.logger);
+        this.serviceBrowsersLock = new AsyncLock(this.logger);
+        this.interfaceIndex = interfaceIndex;
+        this.ipProtocolType = ipProtocolType;
+        this.ReplyDomain = replyDomain;
+    }
+
     public void Dispose()
     {
         using (this.serviceTypeLock.Enter().GetAwaiter().GetResult())
@@ -68,6 +79,13 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
     public event EventHandler<ServiceTypeBrowseEventArgs>? ServiceTypeAdded;
     public event EventHandler<ServiceTypeBrowseEventArgs>? ServiceTypeRemoved;
 
+    public uint InterfaceIndex => AvahiUtils.AvahiToZeroconfInterfaceIndex(this.interfaceIndex);
+
+    public Abstraction.IpProtocolType IpProtocolType => AvahiUtils.AvahiToZeroconfIpProtocolType(this.ipProtocolType);
+
+    public string ReplyDomain { get; }
+
+    
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.GetEnumerator();
@@ -81,7 +99,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
         }
     }
 
-    public async Task Browse(uint interfaceIndex, Abstraction.IpProtocolType ipProtocolType, string? domain)
+    public async Task Browse()
     {
         using (await this.serviceTypeLock.Enter())
         {
@@ -93,9 +111,9 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
             await this.ClearUnSynchronized();
 
             this.serviceTypeBrowser = await DBusManager.Server.ServiceTypeBrowserNewAsync(
-                AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
-                (int)AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
-                domain ?? string.Empty,
+                this.interfaceIndex,
+                (int)this.ipProtocolType,
+                this.ReplyDomain,
                 (uint)LookupFlags.None);
 
             this.newServiceTypeWatcher = await this.serviceTypeBrowser.WatchItemNewAsync(this.OnServiceTypeNew);

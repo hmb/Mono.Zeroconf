@@ -46,7 +46,7 @@ public static class AvahiUtils
         };
     }
 
-    public static Abstraction.IpProtocolType AvahiToZeroconfIpAddressProtocol(IpProtocolType ipProtocolType)
+    public static Abstraction.IpProtocolType AvahiToZeroconfIpProtocolType(IpProtocolType ipProtocolType)
     {
         return ipProtocolType switch
         {

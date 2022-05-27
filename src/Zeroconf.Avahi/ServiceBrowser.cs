@@ -54,11 +54,25 @@ public class ServiceBrowser : IServiceBrowser
 
     private readonly Dictionary<string, CountedBrowseService> services = new();
     private readonly AsyncLock serviceLock = new();
+    private readonly int interfaceIndex;
+    private readonly IpProtocolType ipProtocolType;
 
     private DBus.IServiceBrowser? serviceBrowser;
     private IDisposable? newServiceWatcher;
     private IDisposable? removeServiceWatcher;
 
+    public ServiceBrowser(ILoggerFactory loggerFactory, int interfaceIndex, IpProtocolType ipProtocolType, string regType, string replyDomain)
+    {
+        this.loggerFactory = loggerFactory;
+        this.logger = loggerFactory.CreateLogger<ServiceBrowser>();
+        this.serviceBrowserLock = new AsyncLock(this.logger);
+        this.serviceResolverLock = new AsyncLock(this.logger);
+        this.interfaceIndex = interfaceIndex;
+        this.ipProtocolType = ipProtocolType;
+        this.RegType = regType;
+        this.ReplyDomain = replyDomain;
+    }
+    
     public void Dispose()
     {
         using (this.serviceLock.Enter().GetAwaiter().GetResult())
@@ -70,6 +84,13 @@ public class ServiceBrowser : IServiceBrowser
     public event EventHandler<ServiceBrowseEventArgs>? ServiceAdded;
     public event EventHandler<ServiceBrowseEventArgs>? ServiceRemoved;
 
+    public uint InterfaceIndex => AvahiUtils.AvahiToZeroconfInterfaceIndex(this.interfaceIndex);
+
+    public Abstraction.IpProtocolType IpProtocolType => AvahiUtils.AvahiToZeroconfIpProtocolType(this.ipProtocolType);
+
+    public string RegType { get; }
+    public string ReplyDomain { get; }
+    
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.GetEnumerator();
@@ -83,7 +104,7 @@ public class ServiceBrowser : IServiceBrowser
         }
     }
 
-    public async Task Browse(uint interfaceIndex, Abstraction.IpProtocolType protocolType, string? regtype, string? domain)
+    public async Task Browse()
     {
         using (await this.serviceLock.Enter())
         {
@@ -95,10 +116,10 @@ public class ServiceBrowser : IServiceBrowser
             await this.ClearUnSynchronized();
 
             this.serviceBrowser = await DBusManager.Server.ServiceBrowserNewAsync(
-                AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
-                (int)AvahiUtils.ZeroconfToAvahiIpAddressProtocol(protocolType),
-                regtype ?? string.Empty,
-                domain ?? string.Empty,
+                this.interfaceIndex,
+                (int)this.ipProtocolType,
+                this.RegType,
+                this.ReplyDomain,
                 (uint)LookupFlags.None);
 
             this.newServiceWatcher = await this.serviceBrowser.WatchItemNewAsync(this.OnServiceNew);

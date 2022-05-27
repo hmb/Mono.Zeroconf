@@ -28,8 +28,10 @@
 
 namespace Zeroconf.Avahi;
 
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Zeroconf.Abstraction;
+using IServiceBrowser = Zeroconf.Abstraction.IServiceBrowser;
+using IServiceTypeBrowser = Zeroconf.Abstraction.IServiceTypeBrowser;
 
 public class ProviderFactory : IProviderFactory
 {
@@ -38,14 +40,46 @@ public class ProviderFactory : IProviderFactory
         await AvahiInit.Initialize();
     }
 
-    public IServiceTypeBrowser CreateServiceTypeBrowser()
+    public IServiceTypeBrowser CreateServiceTypeBrowser(
+        uint interfaceIndex,
+        Abstraction.IpProtocolType ipProtocolType,
+        string replyDomain)
     {
-        return new ServiceTypeBrowser();
+        return new ServiceTypeBrowser(
+            this.loggerFactory,
+            AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
+            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            replyDomain);
     }
-    
-    public IServiceBrowser CreateServiceBrowser()
+
+    public IServiceBrowser CreateServiceBrowser(
+        uint interfaceIndex,
+        Abstraction.IpProtocolType ipProtocolType,
+        string regtype,
+        string domain)
     {
-        return new ServiceBrowser();
+        return new ServiceBrowser(
+            this.loggerFactory,
+            AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
+            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            regtype,
+            domain);
+    }
+
+    public IResolvableService CreateServiceResolver(
+        uint interfaceIndex,
+        Abstraction.IpProtocolType ipProtocolType,
+        string name,
+        string regtype,
+        string domain)
+    {
+        return new ServiceResolver(
+            this.loggerFactory,
+            AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
+            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            name,
+            regtype,
+            domain);
     }
     
     public IRegisterService CreateRegisterService()

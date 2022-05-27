@@ -46,8 +46,8 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
     private IDisposable? foundWatcher;
     private IDisposable? failureWatcher;
 
-    public ServiceResolver(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
-        : base(name, regtype, replyDomain, interfaceIndex, ipProtocolType)
+    public ServiceResolver(ILoggerFactory loggerFactory, int interfaceIndex, IpProtocolType ipProtocolType, string name, string regType, string replyDomain)
+        : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
         this.FullName = string.Empty;
         this.HostEntry = null!;
@@ -68,7 +68,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
 
     public uint InterfaceIndex => AvahiUtils.AvahiToZeroconfInterfaceIndex(this.AvahiInterfaceIndex);
 
-    public Abstraction.IpProtocolType IpProtocolType => AvahiUtils.AvahiToZeroconfIpAddressProtocol(this.AvahiIpProtocolType);
+    public Abstraction.IpProtocolType IpProtocolType => AvahiUtils.AvahiToZeroconfIpProtocolType(this.AvahiIpProtocolType);
 
     public ushort Port { get; private set; }
 

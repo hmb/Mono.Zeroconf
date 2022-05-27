@@ -47,8 +47,8 @@ public class RegisterService : Service, IRegisterService
     {
     }
     
-    public RegisterService(string name, string regtype, string replyDomain, int interfaceIndex, IpProtocolType ipProtocolType)
-        : base(name, regtype, replyDomain, interfaceIndex, ipProtocolType)
+    public RegisterService(int interfaceIndex, IpProtocolType ipProtocolType, string name, string regType, string replyDomain)
+        : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
     }
 

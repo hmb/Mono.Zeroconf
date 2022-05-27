@@ -40,21 +40,23 @@ using Zeroconf.Avahi.Threading;
 
 public class ServiceTypeBrowser : IServiceTypeBrowser
 {
-    private class CountedServiceType
+    private class CountedBrowser
     {
-        public CountedServiceType(ServiceType serviceType)
+        public CountedBrowser(ServiceBrowser serviceBrowser)
         {
-            this.ServiceType = serviceType;
+            this.ServiceBrowser = serviceBrowser;
         }
 
-        public readonly ServiceType ServiceType;
+        public readonly ServiceBrowser ServiceBrowser;
         public int UsageCount = 1;
     }
 
     private readonly ILoggerFactory loggerFactory;
     private readonly ILogger logger;
-    private readonly Dictionary<string, CountedServiceType> serviceTypes = new();
-    private readonly AsyncLock serviceTypeLock = new();
+    private readonly Dictionary<string, CountedBrowser> serviceBrowsers = new();
+    private readonly AsyncLock serviceTypeBrowserLock;
+    private readonly AsyncLock serviceBrowsersLock;
+
     private readonly int interfaceIndex;
     private readonly IpProtocolType ipProtocolType;
 
@@ -75,10 +77,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
     public void Dispose()
     {
-        using (this.serviceTypeLock.Enter().GetAwaiter().GetResult())
-        {
-            this.ClearUnSynchronized().GetAwaiter().GetResult();
-        }
+        this.StopBrowse().GetAwaiter().GetResult();
     }
 
     public event EventHandler<ServiceTypeBrowseEventArgs>? ServiceTypeAdded;
@@ -96,11 +95,11 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
         return this.GetEnumerator();
     }
 
-    public IEnumerator<IServiceType> GetEnumerator()
+    public IEnumerator<IServiceBrowser> GetEnumerator()
     {
-        using (this.serviceTypeLock.Enter().GetAwaiter().GetResult())
+        using (this.serviceBrowsersLock.Enter("GetEnumerator").GetAwaiter().GetResult())
         {
-            return this.serviceTypes.Values.Select(st => st.ServiceType).ToList().GetEnumerator();
+            return this.serviceBrowsers.Values.Select(st => st.ServiceBrowser).ToList().GetEnumerator();
         }
     }
 
@@ -113,7 +112,10 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
                 throw new ConnectException("no connection to the avahi daemon possible");
             }
 
-            await this.ClearUnSynchronized();
+            if (this.serviceTypeBrowser != null)
+            {
+                throw new InvalidOperationException("The service type browser is already running");
+            }
 
             this.serviceTypeBrowser = await DBusManager.Server.ServiceTypeBrowserNewAsync(
                 this.interfaceIndex,
@@ -126,34 +128,46 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
         }
     }
 
-    private async Task ClearUnSynchronized()
+    public async Task StopBrowse()
     {
-        this.newServiceTypeWatcher?.Dispose();
-        this.newServiceTypeWatcher = null;
-
-        this.removeServiceTypeWatcher?.Dispose();
-        this.removeServiceTypeWatcher = null;
-
-        if (this.serviceTypeBrowser != null)
+        using (this.serviceTypeBrowserLock.Enter("Dispose").GetAwaiter().GetResult())
         {
-            await this.serviceTypeBrowser.FreeAsync();
-            this.serviceTypeBrowser = null;
-        }
+            this.newServiceTypeWatcher?.Dispose();
+            this.newServiceTypeWatcher = null;
 
-        foreach (var service in this.serviceTypes.Values)
-        {
-            service.ServiceType.Dispose();
-        }
+            this.removeServiceTypeWatcher?.Dispose();
+            this.removeServiceTypeWatcher = null;
 
-        this.serviceTypes.Clear();
+            if (this.serviceTypeBrowser != null)
+            {
+                await this.serviceTypeBrowser.FreeAsync();
+                this.serviceTypeBrowser = null;
+            }
+
+            await this.ClearServiceBrowsers();
+        }
     }
 
-    private void RaiseServiceTypeAdded(IServiceType service)
+    private async Task ClearServiceBrowsers()
+    {
+        using (await this.serviceBrowsersLock.Enter("ClearServiceBrowsers"))
+        {
+            foreach (var service in this.serviceBrowsers.Values)
+            {
+                this.RaiseServiceTypeRemoved(service.ServiceBrowser);
+                service.ServiceBrowser.Dispose();
+            }
+
+            this.serviceBrowsers.Clear();
+        }
+    }
+
+    private void RaiseServiceTypeAdded(IServiceBrowser service)
     {
         this.ServiceTypeAdded?.Invoke(this, new ServiceTypeBrowseEventArgs(service));
     }
 
-    private void RaiseServiceTypeRemoved(IServiceType service)
+    private void RaiseServiceTypeRemoved(IServiceBrowser service)
     {
         this.ServiceTypeRemoved?.Invoke(this, new ServiceTypeBrowseEventArgs(service));
     }
@@ -165,9 +179,10 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
             var key = GetServiceNameKey(
                 serviceType.interfaceIndex,
                 serviceType.ipProtocolType,
-                serviceType.regtype);
+                serviceType.regtype,
+                serviceType.domain);
 
-            if (this.serviceTypes.TryGetValue(key, out var existingServiceType))
+            if (this.serviceBrowsers.TryGetValue(key, out var existingServiceType))
             {
                 this.logger.LogDebug("service browser {Key} was already added, increment usage", key);
                 ++existingServiceType.UsageCount;
@@ -175,15 +190,16 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
             else
             {
                 this.logger.LogDebug("create new service browser {Key}", key);
-                var newServiceType = new ServiceType(
+                var newServiceBrowser = new ServiceBrowser(
+                    this.loggerFactory,
                     serviceType.interfaceIndex,
                     (IpProtocolType)serviceType.ipProtocolType,
                     serviceType.regtype,
                     serviceType.domain);
 
-                this.serviceTypes.Add(key, new CountedServiceType(newServiceType));
+                this.serviceBrowsers.Add(key, new CountedBrowser(newServiceBrowser));
 
-                this.RaiseServiceTypeAdded(newServiceType);
+                this.RaiseServiceTypeAdded(newServiceBrowser);
             }
         }
     }
@@ -195,9 +211,10 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
             var key = GetServiceNameKey(
                 serviceType.interfaceIndex,
                 serviceType.ipProtocolType,
-                serviceType.regtype);
+                serviceType.regtype,
+                serviceType.domain);
 
-            if (!this.serviceTypes.TryGetValue(key, out var existingServiceType))
+            if (!this.serviceBrowsers.TryGetValue(key, out var existingServiceType))
             {
                 this.logger.LogDebug($"ERROR: resolver was never added: {key}");
                 return;
@@ -211,17 +228,15 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
                 return;
             }
 
-            this.RaiseServiceTypeRemoved(existingServiceType.ServiceType);
-
-            Console.WriteLine($"usage count on resolver {key} down to zero, remove it");
-            existingServiceType.ServiceType.Dispose();
-
-            this.serviceTypes.Remove(key);
+            this.logger.LogDebug($"usage count on resolver {key} down to zero, remove it");
+            this.serviceBrowsers.Remove(key);
+            this.RaiseServiceTypeRemoved(existingServiceType.ServiceBrowser);
+            await existingServiceType.ServiceBrowser.StopBrowse();
         }
     }
 
-    private static string GetServiceNameKey(int interfaceIndex, int ipProtocolType, string regtype)
+    private static string GetServiceNameKey(int interfaceIndex, int protocol, string type, string domain)
     {
-        return $"{interfaceIndex}_{ipProtocolType}_{regtype}";
+        return $"{interfaceIndex}_{protocol}_{type}_{domain}";
     }
 }

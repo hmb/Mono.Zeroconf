@@ -42,9 +42,9 @@ using Zeroconf.Avahi.Threading;
 
 public class ServiceBrowser : IServiceBrowser
 {
-    private class CountedBrowseService
+    private class CountedResolver
     {
-        public CountedBrowseService(ServiceResolver serviceResolver)
+        public CountedResolver(ServiceResolver serviceResolver)
         {
             this.ServiceResolver = serviceResolver;
         }
@@ -55,9 +55,10 @@ public class ServiceBrowser : IServiceBrowser
 
     private readonly ILoggerFactory loggerFactory;
     private readonly ILogger logger;
-    private readonly Dictionary<string, CountedBrowseService> services = new();
+    private readonly Dictionary<string, CountedResolver> serviceResolvers = new();
     private readonly AsyncLock serviceBrowserLock;
     private readonly AsyncLock serviceResolverLock;
+    
     private readonly int interfaceIndex;
     private readonly IpProtocolType ipProtocolType;
 
@@ -79,10 +80,7 @@ public class ServiceBrowser : IServiceBrowser
     
     public void Dispose()
     {
-        using (this.serviceLock.Enter().GetAwaiter().GetResult())
-        {
-            this.ClearUnSynchronized().GetAwaiter().GetResult();
-        }
+        this.StopBrowse().GetAwaiter().GetResult();
     }
 
     public event EventHandler<ServiceBrowseEventArgs>? ServiceAdded;
@@ -104,7 +102,7 @@ public class ServiceBrowser : IServiceBrowser
     {
         using (this.serviceResolverLock.Enter("GetEnumerator").GetAwaiter().GetResult())
         {
-            return this.services.Values.Select(sr => sr.ServiceResolver).ToList().GetEnumerator();
+            return this.serviceResolvers.Values.Select(sr => sr.ServiceResolver).ToList().GetEnumerator();
         }
     }
 
@@ -117,7 +115,10 @@ public class ServiceBrowser : IServiceBrowser
                 throw new ConnectException("no connection to the avahi daemon possible");
             }
 
-            await this.ClearUnSynchronized();
+            if (this.serviceBrowser != null)
+            {
+                throw new InvalidOperationException("The service browser is already running");
+            }
 
             this.logger.LogDebug("browse: ServiceBrowserNewAsync");
             this.serviceBrowser = await DBusManager.Server.ServiceBrowserNewAsync(
@@ -134,27 +135,38 @@ public class ServiceBrowser : IServiceBrowser
         }
     }
 
-    private async Task ClearUnSynchronized()
+    public async Task StopBrowse()
     {
-        this.newServiceWatcher?.Dispose();
-        this.newServiceWatcher = null;
-
-        this.removeServiceWatcher?.Dispose();
-        this.removeServiceWatcher = null;
-
-        if (this.serviceBrowser != null)
+        using (await this.serviceBrowserLock.Enter("StopBrowse"))
         {
-            await this.serviceBrowser.FreeAsync();
-            this.serviceBrowser = null;
-        }
+            this.newServiceWatcher?.Dispose();
+            this.newServiceWatcher = null;
 
-        foreach (var service in this.services.Values)
+            this.removeServiceWatcher?.Dispose();
+            this.removeServiceWatcher = null;
+
+            if (this.serviceBrowser != null)
+            {
+                await this.serviceBrowser.FreeAsync();
+                this.serviceBrowser = null;
+            }
+            
+            await this.ClearResolvers();
+        }
+    }
+
+    private async Task ClearResolvers()
+    {
+        using (await this.serviceResolverLock.Enter("Clear resolvers"))
         {
-            this.RaiseServiceRemoved(service.ServiceResolver);
-            service.ServiceResolver.Dispose();
-        }
+            foreach (var service in this.serviceResolvers.Values)
+            {
+                this.RaiseServiceRemoved(service.ServiceResolver);
+                await service.ServiceResolver.StopResolve();
+            }
 
-        this.services.Clear();
+            this.serviceResolvers.Clear();
+        }
     }
 
     private void RaiseServiceAdded(IResolvableService service)
@@ -167,51 +179,51 @@ public class ServiceBrowser : IServiceBrowser
         this.ServiceRemoved?.Invoke(this, new ServiceBrowseEventArgs(service));
     }
 
-    private async void OnServiceNew(
-        (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
+    private async void OnServiceNew((int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
         using (await this.serviceResolverLock.Enter("OnServiceNew"))
         {
             var key = GetServiceNameKey(
                 serviceData.interfaceIndex,
                 serviceData.protocol,
+                serviceData.name,
                 serviceData.regtype,
-                serviceData.name);
+                serviceData.domain);
 
-            if (this.services.TryGetValue(key, out var existingResolverInstance))
+            if (this.serviceResolvers.TryGetValue(key, out var existingServiceResolver))
             {
                 this.logger.LogDebug($"resolver {key} was already added, increment usage");
-                ++existingResolverInstance.UsageCount;
+                ++existingServiceResolver.UsageCount;
             }
             else
             {
                 this.logger.LogDebug($"create new resolver {key}");
-                var newBrowseService = new ServiceResolver(
+                var newServiceResolver = new ServiceResolver(
+                    this.loggerFactory,
+                    serviceData.interfaceIndex,
+                    (IpProtocolType)serviceData.protocol,
                     serviceData.name,
                     serviceData.regtype,
-                    serviceData.domain,
-                    serviceData.interfaceIndex,
-                    (IpProtocolType)serviceData.protocol);
+                    serviceData.domain);
 
-                this.services.Add(key, new CountedBrowseService(newBrowseService));
-                
-                this.RaiseServiceAdded(newBrowseService);
+                this.serviceResolvers.Add(key, new CountedResolver(newServiceResolver));
+                this.RaiseServiceAdded(newServiceResolver);
             }
         }
     }
 
-    private async void OnServiceRemove(
-        (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
+    private async void OnServiceRemove((int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
-        using (await this.serviceLock.Enter())
+        using (await this.serviceResolverLock.Enter("OnServiceRemove"))
         {
             var key = GetServiceNameKey(
                 serviceData.interfaceIndex,
                 serviceData.protocol,
+                serviceData.name,
                 serviceData.regtype,
-                serviceData.name);
+                serviceData.domain);
 
-            if (!this.services.TryGetValue(key, out var resolverInstance))
+            if (!this.serviceResolvers.TryGetValue(key, out var resolverInstance))
             {
                 this.logger.LogDebug($"ERROR: resolver was never added: {key}");
                 return;
@@ -226,16 +238,14 @@ public class ServiceBrowser : IServiceBrowser
             }
 
             this.logger.LogDebug($"usage count on resolver {key} down to zero, remove it");
+            this.serviceResolvers.Remove(key);
             this.RaiseServiceRemoved(resolverInstance.ServiceResolver);
-
             await resolverInstance.ServiceResolver.StopResolve();
-
-            this.services.Remove(key);
         }
     }
 
-    private static string GetServiceNameKey(int networkInterface, int protocol, string type, string name)
+    private static string GetServiceNameKey(int interfaceIndex, int protocol, string name, string type, string domain)
     {
-        return $"{networkInterface}_{protocol}_{type}_{name}";
+        return $"{interfaceIndex}_{protocol}_{name}_{type}_{domain}";
     }
 }

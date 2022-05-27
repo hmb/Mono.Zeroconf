@@ -114,24 +114,23 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
     {
         using (await this.serviceLock.Enter("StopResolve"))
         {
-            await this.ClearUnSynchronized();
+            if (this.resolver == null)
+            {
+                return;
+            }
+
+            this.logger.LogDebug("found dispose");
+            this.foundWatcher?.Dispose();
+            this.foundWatcher = null;
+
+            this.logger.LogDebug("failure dispose");
+            this.failureWatcher?.Dispose();
+            this.failureWatcher = null;
+            
+            this.logger.LogDebug("FreeAsync");
+            await this.resolver.FreeAsync();
+            this.resolver = null;
         }
-    }
-
-    private async Task ClearUnSynchronized()
-    {
-        if (this.resolver == null)
-        {
-            return;
-        }
-
-        this.foundWatcher?.Dispose();
-        this.failureWatcher?.Dispose();
-        await this.resolver.FreeAsync();
-
-        this.resolver = null;
-        this.foundWatcher = null;
-        this.failureWatcher = null;
     }
 
     private void RaiseResolved()
@@ -144,8 +143,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
         this.ResolveFailure?.Invoke(this, error);
     }
     
-    private void OnResolveFound(
-        (int interfaceIndex, int protocol, string name, string regtype, string domain, string host, int aprotocol, string address, ushort port, byte[][] txt, uint flags) obj)
+    private void OnResolveFound((int interfaceIndex, int protocol, string name, string regtype, string domain, string host, int aprotocol, string address, ushort port, byte[][] txt, uint flags) obj)
     {
         this.FullName = $"{obj.name.Replace(" ", "\\032")}.{obj.regtype}.{obj.domain}";
         

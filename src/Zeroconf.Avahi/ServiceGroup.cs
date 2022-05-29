@@ -88,7 +88,7 @@ public class ServiceGroup : IServiceGroup
 
     public async Task Terminate()
     {
-        using (await this.serviceLock.Enter("RegisterStop"))
+        using (await this.serviceLock.Enter("Terminate"))
         {
             if (this.entryGroup == null)
             {
@@ -98,7 +98,6 @@ public class ServiceGroup : IServiceGroup
             this.stateChangeWatcher?.Dispose();
             this.stateChangeWatcher = null;
 
-            await this.entryGroup.ResetAsync();
             await this.entryGroup.FreeAsync();
             this.entryGroup = null;
         }
@@ -114,7 +113,7 @@ public class ServiceGroup : IServiceGroup
         ushort port,
         ITxtRecord? txtRecord)
     {
-        using (await this.serviceLock.Enter("Initialize"))
+        using (await this.serviceLock.Enter("AddServiceAsync"))
         {
             if (this.entryGroup == null)
             {
@@ -138,7 +137,7 @@ public class ServiceGroup : IServiceGroup
 
     public async Task CommitAsync()
     {
-        using (await this.serviceLock.Enter("Initialize"))
+        using (await this.serviceLock.Enter("CommitAsync"))
         {
 
             if (this.entryGroup == null)
@@ -152,9 +151,8 @@ public class ServiceGroup : IServiceGroup
     
     public async Task ResetAsync()
     {
-        using (await this.serviceLock.Enter("Initialize"))
+        using (await this.serviceLock.Enter("ResetAsync"))
         {
-
             if (this.entryGroup == null)
             {
                 throw new ApplicationException("no avahi entry group present");
@@ -171,6 +169,8 @@ public class ServiceGroup : IServiceGroup
 
     private void OnEntryGroupStateChanged((int state, string error) obj)
     {
+        this.logger.LogDebug("OnEntryGroupStateChanged {State} {Error}", (EntryGroupState)obj.state, obj.error);
+        
         switch ((EntryGroupState)obj.state)
         {
             case EntryGroupState.Collision:
@@ -184,6 +184,15 @@ public class ServiceGroup : IServiceGroup
             case EntryGroupState.Established:
                 this.RaiseResponse(ErrorCode.Ok);
                 break;
+            
+            case EntryGroupState.Uncommited:
+                break;
+            
+            case EntryGroupState.Registering:
+                break;
+
+            // no default
+            // default:
         }
     }
 

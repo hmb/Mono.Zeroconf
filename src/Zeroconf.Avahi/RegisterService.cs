@@ -59,20 +59,7 @@ public class RegisterService : Service, IRegisterService
 
     public void Dispose()
     {
-        using (this.serviceLock.Enter("Dispose").GetAwaiter().GetResult())
-        {
-            if (this.entryGroup == null)
-            {
-                return;
-            }
-
-            this.stateChangeWatcher?.Dispose();
-            this.stateChangeWatcher = null;
-
-            this.entryGroup.ResetAsync().GetAwaiter().GetResult();
-            this.entryGroup.FreeAsync().GetAwaiter().GetResult();
-            this.entryGroup = null;
-        }
+        this.StopRegister().GetAwaiter().GetResult();
     }
 
     public event EventHandler<RegisterServiceEventArgs>? Response;
@@ -94,16 +81,12 @@ public class RegisterService : Service, IRegisterService
                 throw new ApplicationException("Avahi server is not rRunning");
             }
 
-            if (this.entryGroup == null)
+            if (this.entryGroup != null)
             {
-                this.entryGroup = await DBusManager.Server.EntryGroupNewAsync();
+                throw new InvalidOperationException("The service is already registered");
             }
-            else
-            {
-                this.stateChangeWatcher?.Dispose();
-                await this.entryGroup.ResetAsync();
-            }
-
+            
+            this.entryGroup = await DBusManager.Server.EntryGroupNewAsync();
             this.stateChangeWatcher = await this.entryGroup.WatchStateChangedAsync(this.OnEntryGroupStateChanged);
 
             if (this.entryGroup == null)
@@ -128,6 +111,24 @@ public class RegisterService : Service, IRegisterService
         }
     }
 
+    public async Task StopRegister()
+    {
+        using (await this.serviceLock.Enter("RegisterStop"))
+        {
+            if (this.entryGroup == null)
+            {
+                return;
+            }
+
+            this.stateChangeWatcher?.Dispose();
+            this.stateChangeWatcher = null;
+
+            await this.entryGroup.ResetAsync();
+            await this.entryGroup.FreeAsync();
+            this.entryGroup = null;
+        }
+    }
+    
     private void OnEntryGroupStateChanged((int state, string error) obj)
     {
         // TODO this is very strange code if there's no attached event handler the function throws

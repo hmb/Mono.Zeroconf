@@ -109,6 +109,11 @@ public class ProviderFactory : IProviderFactory
             port);
     }
 
+    public IServiceGroup CreateServiceGroup()
+    {
+        return new ServiceGroup(this.loggerFactory);
+    }
+
     public ITxtRecord CreateTxtRecord()
     {
         return new TxtRecord();

@@ -89,9 +89,24 @@ public class ProviderFactory : IProviderFactory
             domain);
     }
 
-    public IRegisterService CreateRegisterService()
+    public IRegisterService CreateRegisterService(
+        uint interfaceIndex,
+        Abstraction.IpProtocolType ipProtocolType,
+        string name,
+        string regType,
+        string replyDomain,
+        string target,
+        ushort port)
     {
-        return new RegisterService();
+        return new RegisterService(
+//            this.loggerFactory,
+            AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
+            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            name,
+            regType,
+            replyDomain,
+            target,
+            port);
     }
 
     public ITxtRecord CreateTxtRecord()

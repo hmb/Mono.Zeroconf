@@ -34,15 +34,6 @@ using Zeroconf.Abstraction;
 
 public class Service : IService
 {
-    protected Service()
-    {
-        this.AvahiInterfaceIndex = AvahiUtils.AvahiInterfaceIndexAny;
-        this.AvahiIpProtocolType = IpProtocolType.Unspecified;
-        this.Name = string.Empty;
-        this.RegType = string.Empty;
-        this.ReplyDomain = string.Empty;
-    }
-
     protected Service(
         int interfaceIndex,
         IpProtocolType ipProtocolType,

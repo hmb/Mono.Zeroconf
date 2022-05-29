@@ -52,7 +52,14 @@ public interface IProviderFactory
         string regType,
         string replyDomain);
 
-    IRegisterService CreateRegisterService();
+    public IRegisterService CreateRegisterService(
+        uint interfaceIndex,
+        IpProtocolType ipProtocolType,
+        string name,
+        string regType,
+        string replyDomain,
+        string target,
+        ushort port);
 
-    ITxtRecord CreateTxtRecord();
+    public ITxtRecord CreateTxtRecord();
 }

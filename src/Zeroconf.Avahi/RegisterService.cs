@@ -43,10 +43,6 @@ public class RegisterService : Service, IRegisterService
     private IEntryGroup? entryGroup;
     private IDisposable? stateChangeWatcher;
 
-    public RegisterService()
-    {
-    }
-
     public RegisterService(
         int interfaceIndex,
         IpProtocolType ipProtocolType,

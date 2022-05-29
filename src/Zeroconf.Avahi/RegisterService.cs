@@ -59,7 +59,7 @@ public class RegisterService : Service, IRegisterService
 
     public void Dispose()
     {
-        this.StopRegister().GetAwaiter().GetResult();
+        this.StopRegister().ConfigureAwait(false).GetAwaiter().GetResult();
     }
 
     public event EventHandler<RegisterServiceEventArgs>? Response;
@@ -69,14 +69,14 @@ public class RegisterService : Service, IRegisterService
 
     public async Task Register()
     {
-        using (await this.serviceLock.Enter("Register"))
+        using (await this.serviceLock.Enter("Register").ConfigureAwait(false))
         {
             if (DBusManager.Server == null)
             {
                 throw new ConnectException("no connection to the avahi daemon possible");
             }
 
-            if (await DBusManager.Server.GetStateAsync() != AvahiServerState.Running)
+            if (await DBusManager.Server.GetStateAsync().ConfigureAwait(false) != AvahiServerState.Running)
             {
                 throw new ApplicationException("Avahi server is not rRunning");
             }
@@ -86,8 +86,8 @@ public class RegisterService : Service, IRegisterService
                 throw new InvalidOperationException("The service is already registered");
             }
             
-            this.entryGroup = await DBusManager.Server.EntryGroupNewAsync();
-            this.stateChangeWatcher = await this.entryGroup.WatchStateChangedAsync(this.OnEntryGroupStateChanged);
+            this.entryGroup = await DBusManager.Server.EntryGroupNewAsync().ConfigureAwait(false);
+            this.stateChangeWatcher = await this.entryGroup.WatchStateChangedAsync(this.OnEntryGroupStateChanged).ConfigureAwait(false);
 
             if (this.entryGroup == null)
             {
@@ -105,15 +105,15 @@ public class RegisterService : Service, IRegisterService
                 this.ReplyDomain,
                 this.Target,
                 this.Port,
-                avahiTxtRecord);
+                avahiTxtRecord).ConfigureAwait(false);
 
-            await this.entryGroup.CommitAsync();
+            await this.entryGroup.CommitAsync().ConfigureAwait(false);
         }
     }
 
     public async Task StopRegister()
     {
-        using (await this.serviceLock.Enter("RegisterStop"))
+        using (await this.serviceLock.Enter("RegisterStop").ConfigureAwait(false))
         {
             if (this.entryGroup == null)
             {
@@ -123,8 +123,7 @@ public class RegisterService : Service, IRegisterService
             this.stateChangeWatcher?.Dispose();
             this.stateChangeWatcher = null;
 
-            await this.entryGroup.ResetAsync();
-            await this.entryGroup.FreeAsync();
+            await this.entryGroup.FreeAsync().ConfigureAwait(false);
             this.entryGroup = null;
         }
     }

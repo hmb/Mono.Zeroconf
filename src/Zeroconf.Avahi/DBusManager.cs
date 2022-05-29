@@ -45,7 +45,7 @@ internal static class DBusManager
 
     public static async Task Initialize()
     {
-        using (await s_serverLock.Enter("Initialize"))
+        using (await s_serverLock.Enter("Initialize").ConfigureAwait(false))
         {
             if (Server != null)
             {
@@ -60,7 +60,7 @@ internal static class DBusManager
                 throw new ApplicationException("Could not find org.freedesktop.Avahi");
             }
 
-            var apiVersion = await Server.GetAPIVersionAsync();
+            var apiVersion = await Server.GetAPIVersionAsync().ConfigureAwait(false);
             if (apiVersion < MinimumAvahiApiVersion)
             {
                 throw new ApplicationException(

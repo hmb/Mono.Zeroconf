@@ -44,7 +44,7 @@ public class ProviderFactory : IProviderFactory
 
     public async Task Initialize()
     {
-        await AvahiInit.Initialize();
+        await AvahiInit.Initialize().ConfigureAwait(false);
     }
 
     public IServiceTypeBrowser CreateServiceTypeBrowser(

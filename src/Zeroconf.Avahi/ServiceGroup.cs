@@ -59,14 +59,14 @@ public class ServiceGroup : IServiceGroup
 
     public async Task Initialize()
     {
-        using (await this.serviceLock.Enter("Initialize"))
+        using (await this.serviceLock.Enter("Initialize").ConfigureAwait(false))
         {
             if (DBusManager.Server == null)
             {
                 throw new ConnectException("no connection to the avahi daemon possible");
             }
 
-            if (await DBusManager.Server.GetStateAsync() != AvahiServerState.Running)
+            if (await DBusManager.Server.GetStateAsync().ConfigureAwait(false) != AvahiServerState.Running)
             {
                 throw new ApplicationException("Avahi server is not rRunning");
             }
@@ -88,7 +88,7 @@ public class ServiceGroup : IServiceGroup
 
     public async Task Terminate()
     {
-        using (await this.serviceLock.Enter("Terminate"))
+        using (await this.serviceLock.Enter("Terminate").ConfigureAwait(false))
         {
             if (this.entryGroup == null)
             {
@@ -98,7 +98,7 @@ public class ServiceGroup : IServiceGroup
             this.stateChangeWatcher?.Dispose();
             this.stateChangeWatcher = null;
 
-            await this.entryGroup.FreeAsync();
+            await this.entryGroup.FreeAsync().ConfigureAwait(false);
             this.entryGroup = null;
         }
     }
@@ -113,7 +113,7 @@ public class ServiceGroup : IServiceGroup
         ushort port,
         ITxtRecord? txtRecord)
     {
-        using (await this.serviceLock.Enter("AddServiceAsync"))
+        using (await this.serviceLock.Enter("AddServiceAsync").ConfigureAwait(false))
         {
             if (this.entryGroup == null)
             {
@@ -131,13 +131,13 @@ public class ServiceGroup : IServiceGroup
                 replyDomain,
                 target,
                 port,
-                avahiTxtRecord);
+                avahiTxtRecord).ConfigureAwait(false);
         }
     }
 
     public async Task CommitAsync()
     {
-        using (await this.serviceLock.Enter("CommitAsync"))
+        using (await this.serviceLock.Enter("CommitAsync").ConfigureAwait(false))
         {
 
             if (this.entryGroup == null)
@@ -145,25 +145,25 @@ public class ServiceGroup : IServiceGroup
                 throw new ApplicationException("no avahi entry group present");
             }
 
-            await this.entryGroup.CommitAsync();
+            await this.entryGroup.CommitAsync().ConfigureAwait(false);
         }
     }
     
     public async Task ResetAsync()
     {
-        using (await this.serviceLock.Enter("ResetAsync"))
+        using (await this.serviceLock.Enter("ResetAsync").ConfigureAwait(false))
         {
             if (this.entryGroup == null)
             {
                 throw new ApplicationException("no avahi entry group present");
             }
 
-            await this.entryGroup.ResetAsync();
+            await this.entryGroup.ResetAsync().ConfigureAwait(false);
             
             // this apparently is a bug in avahi (or a known issue, or broken by design):
             // after reset and republish the services do not get republished
             // if only payload data changes (port, target and txt)
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
         }
     }
 

@@ -65,7 +65,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
         this.Port = 0;
     }
 
-    public void Dispose() => this.StopResolve().GetAwaiter().GetResult();
+    public void Dispose() => this.StopResolve().ConfigureAwait(false).GetAwaiter().GetResult();
 
     public event EventHandler<ServiceResolvedEventArgs>? Resolved;
     public event EventHandler<string>? ResolveFailure;
@@ -85,7 +85,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
 
     public async Task Resolve()
     {
-        using (await this.serviceLock.Enter("Resolve"))
+        using (await this.serviceLock.Enter("Resolve").ConfigureAwait(false))
         {
             if (DBusManager.Server == null)
             {
@@ -112,16 +112,16 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
                 this.RegType,
                 this.ReplyDomain,
                 (int)this.AvahiIpProtocolType,
-                (uint)LookupFlags.None);
+                (uint)LookupFlags.None).ConfigureAwait(false);
 
-            this.foundWatcher = await this.resolver.WatchFoundAsync(this.OnResolveFound);
-            this.failureWatcher = await this.resolver.WatchFailureAsync(this.OnResolveFailure);
+            this.foundWatcher = await this.resolver.WatchFoundAsync(this.OnResolveFound).ConfigureAwait(false);
+            this.failureWatcher = await this.resolver.WatchFailureAsync(this.OnResolveFailure).ConfigureAwait(false);
         }
     }
 
     public async Task StopResolve()
     {
-        using (await this.serviceLock.Enter("StopResolve"))
+        using (await this.serviceLock.Enter("StopResolve").ConfigureAwait(false))
         {
             if (this.resolver == null)
             {
@@ -134,7 +134,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
             this.failureWatcher?.Dispose();
             this.failureWatcher = null;
 
-            await this.resolver.FreeAsync();
+            await this.resolver.FreeAsync().ConfigureAwait(false);
             this.resolver = null;
         }
     }

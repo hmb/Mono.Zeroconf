@@ -23,7 +23,7 @@ public static class AsyncLockExtension
         semaphore.Logger?.LogTrace("enter semaphore{Description}", cleanedDescription);
 
         var wrapper = new LockHolder(semaphore, cleanedDescription);
-        await wrapper.Semaphore.WaitAsync();
+        await wrapper.Semaphore.WaitAsync().ConfigureAwait(false);
 
         semaphore.Logger?.LogTrace("semaphore entered{Description}", cleanedDescription);
 

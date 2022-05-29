@@ -85,7 +85,7 @@ public class ServiceBrowser : IServiceBrowser
 
     public void Dispose()
     {
-        this.StopBrowse().GetAwaiter().GetResult();
+        this.StopBrowse().ConfigureAwait(false).GetAwaiter().GetResult();
     }
 
     public event EventHandler<ServiceBrowseEventArgs>? ServiceAdded;
@@ -105,7 +105,7 @@ public class ServiceBrowser : IServiceBrowser
 
     public IEnumerator<IResolvableService> GetEnumerator()
     {
-        using (this.serviceResolverLock.Enter("GetEnumerator").GetAwaiter().GetResult())
+        using (this.serviceResolverLock.Enter("GetEnumerator").ConfigureAwait(false).GetAwaiter().GetResult())
         {
             return this.serviceResolvers.Values.Select(sr => sr.ServiceResolver).ToList().GetEnumerator();
         }
@@ -113,7 +113,7 @@ public class ServiceBrowser : IServiceBrowser
 
     public async Task Browse()
     {
-        using (await this.serviceBrowserLock.Enter("Browse"))
+        using (await this.serviceBrowserLock.Enter("Browse").ConfigureAwait(false))
         {
             if (DBusManager.Server == null)
             {
@@ -130,16 +130,16 @@ public class ServiceBrowser : IServiceBrowser
                 (int)this.ipProtocolType,
                 this.RegType,
                 this.ReplyDomain,
-                (uint)LookupFlags.None);
+                (uint)LookupFlags.None).ConfigureAwait(false);
 
-            this.newServiceWatcher = await this.serviceBrowser.WatchItemNewAsync(this.OnServiceNew);
-            this.removeServiceWatcher = await this.serviceBrowser.WatchItemRemoveAsync(this.OnServiceRemove);
+            this.newServiceWatcher = await this.serviceBrowser.WatchItemNewAsync(this.OnServiceNew).ConfigureAwait(false);
+            this.removeServiceWatcher = await this.serviceBrowser.WatchItemRemoveAsync(this.OnServiceRemove).ConfigureAwait(false);
         }
     }
 
     public async Task StopBrowse()
     {
-        using (await this.serviceBrowserLock.Enter("StopBrowse"))
+        using (await this.serviceBrowserLock.Enter("StopBrowse").ConfigureAwait(false))
         {
             this.newServiceWatcher?.Dispose();
             this.newServiceWatcher = null;
@@ -149,22 +149,22 @@ public class ServiceBrowser : IServiceBrowser
 
             if (this.serviceBrowser != null)
             {
-                await this.serviceBrowser.FreeAsync();
+                await this.serviceBrowser.FreeAsync().ConfigureAwait(false);
                 this.serviceBrowser = null;
             }
 
-            await this.ClearResolvers();
+            await this.ClearResolvers().ConfigureAwait(false);
         }
     }
 
     private async Task ClearResolvers()
     {
-        using (await this.serviceResolverLock.Enter("Clear resolvers"))
+        using (await this.serviceResolverLock.Enter("Clear resolvers").ConfigureAwait(false))
         {
             foreach (var service in this.serviceResolvers.Values)
             {
                 this.RaiseServiceRemoved(service.ServiceResolver);
-                await service.ServiceResolver.StopResolve();
+                await service.ServiceResolver.StopResolve().ConfigureAwait(false);
             }
 
             this.serviceResolvers.Clear();
@@ -184,7 +184,7 @@ public class ServiceBrowser : IServiceBrowser
     private async void OnServiceNew(
         (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
-        using (await this.serviceResolverLock.Enter("OnServiceNew"))
+        using (await this.serviceResolverLock.Enter("OnServiceNew").ConfigureAwait(false))
         {
             var key = GetServiceNameKey(
                 serviceData.interfaceIndex,
@@ -218,7 +218,7 @@ public class ServiceBrowser : IServiceBrowser
     private async void OnServiceRemove(
         (int interfaceIndex, int protocol, string name, string regtype, string domain, uint flags) serviceData)
     {
-        using (await this.serviceResolverLock.Enter("OnServiceRemove"))
+        using (await this.serviceResolverLock.Enter("OnServiceRemove").ConfigureAwait(false))
         {
             var key = GetServiceNameKey(
                 serviceData.interfaceIndex,
@@ -244,7 +244,7 @@ public class ServiceBrowser : IServiceBrowser
             this.logger.LogDebug("usage count on resolver {Key} down to zero, remove it", key);
             this.serviceResolvers.Remove(key);
             this.RaiseServiceRemoved(resolverInstance.ServiceResolver);
-            await resolverInstance.ServiceResolver.StopResolve();
+            await resolverInstance.ServiceResolver.StopResolve().ConfigureAwait(false);
         }
     }
 

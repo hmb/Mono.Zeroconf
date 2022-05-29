@@ -4,6 +4,6 @@ public static class AvahiInit
 {
     public static async Task Initialize()
     {
-        await DBusManager.Initialize();
+        await DBusManager.Initialize().ConfigureAwait(false);
     }
 }

@@ -52,9 +52,13 @@ public class RegisterService : Service, IRegisterService
         IpProtocolType ipProtocolType,
         string name,
         string regType,
-        string replyDomain)
+        string replyDomain,
+        string target,
+        ushort port)
         : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
+        this.Target = target;
+        this.Port = port;
     }
 
     public void Dispose()
@@ -77,6 +81,7 @@ public class RegisterService : Service, IRegisterService
 
     public event EventHandler<RegisterServiceEventArgs>? Response;
 
+    public string Target { get; set; }
     public ushort Port { get; set; }
 
     public async Task Register()
@@ -120,7 +125,7 @@ public class RegisterService : Service, IRegisterService
                 this.Name,
                 this.RegType,
                 this.ReplyDomain,
-                string.Empty,
+                this.Target,
                 this.Port,
                 avahiTxtRecord);
 

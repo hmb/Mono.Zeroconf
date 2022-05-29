@@ -159,7 +159,7 @@ public class ServiceBrowser : IServiceBrowser
 
     private async Task ClearResolvers()
     {
-        using (await this.serviceResolverLock.Enter("Clear resolvers").ConfigureAwait(false))
+        using (await this.serviceResolverLock.Enter("ClearResolvers").ConfigureAwait(false))
         {
             foreach (var service in this.serviceResolvers.Values)
             {

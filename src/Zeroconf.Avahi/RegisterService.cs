@@ -113,7 +113,7 @@ public class RegisterService : Service, IRegisterService
 
     public async Task StopRegister()
     {
-        using (await this.serviceLock.Enter("RegisterStop").ConfigureAwait(false))
+        using (await this.serviceLock.Enter("StopRegister").ConfigureAwait(false))
         {
             if (this.entryGroup == null)
             {

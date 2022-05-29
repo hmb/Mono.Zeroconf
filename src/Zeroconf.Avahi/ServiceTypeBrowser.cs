@@ -134,7 +134,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
 
     public async Task StopBrowse()
     {
-        using (await this.serviceTypeBrowserLock.Enter("Dispose").ConfigureAwait(false))
+        using (await this.serviceTypeBrowserLock.Enter("StopBrowse").ConfigureAwait(false))
         {
             this.newServiceTypeWatcher?.Dispose();
             this.newServiceTypeWatcher = null;

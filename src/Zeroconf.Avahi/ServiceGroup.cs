@@ -161,6 +161,11 @@ public class ServiceGroup : IServiceGroup
             }
 
             await this.entryGroup.ResetAsync();
+            
+            // this apparently is a bug in avahi (or a known issue, or broken by design):
+            // after reset and republish the services do not get republished
+            // if only payload data changes (port, target and txt)
+            await Task.Delay(1000);
         }
     }
 

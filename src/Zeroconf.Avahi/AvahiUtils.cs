@@ -36,7 +36,7 @@ public static class AvahiUtils
 {
     public const int AvahiInterfaceIndexAny = -1;
 
-    public static IpProtocolType ZeroconfToAvahiIpAddressProtocol(Abstraction.IpProtocolType ipProtocolType)
+    public static IpProtocolType ZeroconfToAvahiIpProtocolType(Abstraction.IpProtocolType ipProtocolType)
     {
         return ipProtocolType switch
         {

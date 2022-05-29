@@ -115,9 +115,8 @@ public class RegisterService : Service, IRegisterService
 
             await this.entryGroup.AddServiceAsync(
                 this.AvahiInterfaceIndex,
-                this.AvahiIpProtocolType.ToNativeAvahiProtocolType(),
-                // TODO add cast function
-                (uint)PublishFlags.None,
+                this.AvahiIpProtocolType.ToNativeAvahi(),
+                PublishFlags.None.ToNativeAvahi(),
                 this.Name,
                 this.RegType,
                 this.ReplyDomain,

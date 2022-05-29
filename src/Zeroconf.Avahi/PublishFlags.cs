@@ -28,22 +28,21 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace Zeroconf.Avahi
-{
-    using System;
+namespace Zeroconf.Avahi;
 
-    [Flags]
-    public enum PublishFlags : uint
-    {
-        None = 0,
-        Unique = 1,
-        NoProbe = 2,
-        NoAnnounce = 4,
-        AllowMultiple = 8,
-        NoReverse = 16,
-        NoCookie = 32,
-        Update = 64,
-        UseWideArea = 128,
-        UseMulticast = 256
-    }
+using System;
+
+[Flags]
+public enum PublishFlags : uint
+{
+    None = 0,
+    Unique = 1,
+    NoProbe = 2,
+    NoAnnounce = 4,
+    AllowMultiple = 8,
+    NoReverse = 16,
+    NoCookie = 32,
+    Update = 64,
+    UseWideArea = 128,
+    UseMulticast = 256
 }

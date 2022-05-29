@@ -55,7 +55,7 @@ public class ProviderFactory : IProviderFactory
         return new ServiceTypeBrowser(
             this.loggerFactory,
             AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
-            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            AvahiUtils.ZeroconfToAvahiIpProtocolType(ipProtocolType),
             replyDomain);
     }
 
@@ -68,7 +68,7 @@ public class ProviderFactory : IProviderFactory
         return new ServiceBrowser(
             this.loggerFactory,
             AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
-            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            AvahiUtils.ZeroconfToAvahiIpProtocolType(ipProtocolType),
             regtype,
             domain);
     }
@@ -83,7 +83,7 @@ public class ProviderFactory : IProviderFactory
         return new ServiceResolver(
             this.loggerFactory,
             AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
-            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            AvahiUtils.ZeroconfToAvahiIpProtocolType(ipProtocolType),
             name,
             regtype,
             domain);
@@ -101,7 +101,7 @@ public class ProviderFactory : IProviderFactory
         return new RegisterService(
 //            this.loggerFactory,
             AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
-            AvahiUtils.ZeroconfToAvahiIpAddressProtocol(ipProtocolType),
+            AvahiUtils.ZeroconfToAvahiIpProtocolType(ipProtocolType),
             name,
             regType,
             replyDomain,

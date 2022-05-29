@@ -159,7 +159,7 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
             foreach (var service in this.serviceBrowsers.Values)
             {
                 this.RaiseServiceTypeRemoved(service.ServiceBrowser);
-                service.ServiceBrowser.Dispose();
+                await service.ServiceBrowser.StopBrowse().ConfigureAwait(false);
             }
 
             this.serviceBrowsers.Clear();

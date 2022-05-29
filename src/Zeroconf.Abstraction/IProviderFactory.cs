@@ -52,6 +52,8 @@ public interface IProviderFactory
         string regType,
         string replyDomain);
 
+    public IServiceGroup CreateServiceGroup();
+    
     public IRegisterService CreateRegisterService(
         uint interfaceIndex,
         IpProtocolType ipProtocolType,

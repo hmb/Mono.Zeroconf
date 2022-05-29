@@ -44,4 +44,5 @@ public interface IRegisterService : IService, IDisposable
     ushort Port { get; set; }
 
     Task Register();
+    Task StopRegister();
 }

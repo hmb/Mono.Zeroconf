@@ -45,4 +45,5 @@ public interface IServiceBrowser : IEnumerable<IResolvableService>, IDisposable
     string ReplyDomain { get; }
 
     Task Browse();
+    Task StopBrowse();
 }

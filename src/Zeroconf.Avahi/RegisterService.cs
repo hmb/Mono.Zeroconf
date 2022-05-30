@@ -39,7 +39,8 @@ using Zeroconf.Avahi.Threading;
 
 public class RegisterService : Service, IRegisterService
 {
-    private readonly AsyncLock serviceLock = new();
+    private readonly IAsyncLock serviceLock = new AsyncLock();
+    
     private IEntryGroup? entryGroup;
     private IDisposable? stateChangeWatcher;
 

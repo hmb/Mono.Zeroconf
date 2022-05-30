@@ -41,7 +41,7 @@ internal static class DBusManager
     private const string AvahiDbusName = "org.freedesktop.Avahi";
     private const uint MinimumAvahiApiVersion = 515;
 
-    private static readonly AsyncLock s_serverLock = new();
+    private static readonly IAsyncLock s_serverLock = new AsyncLock();
 
     public static async Task Initialize()
     {

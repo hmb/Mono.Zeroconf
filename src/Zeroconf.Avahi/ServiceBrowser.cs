@@ -56,8 +56,8 @@ public class ServiceBrowser : IServiceBrowser
     private readonly ILoggerFactory loggerFactory;
     private readonly ILogger logger;
     private readonly Dictionary<string, CountedResolver> serviceResolvers = new();
-    private readonly AsyncLockDebug serviceBrowserLock;
-    private readonly AsyncLockDebug serviceResolverLock;
+    private readonly IAsyncLock serviceBrowserLock;
+    private readonly IAsyncLock serviceResolverLock;
 
     private readonly int interfaceIndex;
     private readonly IpProtocolType ipProtocolType;

@@ -1,30 +1,21 @@
 ﻿namespace Zeroconf.Avahi.Threading;
 
-using Microsoft.Extensions.Logging;
-
-public class AsyncLock : SemaphoreSlim
+public class AsyncLock : SemaphoreSlim, IAsyncLock
 {
     public AsyncLock() : base(1, 1)
     {
     }
 
-    public AsyncLock(ILogger _, string __) : base(1, 1)
+    public async Task<IDisposable> Enter()
     {
-    }
-}
-
-public static class AsyncLockExtension
-{
-    public static async Task<IDisposable> Enter(this AsyncLock semaphore)
-    {
-        var wrapper = new LockHolder(semaphore);
+        var wrapper = new LockHolder(this);
         await wrapper.Semaphore.WaitAsync().ConfigureAwait(false);
         return wrapper;
     }
 
-    public static async Task<IDisposable> Enter(this AsyncLock semaphore, string _)
+    public async Task<IDisposable> Enter(string _)
     {
-        var wrapper = new LockHolder(semaphore);
+        var wrapper = new LockHolder(this);
         await wrapper.Semaphore.WaitAsync().ConfigureAwait(false);
         return wrapper;
     }

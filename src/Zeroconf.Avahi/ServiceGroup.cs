@@ -36,11 +36,10 @@ using Zeroconf.Avahi.Threading;
 
 public class ServiceGroup : IServiceGroup
 {
-    private readonly AsyncLock serviceLock = new();
-    
     private readonly ILoggerFactory loggerFactory;
     private readonly ILogger logger;
-
+    private readonly IAsyncLock serviceLock;
+    
     private IEntryGroup? entryGroup;
     private IDisposable? stateChangeWatcher;
 
@@ -48,6 +47,7 @@ public class ServiceGroup : IServiceGroup
     {
         this.loggerFactory = loggerFactory;
         this.logger = loggerFactory.CreateLogger<ILoggerFactory>();
+        this.serviceLock = new AsyncLockDebug(this.logger, "serviceLock");
     }
 
     public void Dispose()

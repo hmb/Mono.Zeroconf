@@ -41,15 +41,15 @@ using Zeroconf.Avahi.Threading;
 
 public class ServiceResolver : Service, IResolvableService, IDisposable
 {
-    private readonly ILogger logger;
-    private readonly AsyncLockDebug serviceLock;
+    private readonly ILogger<ServiceResolver> logger;
+    private readonly IAsyncLock serviceLock;
 
     private IServiceResolver? resolver;
     private IDisposable? foundWatcher;
     private IDisposable? failureWatcher;
 
     public ServiceResolver(
-        ILoggerFactory loggerFactory,
+        ILogger<ServiceResolver> logger,
         int interfaceIndex,
         IpProtocolType ipProtocolType,
         string name,
@@ -57,7 +57,7 @@ public class ServiceResolver : Service, IResolvableService, IDisposable
         string replyDomain)
         : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
-        this.logger = loggerFactory.CreateLogger<ServiceResolver>();
+        this.logger = logger;
         this.serviceLock = new AsyncLockDebug(this.logger, "serviceLock");
         this.FullName = string.Empty;
         this.HostEntry = null!;

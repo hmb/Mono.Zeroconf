@@ -202,7 +202,7 @@ public class ServiceBrowser : IServiceBrowser
             {
                 this.logger.LogDebug("create new resolver {Key}", key);
                 var newServiceResolver = new ServiceResolver(
-                    this.loggerFactory,
+                    this.loggerFactory.CreateLogger<ServiceResolver>(),
                     serviceData.interfaceIndex,
                     (IpProtocolType)serviceData.protocol,
                     serviceData.name,

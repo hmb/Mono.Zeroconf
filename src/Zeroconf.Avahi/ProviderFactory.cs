@@ -81,7 +81,7 @@ public class ProviderFactory : IProviderFactory
         string domain)
     {
         return new ServiceResolver(
-            this.loggerFactory,
+            this.loggerFactory.CreateLogger<ServiceResolver>(),
             AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
             AvahiUtils.ZeroconfToAvahiIpProtocolType(ipProtocolType),
             name,
@@ -99,7 +99,7 @@ public class ProviderFactory : IProviderFactory
         ushort port)
     {
         return new RegisterService(
-//            this.loggerFactory,
+            this.loggerFactory.CreateLogger<RegisterService>(),
             AvahiUtils.ZeroconfToAvahiInterfaceIndex(interfaceIndex),
             AvahiUtils.ZeroconfToAvahiIpProtocolType(ipProtocolType),
             name,
@@ -111,7 +111,8 @@ public class ProviderFactory : IProviderFactory
 
     public IServiceGroup CreateServiceGroup()
     {
-        return new ServiceGroup(this.loggerFactory);
+        return new ServiceGroup(
+            this.loggerFactory.CreateLogger<ServiceGroup>());
     }
 
     public ITxtRecord CreateTxtRecord()

@@ -32,6 +32,7 @@ namespace Zeroconf.Avahi;
 
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Tmds.DBus;
 using Zeroconf.Abstraction;
 using Zeroconf.Avahi.DBus;
@@ -39,12 +40,14 @@ using Zeroconf.Avahi.Threading;
 
 public class RegisterService : Service, IRegisterService
 {
-    private readonly IAsyncLock serviceLock = new AsyncLock();
-    
+    private readonly ILogger<RegisterService> logger;
+    private readonly IAsyncLock serviceLock;
+
     private IEntryGroup? entryGroup;
     private IDisposable? stateChangeWatcher;
 
     public RegisterService(
+        ILogger<RegisterService> logger,
         int interfaceIndex,
         IpProtocolType ipProtocolType,
         string name,
@@ -54,6 +57,8 @@ public class RegisterService : Service, IRegisterService
         ushort port)
         : base(interfaceIndex, ipProtocolType, name, regType, replyDomain)
     {
+        this.logger = logger;
+        this.serviceLock = new AsyncLockDebug(this.logger, "serviceLock");
         this.Target = target;
         this.Port = port;
     }
@@ -87,6 +92,7 @@ public class RegisterService : Service, IRegisterService
                 throw new InvalidOperationException("The service is already registered");
             }
             
+            this.logger.LogDebug("Create the entry group for the register service");
             this.entryGroup = await DBusManager.Server.EntryGroupNewAsync().ConfigureAwait(false);
             this.stateChangeWatcher = await this.entryGroup.WatchStateChangedAsync(this.OnEntryGroupStateChanged).ConfigureAwait(false);
 
@@ -97,6 +103,7 @@ public class RegisterService : Service, IRegisterService
 
             var avahiTxtRecord = this.TxtRecord?.Render() ?? Array.Empty<byte[]>();
 
+            this.logger.LogDebug("Add a single service");
             await this.entryGroup.AddServiceAsync(
                 this.AvahiInterfaceIndex,
                 this.AvahiIpProtocolType.ToNativeAvahi(),

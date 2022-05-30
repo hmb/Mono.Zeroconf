@@ -54,8 +54,8 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
     private readonly ILoggerFactory loggerFactory;
     private readonly ILogger logger;
     private readonly Dictionary<string, CountedBrowser> serviceBrowsers = new();
-    private readonly AsyncLock serviceTypeBrowserLock;
-    private readonly AsyncLock serviceBrowsersLock;
+    private readonly AsyncLockDebug serviceTypeBrowserLock;
+    private readonly AsyncLockDebug serviceBrowsersLock;
 
     private readonly int interfaceIndex;
     private readonly IpProtocolType ipProtocolType;
@@ -72,8 +72,8 @@ public class ServiceTypeBrowser : IServiceTypeBrowser
     {
         this.loggerFactory = loggerFactory;
         this.logger = loggerFactory.CreateLogger<ServiceTypeBrowser>();
-        this.serviceTypeBrowserLock = new AsyncLock(this.logger);
-        this.serviceBrowsersLock = new AsyncLock(this.logger);
+        this.serviceTypeBrowserLock = new AsyncLockDebug(this.logger, "serviceTypeBrowserLock");
+        this.serviceBrowsersLock = new AsyncLockDebug(this.logger, "serviceBrowsersLock");
         this.interfaceIndex = interfaceIndex;
         this.ipProtocolType = ipProtocolType;
         this.ReplyDomain = replyDomain;
